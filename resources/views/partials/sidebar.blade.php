@@ -67,194 +67,230 @@
                     </a>
                 </li>
 
-                <!-- Loan Management - DROPS DOWN VERTICALLY -->
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('admin.loans.*') ? 'active' : '' }}"
-                       href="#loanManagement" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="loanManagement">
+                <!-- Loan Management - Flat structure -->
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.index') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.index') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Loan Management</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                        <span style="font-size: 13px;">All Loans</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.applications') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.applications') }}">
+                        <i class="fas fa-file-alt me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Applications</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.pending') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.pending') }}">
+                        <i class="fas fa-clock me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Pending</span>
                         @php $pendingLoans = \App\Models\LoanApplication::where('status', 'pending')->count(); @endphp
                         @if($pendingLoans > 0)
                             <span class="sidebar-badge">{{ $pendingLoans }}</span>
                         @endif
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('admin.loans.pending') || request()->routeIs('admin.loans.under-verification') || request()->routeIs('admin.loans.verified') || request()->routeIs('admin.loans.approved') || request()->routeIs('admin.loans.disbursed') || request()->routeIs('admin.loans.completed') || request()->routeIs('admin.loans.defaulters') ? 'show' : '' }}" id="loanManagement">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.index') ? 'active' : '' }}" href="{{ route('admin.loans.index') }}">
-                            <i class="fas fa-list me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">All Loans</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.applications') ? 'active' : '' }}" href="{{ route('admin.loans.applications') }}">
-                            <i class="fas fa-file-alt me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Applications</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.pending') ? 'active' : '' }}" href="{{ route('admin.loans.pending') }}">
-                            <i class="fas fa-clock me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Pending</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.under-verification') ? 'active' : '' }}" href="{{ route('admin.loans.under-verification') }}">
-                            <i class="fas fa-search me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Under Verification</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.verified') ? 'active' : '' }}" href="{{ route('admin.loans.verified') }}">
-                            <i class="fas fa-check-circle me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Verified</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.approved') ? 'active' : '' }}" href="{{ route('admin.loans.approved') }}">
-                            <i class="fas fa-thumbs-up me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Approved</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.disbursed') ? 'active' : '' }}" href="{{ route('admin.loans.disbursed') }}">
-                            <i class="fas fa-money-bill-wave me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Disbursed</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.completed') ? 'active' : '' }}" href="{{ route('admin.loans.completed') }}">
-                            <i class="fas fa-check-double me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Completed</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.loans.defaulters') ? 'active' : '' }}" href="{{ route('admin.loans.defaulters') }}">
-                            <i class="fas fa-exclamation-triangle me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Defaulters</span>
-                        </a>
-                    </div>
                 </li>
 
-                <!-- Payments - DROPS DOWN VERTICALLY -->
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}"
-                       href="#paymentManagement" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="paymentManagement">
-                        <i class="fas fa-credit-card me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Payments</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.under-verification') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.under-verification') }}">
+                        <i class="fas fa-search me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Under Verification</span>
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('admin.payments.collect') || request()->routeIs('admin.payments.history') ? 'show' : '' }}" id="paymentManagement">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.payments.collect') ? 'active' : '' }}" href="{{ route('admin.payments.collect') }}">
-                            <i class="fas fa-hand-holding-usd me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Collect Payment</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.payments.history') ? 'active' : '' }}" href="{{ route('admin.payments.history') }}">
-                            <i class="fas fa-history me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Payment History</span>
-                        </a>
-                    </div>
                 </li>
 
-                <!-- Savings Management - DROPS DOWN VERTICALLY -->
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('admin.savings.*') ? 'active' : '' }}"
-                       href="#savingsManagement" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="savingsManagement">
-                        <i class="fas fa-piggy-bank me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Savings</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.verified') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.verified') }}">
+                        <i class="fas fa-check-circle me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Verified</span>
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('admin.savings.index') || request()->routeIs('admin.savings.deposits') || request()->routeIs('admin.savings.withdrawals') || request()->routeIs('admin.savings.create') ? 'show' : '' }}" id="savingsManagement">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.savings.index') ? 'active' : '' }}" href="{{ route('admin.savings.index') }}">
-                            <i class="fas fa-list me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">All Transactions</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.savings.deposits') ? 'active' : '' }}" href="{{ route('admin.savings.deposits') }}">
-                            <i class="fas fa-arrow-down me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Deposits</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.savings.withdrawals') ? 'active' : '' }}" href="{{ route('admin.savings.withdrawals') }}">
-                            <i class="fas fa-arrow-up me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Withdrawals</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.savings.create') ? 'active' : '' }}" href="{{ route('admin.savings.create') }}">
-                            <i class="fas fa-plus-circle me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Add Transaction</span>
-                        </a>
-                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.approved') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.approved') }}">
+                        <i class="fas fa-thumbs-up me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Approved</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.disbursed') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.disbursed') }}">
+                        <i class="fas fa-money-bill-wave me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Disbursed</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.completed') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.completed') }}">
+                        <i class="fas fa-check-double me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Completed</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.defaulters') ? 'active' : '' }}"
+                       href="{{ route('admin.loans.defaulters') }}">
+                        <i class="fas fa-exclamation-triangle me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Defaulters</span>
+                    </a>
+                </li>
+
+                <!-- Payments - Flat structure -->
+                <li class="nav-section mt-3 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Payments</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.payments.collect') ? 'active' : '' }}"
+                       href="{{ route('admin.payments.collect') }}">
+                        <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Collect Payment</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.payments.history') ? 'active' : '' }}"
+                       href="{{ route('admin.payments.history') }}">
+                        <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Payment History</span>
+                    </a>
+                </li>
+
+                <!-- Savings - Flat structure -->
+                <li class="nav-section mt-3 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Savings</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.index') ? 'active' : '' }}"
+                       href="{{ route('admin.savings.index') }}">
+                        <i class="fas fa-list me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">All Transactions</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.deposits') ? 'active' : '' }}"
+                       href="{{ route('admin.savings.deposits') }}">
+                        <i class="fas fa-arrow-down me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Deposits</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.withdrawals') ? 'active' : '' }}"
+                       href="{{ route('admin.savings.withdrawals') }}">
+                        <i class="fas fa-arrow-up me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Withdrawals</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.create') ? 'active' : '' }}"
+                       href="{{ route('admin.savings.create') }}">
+                        <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Add Transaction</span>
+                    </a>
                 </li>
 
                 <!-- Reports -->
-                <li class="nav-section mt-2 mb-1 px-3">
+                <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Reports & Analytics</small>
                 </li>
 
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
-                       href="#reports" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="reports">
-                        <i class="fas fa-chart-bar me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Reports</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.savings') ? 'active' : '' }}"
+                       href="{{ route('admin.reports.savings') }}">
+                        <i class="fas fa-chart-line me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Savings Report</span>
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('admin.reports.savings') || request()->routeIs('admin.reports.loans') || request()->routeIs('admin.reports.financial-summary') ? 'show' : '' }}" id="reports">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.reports.savings') ? 'active' : '' }}" href="{{ route('admin.reports.savings') }}">
-                            <i class="fas fa-chart-line me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Savings Report</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.reports.loans') ? 'active' : '' }}" href="{{ route('admin.reports.loans') }}">
-                            <i class="fas fa-chart-bar me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Loans Report</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('admin.reports.financial-summary') ? 'active' : '' }}" href="{{ route('admin.reports.financial-summary') }}">
-                            <i class="fas fa-file-invoice-dollar me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Financial Summary</span>
-                        </a>
-                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.loans') ? 'active' : '' }}"
+                       href="{{ route('admin.reports.loans') }}">
+                        <i class="fas fa-chart-bar me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Loans Report</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.financial-summary') ? 'active' : '' }}"
+                       href="{{ route('admin.reports.financial-summary') }}">
+                        <i class="fas fa-file-invoice-dollar me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Financial Summary</span>
+                    </a>
                 </li>
 
             @elseif(auth()->user()->hasRole('treasurer'))
-                <!-- TREASURER MENU -->
+                <!-- TREASURER MENU - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Loan Operations</small>
                 </li>
 
-                <!-- Loan Repayments - DROPS DOWN VERTICALLY -->
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('treasurer.repayments.*') || request()->routeIs('treasurer.loans.*') ? 'active' : '' }}"
-                       href="#loanRepayments" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="loanRepayments">
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.repayments.collect') ? 'active' : '' }}"
+                       href="{{ route('treasurer.repayments.collect') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Loan Repayments</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                        <span style="font-size: 13px;">Collect Payment</span>
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('treasurer.repayments.collect') || request()->routeIs('treasurer.repayments.index') || request()->routeIs('treasurer.loans.assigned') ? 'show' : '' }}" id="loanRepayments">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.repayments.collect') ? 'active' : '' }}" href="{{ route('treasurer.repayments.collect') }}">
-                            <i class="fas fa-hand-holding-usd me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Collect Payment</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.repayments.index') ? 'active' : '' }}" href="{{ route('treasurer.repayments.index') }}">
-                            <i class="fas fa-history me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Payment History</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.loans.assigned') ? 'active' : '' }}" href="{{ route('treasurer.loans.assigned') }}">
-                            <i class="fas fa-tasks me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">My Assigned Loans</span>
-                            @php
-                                $assignedLoans = \App\Models\LoanApplication::where('treasurer_id', auth()->id())
-                                    ->whereIn('status', ['disbursed', 'approved'])
-                                    ->count();
-                            @endphp
-                            @if($assignedLoans > 0)
-                                <span class="sidebar-badge">{{ $assignedLoans }}</span>
-                            @endif
-                        </a>
-                    </div>
                 </li>
 
-                <!-- Loan Verification - DROPS DOWN VERTICALLY -->
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('treasurer.verifications.*') ? 'active' : '' }}"
-                       href="#verifications" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="verifications">
-                        <i class="fas fa-check-circle me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Verifications</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.repayments.index') ? 'active' : '' }}"
+                       href="{{ route('treasurer.repayments.index') }}">
+                        <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Payment History</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.loans.assigned') ? 'active' : '' }}"
+                       href="{{ route('treasurer.loans.assigned') }}">
+                        <i class="fas fa-tasks me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">My Assigned Loans</span>
+                        @php
+                            $assignedLoans = \App\Models\LoanApplication::where('treasurer_id', auth()->id())
+                                ->whereIn('status', ['disbursed', 'approved'])
+                                ->count();
+                        @endphp
+                        @if($assignedLoans > 0)
+                            <span class="sidebar-badge">{{ $assignedLoans }}</span>
+                        @endif
+                    </a>
+                </li>
+
+                <li class="nav-section mt-2 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Verifications</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.verifications.pending') ? 'active' : '' }}"
+                       href="{{ route('treasurer.verifications.pending') }}">
+                        <i class="fas fa-clock me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Pending</span>
                         @php $pendingVerifications = \App\Models\LoanApplication::where('treasurer_id', auth()->id())->where('status', 'under_verification')->count(); @endphp
                         @if($pendingVerifications > 0)
                             <span class="sidebar-badge">{{ $pendingVerifications }}</span>
                         @endif
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('treasurer.verifications.pending') || request()->routeIs('treasurer.verifications.verified') ? 'show' : '' }}" id="verifications">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.verifications.pending') ? 'active' : '' }}" href="{{ route('treasurer.verifications.pending') }}">
-                            <i class="fas fa-clock me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Pending</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.verifications.verified') ? 'active' : '' }}" href="{{ route('treasurer.verifications.verified') }}">
-                            <i class="fas fa-check me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Verified</span>
-                        </a>
-                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.verifications.verified') ? 'active' : '' }}"
+                       href="{{ route('treasurer.verifications.verified') }}">
+                        <i class="fas fa-check me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Verified</span>
+                    </a>
                 </li>
 
                 <!-- Savings Section -->
@@ -262,35 +298,40 @@
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Savings</small>
                 </li>
 
-                <li class="nav-item dropdown-vertical">
-                    <a class="nav-link py-2 px-3 dropdown-toggle {{ request()->routeIs('treasurer.savings.*') ? 'active' : '' }}"
-                       href="#treasurerSavings" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="treasurerSavings">
-                        <i class="fas fa-piggy-bank me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Savings</span>
-                        <i class="fas fa-chevron-down ms-auto dropdown-icon" style="font-size: 10px;"></i>
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.transactions') ? 'active' : '' }}"
+                       href="{{ route('treasurer.savings.transactions') }}">
+                        <i class="fas fa-list me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">All Transactions</span>
                     </a>
-                    <div class="collapse dropdown-menu-vertical {{ request()->routeIs('treasurer.savings.transactions') || request()->routeIs('treasurer.savings.create') ? 'show' : '' }}" id="treasurerSavings">
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.savings.transactions') ? 'active' : '' }}" href="{{ route('treasurer.savings.transactions') }}">
-                            <i class="fas fa-list me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">All Transactions</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.savings.deposits') ? 'active' : '' }}" href="{{ route('treasurer.savings.deposits') }}">
-                            <i class="fas fa-arrow-down me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Deposits</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.savings.withdrawals') ? 'active' : '' }}" href="{{ route('treasurer.savings.withdrawals') }}">
-                            <i class="fas fa-arrow-up me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Withdrawals</span>
-                        </a>
-                        <a class="dropdown-item py-2 px-3 {{ request()->routeIs('treasurer.savings.create') ? 'active' : '' }}" href="{{ route('treasurer.savings.create') }}">
-                            <i class="fas fa-plus-circle me-2" style="width: 18px; font-size: 12px;"></i>
-                            <span style="font-size: 12px;">Record Transaction</span>
-                        </a>
-                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.deposits') ? 'active' : '' }}"
+                       href="{{ route('treasurer.savings.deposits') }}">
+                        <i class="fas fa-arrow-down me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Deposits</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.withdrawals') ? 'active' : '' }}"
+                       href="{{ route('treasurer.savings.withdrawals') }}">
+                        <i class="fas fa-arrow-up me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Withdrawals</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.create') ? 'active' : '' }}"
+                       href="{{ route('treasurer.savings.create') }}">
+                        <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Record Transaction</span>
+                    </a>
                 </li>
 
             @else
-                <!-- MEMBER MENU - Simple & Clear -->
+                <!-- MEMBER MENU - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">My Savings</small>
                 </li>
@@ -341,7 +382,7 @@
             @endif
 
             <!-- PROFILE - Common for all -->
-            <li class="nav-section mt-2 mb-1 px-3">
+            <li class="nav-section mt-3 mb-1 px-3">
                 <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Account</small>
             </li>
 
@@ -375,43 +416,6 @@
         </form>
     </div>
 </nav>
-
-<!-- JavaScript for dropdown toggle animation -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle dropdown icon rotation
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                const icon = this.querySelector('.dropdown-icon');
-
-                if (target) {
-                    const bsCollapse = new bootstrap.Collapse(target, {
-                        toggle: true
-                    });
-
-                    target.addEventListener('show.bs.collapse', function() {
-                        icon.style.transform = 'rotate(180deg)';
-                    });
-
-                    target.addEventListener('hide.bs.collapse', function() {
-                        icon.style.transform = 'rotate(0deg)';
-                    });
-                }
-            });
-
-            // Set initial icon rotation
-            const target = document.querySelector(toggle.getAttribute('href'));
-            const icon = toggle.querySelector('.dropdown-icon');
-            if (target && target.classList.contains('show')) {
-                icon.style.transform = 'rotate(180deg)';
-            }
-        });
-    });
-</script>
 
 <style>
     /* Sidebar Variables */
@@ -498,7 +502,7 @@
         margin: 0.125rem 0.5rem;
     }
 
-    .nav-link, .dropdown-item {
+    .nav-link {
         color: var(--sidebar-text);
         padding: 0.5rem 0.75rem;
         border-radius: 6px;
@@ -507,59 +511,35 @@
         align-items: center;
         text-decoration: none;
         border: 1px solid transparent;
-        cursor: pointer;
-        background: transparent;
         width: 100%;
-        text-align: left;
     }
 
-    .nav-link:hover, .dropdown-item:hover {
+    .nav-link:hover {
         background: var(--sidebar-hover);
         color: white;
         border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .nav-link.active, .dropdown-item.active {
+    .nav-link.active {
         background: var(--sidebar-active);
         color: white;
         font-weight: 600;
         border-left: 3px solid #ffd700;
     }
 
-    .nav-link i, .dropdown-item i {
+    .nav-link i {
         min-width: 20px;
         opacity: 0.8;
     }
 
-    .dropdown-icon {
-        transition: transform 0.3s ease;
-        margin-left: auto;
-        opacity: 0.7;
-    }
-
-    /* Dropdown Menu - EXPANDS VERTICALLY BELOW */
-    .dropdown-menu-vertical {
-        padding: 0.25rem 0 0.25rem 1.5rem;
-        margin: 0;
-        border: none;
-        background: transparent;
-    }
-
-    .dropdown-menu-vertical .dropdown-item {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.9rem;
-        margin-bottom: 0.125rem;
-    }
-
-    .dropdown-menu-vertical .dropdown-item i {
-        font-size: 12px;
-        width: 18px;
+    .nav-link:hover i,
+    .nav-link.active i {
+        opacity: 1;
     }
 
     /* Sidebar Badge */
     .sidebar-badge {
         margin-left: auto;
-        margin-right: 20px;
         font-size: 10px;
         padding: 2px 6px;
         border-radius: 10px;

@@ -63,7 +63,7 @@ class RolePermissionSeeder extends Seeder
         // Create users
         $admin = User::create([
             'name' => 'System Administrator',
-            'email' => 'admin@save.com',
+            'email' => 'admin@sacco.com',
             'password' => Hash::make('password'),
             'phone_number' => '+256700000001',
             'address' => 'Kampala',
@@ -76,7 +76,7 @@ class RolePermissionSeeder extends Seeder
 
         $treasurer = User::create([
             'name' => 'John Treasurer',
-            'email' => 'treasurer@save.com',
+            'email' => 'treasurer@sacco.com',
             'password' => Hash::make('password'),
             'phone_number' => '+256700000002',
             'address' => 'Kampala',
@@ -89,7 +89,7 @@ class RolePermissionSeeder extends Seeder
 
         $member = User::create([
             'name' => 'Alice Member',
-            'email' => 'alice@save.com',
+            'email' => 'alice@ssacco.com',
             'password' => Hash::make('password'),
             'phone_number' => '+256700000003',
             'address' => 'Kampala',
