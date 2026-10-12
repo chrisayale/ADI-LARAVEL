@@ -26,7 +26,8 @@ class User extends Authenticatable
         'next_of_kin_name',
         'next_of_kin_phone',
         'next_of_kin_relationship',
-        'profile_photo'
+        'profile_photo',
+        'sacco_id'
     ];
 
     protected $hidden = [
@@ -40,6 +41,13 @@ class User extends Authenticatable
         'membership_date' => 'date',
     ];
 
+    /**
+     * Get the SACCO that the user belongs to.
+     */
+    public function sacco()
+    {
+        return $this->belongsTo(Sacco::class);
+    }
 
 
 /**
@@ -127,7 +135,6 @@ public function completedSavingsTransactions()
 }
 
 
-
 public function getPendingSavingsAttribute()
 {
     return $this->savingsTransactions()
@@ -148,8 +155,8 @@ public function getLastTransactionAttribute()
         ->where('status', 'approved')
         ->latest()
         ->first();
-}
 
+}
   public function savingsTransactions()
     {
         return $this->hasMany(SavingsTransaction::class);
@@ -196,5 +203,4 @@ public function getLastTransactionAttribute()
     /**
      * Get the profile associated with the user.
      */
-
 }

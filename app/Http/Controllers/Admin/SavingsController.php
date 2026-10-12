@@ -470,8 +470,8 @@ class SavingsController extends Controller
         $monthlyStats = SavingsTransaction::where('user_id', $request->user_id)
             ->where('status', 'approved')
             ->select(
-                DB::raw('MONTH(transaction_date) as month'),
-                DB::raw('YEAR(transaction_date) as year'),
+                DB::raw('CAST(strftime(\'%m\', transaction_date) AS INTEGER) as month'),
+                DB::raw('CAST(strftime(\'%Y\', transaction_date) AS INTEGER) as year'),
                 DB::raw("SUM(CASE WHEN transaction_type = 'deposit' THEN amount ELSE 0 END) as deposits"),
                 DB::raw("SUM(CASE WHEN transaction_type = 'withdrawal' THEN amount ELSE 0 END) as withdrawals")
             )

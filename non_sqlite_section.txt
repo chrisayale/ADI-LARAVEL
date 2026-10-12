@@ -1,0 +1,8 @@
+            // For other databases (MySQL, PostgreSQL), use the standard approach
+            Schema::table('loan_applications', function (Blueprint $table) {
+                // Drop existing foreign key constraint
+                $table->dropForeign(['sacco_id']);
+
+                // Recreate with correct reference
+                $table->foreignId('sacco_id')->nullable()->constrained('sacos')->onDelete('restrict');
+            });

@@ -76,6 +76,12 @@
             </a>
         @endif
     </form>
+        <form method="GET" action="{{ route('request-sacco.create') }}" class="mt-3">
+            <button type="submit" class="btn-auth mb-3">
+                <i class="fas fa-plus"></i>
+                <span>Demander la création d'un SACCO</span>
+            </button>
+        </form>
 @endsection
 @push('scripts')
 <script>

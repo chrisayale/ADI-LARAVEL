@@ -30,8 +30,8 @@ class SavingsController extends Controller
         // Monthly summary for chart
         $monthlyData = $user->savingsTransactions()
             ->select(
-                \DB::raw('MONTH(created_at) as month'),
-                \DB::raw('YEAR(created_at) as year'),
+                \DB::raw('CAST(strftime(\'%m\', created_at) AS INTEGER) as month'),
+                \DB::raw('CAST(strftime(\'%Y\', created_at) AS INTEGER) as year'),
                 \DB::raw("SUM(CASE WHEN transaction_type = 'deposit' THEN amount ELSE 0 END) as deposits"),
                 \DB::raw("SUM(CASE WHEN transaction_type = 'withdrawal' THEN amount ELSE 0 END) as withdrawals")
             )

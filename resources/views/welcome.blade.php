@@ -625,12 +625,14 @@
                             <h2 class="display-5 fw-bold text-dark mb-4">Ready to Transform Your Investment Club?</h2>
                             <p class="lead text-muted mb-5">Join hundreds of successful members who have already
                                 transformed their financial journey.</p>
-                            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-
-                                <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg px-5 py-3">
-                                    <i class="fas fa-sign-in-alt me-2"></i>Existing Member Login
-                                </a>
-                            </div>
+<div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+        <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg px-5 py-3">
+            <i class="fas fa-sign-in-alt me-2"></i>Existing Member Login
+        </a>
+        <a href="{{ route('request-sacco.create') }}" class="btn btn-success btn-lg px-5 py-3">
+            <i class="fas fa-plus me-2"></i>Request New SACCO
+        </a>
+    </div>
                             <p class="mt-5 mb-0 text-muted">
                                 <i class="fas fa-phone me-2"></i>+256 700 123456 |
                                 <i class="fas fa-envelope ms-3 me-2"></i>info@capitalclub.org |

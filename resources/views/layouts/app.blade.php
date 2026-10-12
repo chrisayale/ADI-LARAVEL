@@ -581,11 +581,13 @@ function updateNotificationList(notifications) {
     list.innerHTML = html;
 }
 
+@auth
 // Load notifications every 30 seconds
 $(document).ready(function() {
     loadNotifications();
     setInterval(loadNotifications, 30000);
 });
+@endauth
 </script>
 
 <!-- Page Specific Scripts -->

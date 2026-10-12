@@ -1,0 +1,10 @@
+                });
+                
+                $sql = "INSERT INTO loan_applications_new (id, application_number, user_id, treasurer_id, sacco_id, amount_applied, amount_approved, interest_rate, duration_months, monthly_repayment, total_repayable, purpose, has_collateral, collateral_type, collateral_description, collateral_value, status, verified_by, verified_at, verification_notes, approved_by, approved_at, approval_notes, disbursed_by, disbursed_at, first_payment_date, maturity_date, created_at, updated_at, deleted_at)
+                        SELECT id, application_number, user_id, treasurer_id, sacco_id, amount_applied, amount_approved, interest_rate, duration_months, monthly_repayment, total_repayable, purpose, has_collateral, collateral_type, collateral_description, collateral_value, status, verified_by, verified_at, verification_notes, approved_by, approved_at, approval_notes, disbursed_by, disbursed_at, first_payment_date, maturity_date, created_at, updated_at, deleted_at
+                        FROM loan_applications";
+                DB::statement($sql);
+                
+                // Drop old table and rename new table
+                Schema::dropIfExists('loan_applications');
+                Schema::rename('loan_applications_new', 'loan_applications');

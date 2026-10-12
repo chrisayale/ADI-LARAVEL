@@ -22,6 +22,8 @@ class SavingsTransaction extends Model
         'recorded_by',
         'status',
         'balance_after' // Changed from 'balance_before' and 'balance_after' to just 'balance_after'
+        ,
+        'sacco_id'
     ];
 
     protected $casts = [

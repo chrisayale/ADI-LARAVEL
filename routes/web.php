@@ -1,11 +1,13 @@
 <?php
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\SavingsController;
+use App\Http\Controllers\Admin\SaccoController as AdminSaccoController;
+use App\Http\Controllers\Admin\RequestSaccoController as AdminRequestSaccoController;
 use App\Http\Controllers\Treasurer\DashboardController as TreasurerDashboardController;
 use App\Http\Controllers\Treasurer\SavingsController as TreasurerSavingsController;
 use App\Http\Controllers\Treasurer\LoanVerificationController as TreasurerLoanVerificationController;
@@ -16,6 +18,8 @@ use App\Http\Controllers\Member\SavingsController as MemberSavingsController;
 use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuperAdmin\SaccoController as SuperAdminSaccoController;
+use App\Http\Controllers\RequestSaccoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -29,10 +33,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
 // Public pages
 Route::view('/services', 'services')->name('services');
 Route::view('/testimonials', 'testimonials')->name('testimonials');
 Route::view('/team', 'team')->name('team');
+
+// Test route to verify routing is working
+Route::get('/test-route', function () {
+    return 'Test route working';
+});
 
 
 // Authentication routes
@@ -144,7 +154,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/{loan}/mark-completed', [AdminLoanController::class, 'markCompleted'])->name('mark-completed');
 
 
-
         // Document download route - ADD THIS
         Route::get('/documents/{document}/download', [AdminLoanController::class, 'downloadDocument'])->name('download-document');
 
@@ -169,33 +178,48 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 
     // ========== ADMIN SAVINGS MANAGEMENT ==========
-Route::prefix('savings')->name('savings.')->group(function () {
-    // ===== STATIC ROUTES (NO PARAMETERS) - These must come first =====
+    Route::prefix('savings')->name('savings.')->group(function () {
+        // ===== STATIC ROUTES (NO PARAMETERS) - These must come first =====
 
-    // Main listing and create forms
-    Route::get('/', [SavingsController::class, 'index'])->name('index');
-    Route::get('/create', [SavingsController::class, 'create'])->name('create');
-    Route::post('/', [SavingsController::class, 'store'])->name('store');
+        // Main listing and create forms
+        Route::get('/', [SavingsController::class, 'index'])->name('index');
+        Route::get('/create', [SavingsController::class, 'create'])->name('create');
+        Route::post('/', [SavingsController::class, 'store'])->name('store');
 
-    // Type-based views
-    Route::get('/deposits/list', [SavingsController::class, 'deposits'])->name('deposits');
-    Route::get('/withdrawals/list', [SavingsController::class, 'withdrawals'])->name('withdrawals');
+        // Type-based views
+        Route::get('/deposits/list', [SavingsController::class, 'deposits'])->name('deposits');
+        Route::get('/withdrawals/list', [SavingsController::class, 'withdrawals'])->name('withdrawals');
 
-    // AJAX endpoints
-    Route::get('/get-member-details', [SavingsController::class, 'getMemberDetails'])->name('get-member-details');
-    Route::get('/member-summary', [SavingsController::class, 'memberSummary'])->name('member-summary');
+        // AJAX endpoints
+        Route::get('/get-member-details', [SavingsController::class, 'getMemberDetails'])->name('get-member-details');
+        Route::get('/member-summary', [SavingsController::class, 'memberSummary'])->name('member-summary');
 
-    // ===== PARAMETER ROUTES ({saving}) - These must come LAST =====
+        // ===== PARAMETER ROUTES ({saving}) - These must come LAST =====
 
-    // Single transaction view
-    Route::get('/{saving}', [SavingsController::class, 'show'])->name('show');
+        // Single transaction view
+        Route::get('/{saving}', [SavingsController::class, 'show'])->name('show');
 
-    // Transaction actions
-    Route::post('/{saving}/approve', [SavingsController::class, 'approve'])->name('approve');
-    Route::post('/{saving}/reject', [SavingsController::class, 'reject'])->name('reject');
-    Route::get('/{saving}/print-receipt', [SavingsController::class, 'printReceipt'])->name('print-receipt');
+        // Transaction actions
+        Route::post('/{saving}/approve', [SavingsController::class, 'approve'])->name('approve');
+        Route::post('/{saving}/reject', [SavingsController::class, 'reject'])->name('reject');
+        Route::get('/{saving}/print-receipt', [SavingsController::class, 'printReceipt'])->name('print-receipt');
+    });
+
 });
 
+// ========== ADMIN SACCO MANAGEMENT ==========
+Route::middleware(['auth', 'role:admin'])->prefix('admin/sacos')->name('admin.sacos.')->group(function () {
+    Route::get('/', [AdminSaccoController::class, 'index'])->name('index');
+    Route::get('/create', [AdminSaccoController::class, 'create'])->name('create');
+    Route::post('/', [AdminSaccoController::class, 'store'])->name('store');
+    Route::get('/{sacco}', [AdminSaccoController::class, 'show'])->name('show');
+    Route::get('/{sacco}/edit', [AdminSaccoController::class, 'edit'])->name('edit');
+    Route::put('/{sacco}', [AdminSaccoController::class, 'update'])->name('update');
+    Route::delete('/{sacco}', [AdminSaccoController::class, 'destroy'])->name('destroy');
+    Route::post('/{sacco}/toggle-official-account', [AdminSaccoController::class, 'toggleOfficialAccount'])->name('toggle-official-account');
+    Route::post('/{sacco}/toggle-status', [AdminSaccoController::class, 'toggleStatus'])->name('toggle-status');
+    Route::get('/{sacco}/official-account', [AdminSaccoController::class, 'editOfficialAccount'])->name('official-account');
+    Route::post('/{sacco}/official-account', [AdminSaccoController::class, 'updateOfficialAccount'])->name('official-account.update');
 });
 
 // ==================== TREASURER ROUTES ====================
@@ -267,6 +291,37 @@ Route::middleware(['auth', 'role:treasurer'])->prefix('treasurer')->name('treasu
 
 });
 
+// ==================== SUPER ADMIN ROUTES ====================
+Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    // SACCO Management
+    Route::prefix('sacos')->name('sacos.')->group(function () {
+        Route::get('/', [SuperAdminSaccoController::class, 'index'])->name('index');
+        Route::get('/create', [SuperAdminSaccoController::class, 'create'])->name('create');
+        Route::post('/', [SuperAdminSaccoController::class, 'store'])->name('store');
+        Route::get('/{sacco}', [SuperAdminSaccoController::class, 'show'])->name('show');
+        Route::get('/{sacco}/edit', [SuperAdminSaccoController::class, 'edit'])->name('edit');
+        Route::put('/{sacco}', [SuperAdminSaccoController::class, 'update'])->name('update');
+        Route::delete('/{sacco}', [SuperAdminSaccoController::class, 'destroy'])->name('destroy');
+        Route::post('/{sacco}/toggle-status', [SuperAdminSaccoController::class, 'toggleStatus'])->name('toggle-status');
+        Route::get('/{sacco}/official-account', [SuperAdminSaccoController::class, 'editOfficialAccount'])->name('official-account');
+        Route::post('/{sacco}/official-account', [SuperAdminSaccoController::class, 'updateOfficialAccount'])->name('official-account.update');
+
+        // SACCO Context Management
+        Route::post('/context/set', [SuperAdminSaccoController::class, 'setContext'])->name('context.set');
+        Route::post('/context/clear', [SuperAdminSaccoController::class, 'clearContext'])->name('context.clear');
+    });
+
+    // SACCO Request Management
+    Route::prefix('request-sacco')->name('request-sacco.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\RequestSaccoController::class, 'index'])->name('index');
+        Route::get('/{requestSacco}', [App\Http\Controllers\Admin\RequestSaccoController::class, 'show'])->name('show');
+        Route::get('/{requestSacco}/approve', [App\Http\Controllers\Admin\RequestSaccoController::class, 'approve'])->name('approve');
+        Route::post('/{requestSacco}/approve', [App\Http\Controllers\Admin\RequestSaccoController::class, 'storeApproval'])->name('storeApproval');
+        Route::get('/{requestSacco}/reject', [App\Http\Controllers\Admin\RequestSaccoController::class, 'reject'])->name('reject');
+        Route::post('/{requestSacco}/reject', [App\Http\Controllers\Admin\RequestSaccoController::class, 'storeRejection'])->name('storeRejection');
+    });
+});
+
 // ==================== MEMBER ROUTES ====================
 Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->group(function () {
     // Dashboard
@@ -295,4 +350,54 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
         Route::put('/', [ProfileController::class, 'update'])->name('update');
         Route::post('/photo', [ProfileController::class, 'updatePhoto'])->name('update-photo');
     });
+});
+// Request SACCO routes (public for creating and storing)
+Route::prefix('request-sacco')->name('request-sacco.')->group(function () {
+    Route::get('/create', [RequestSaccoController::class, 'create'])->name('create');
+    Route::post('/', [RequestSaccoController::class, 'store'])->name('store');
+});
+
+// Request SACCO routes (protected for authenticated users)
+Route::middleware(['auth'])->prefix('request-sacco')->name('request-sacco.')->group(function () {
+    Route::get('/', [RequestSaccoController::class, 'index'])->name('index');
+});
+
+// Admin routes for managing SACCO requests (Super Admin only)
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin/request-sacco')->name('admin.request-sacco.')->group(function () {
+    Route::get('/', [AdminRequestSaccoController::class, 'index'])->name('index');
+    Route::get('/{requestSacco}', [AdminRequestSaccoController::class, 'show'])->name('show');
+    Route::get('/{requestSacco}/approve', [RequestSaccoController::class, 'approve'])->name('approve');
+    Route::get('/{requestSacco}/reject', [RequestSaccoController::class, 'reject'])->name('reject');
+    Route::post('/{requestSacco}/approve', [RequestSaccoController::class, 'storeApproval'])->name('storeApproval');
+    Route::post('/{requestSacco}/reject', [RequestSaccoController::class, 'storeRejection'])->name('storeRejection');
+});
+
+
+
+
+
+
+Route::post('/test-csrf-debug', function (Request $request) {
+    return response()->json([
+        'session_token' => $request->session()->token(),
+        'input_token' => $request->input('_token'),
+        'header_token' => $request->header('X-CSRF-TOKEN'),
+        'x_header_token' => $request->header('X-XSRF-TOKEN'),
+    ]);
+});
+Route::get('/debug-requests', function () {
+    $requests = App\Models\RequestSacco::with('requester')->get();
+    foreach ($requests as $request) {
+        echo "ID: {$request->id}, Name: {$request->name}, Code: {$request->code}, Status: {$request->status}<br>";
+    }
+});
+Route::get('/debug-insert', function () {
+    $requestSacco = App\Models\RequestSacco::create([
+        'name' => 'Debug Test',
+        'registration_number' => '0000',
+        'address' => 'Debug Address',
+        'phone_number' => '0000000000',
+        'status' => 'pending',
+    ]);
+    return "Inserted ID: {$requestSacco->id}";
 });

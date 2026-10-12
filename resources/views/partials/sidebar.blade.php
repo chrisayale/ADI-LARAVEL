@@ -4,20 +4,24 @@
         <div class="d-flex align-items-center justify-content-center mb-1">
             <div class="avatar avatar-lg bg-white text-success d-flex align-items-center justify-content-center rounded-circle"
                  style="width: 40px; height: 40px; font-weight: 600; font-size: 15px;">
-                {{ substr(auth()->user()->name, 0, 1) }}{{ substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1) }}
+                {{ auth()->check() ? (substr(auth()->user()->name, 0, 1) . substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1)) : 'GS' }}
             </div>
         </div>
-        <h6 class="mb-0 fw-bold text-white" style="font-size: 14px;">{{ auth()->user()->name }}</h6>
-        @if(auth()->user()->membership_number)
+        <h6 class="mb-0 fw-bold text-white" style="font-size: 14px;">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h6>
+        @if(auth()->check() && auth()->user()->membership_number)
             <small class="text-white-50 d-block mt-1" style="font-size: 11px;">{{ auth()->user()->membership_number }}</small>
         @endif
         <small class="text-white-50 d-block mt-1" style="font-size: 11px;">
-            @if(auth()->user()->hasRole('admin'))
-                System Administrator
-            @elseif(auth()->user()->hasRole('treasurer'))
-                Treasurer
+            @if(auth()->check())
+                @if(auth()->user()->hasRole('admin'))
+                    System Administrator
+                @elseif(auth()->user()->hasRole('treasurer'))
+                    Treasurer
+                @else
+                    Member
+                @endif
             @else
-                Member
+                Guest
             @endif
         </small>
     </div>
@@ -27,28 +31,30 @@
         <ul class="nav flex-column">
             <!-- DASHBOARD - Common -->
             <li class="nav-item">
-                @if(auth()->user()->hasRole('admin'))
+                @if(auth()->check() && auth()->user()->hasRole('admin'))
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                        href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
                         <span style="font-size: 13px;">Dashboard</span>
                     </a>
-                @elseif(auth()->user()->hasRole('treasurer'))
+                @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.dashboard') ? 'active' : '' }}"
                        href="{{ route('treasurer.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
                         <span style="font-size: 13px;">Dashboard</span>
                     </a>
-                @else
+                @elseif(auth()->check())
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.dashboard') ? 'active' : '' }}"
                        href="{{ route('member.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
                         <span style="font-size: 13px;">Dashboard</span>
                     </a>
+                @else
+                    <!-- No dashboard for guests -->
                 @endif
             </li>
 
-            @if(auth()->user()->hasRole('admin'))
+            @if(auth()->check() && auth()->user()->hasRole('admin'))
                 <!-- ADMIN MENU -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Core Management</small>
@@ -202,6 +208,39 @@
                     </a>
                 </li>
 
+                <!-- SACCO Requests -->
+                <li class="nav-section mt-3 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">SACCO Requests</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.request-sacco.index') ? 'active' : '' }}"
+                       href="{{ route('admin.request-sacco.index') }}">
+                        <i class="fas fa-file-alt me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">Demandes de SACCO</span>
+                        @php $pendingSaccoRequests = \App\Models\RequestSacco::where('status', 'pending')->count(); @endphp
+                        @if($pendingSaccoRequests > 0)
+                            <span class="sidebar-badge">{{ $pendingSaccoRequests }}</span>
+                        @endif
+                    </a>
+                </li>
+
+                <!-- Gestion des SACCOs -->
+                <li class="nav-section mt-3 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Gestion des SACCOs</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.sacos.index') ? 'active' : '' }}"
+                       href="{{ route('admin.sacos.index') }}">
+                        <i class="fas fa-university me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">SACCOs</span>
+                        @php $totalSacos = \App\Models\Sacco::count(); @endphp
+                        @php $activeSacos = \App\Models\Sacco::where('status', 'active')->count(); @endphp
+                        <span style="font-size: 11px; opacity: 0.8;">{{ $activeSacos }}/{{ $totalSacos }} actifs</span>
+                    </a>
+                </li>
+
                 <!-- Reports -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Reports & Analytics</small>
@@ -231,7 +270,7 @@
                     </a>
                 </li>
 
-            @elseif(auth()->user()->hasRole('treasurer'))
+            @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                 <!-- TREASURER MENU - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Loan Operations</small>
@@ -258,11 +297,17 @@
                        href="{{ route('treasurer.loans.assigned') }}">
                         <i class="fas fa-tasks me-2" style="width: 20px; font-size: 14px;"></i>
                         <span style="font-size: 13px;">My Assigned Loans</span>
-                        @php
-                            $assignedLoans = \App\Models\LoanApplication::where('treasurer_id', auth()->id())
-                                ->whereIn('status', ['disbursed', 'approved'])
-                                ->count();
-                        @endphp
+                        @if(auth()->check())
+                            @php
+                                $assignedLoans = \App\Models\LoanApplication::where('treasurer_id', auth()->id())
+                                    ->whereIn('status', ['disbursed', 'approved'])
+                                    ->count();
+                            @endphp
+                        @else
+                            @php
+                                $assignedLoans = 0;
+                            @endphp
+                        @endif
                         @if($assignedLoans > 0)
                             <span class="sidebar-badge">{{ $assignedLoans }}</span>
                         @endif
@@ -387,7 +432,7 @@
             </li>
 
             <li class="nav-item">
-                @if(auth()->user()->hasRole('member'))
+                @if(auth()->check() && auth()->user()->hasRole('member'))
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.profile.edit') ? 'active' : '' }}"
                        href="{{ route('member.profile.edit') }}">
                         <i class="fas fa-user me-2" style="width: 20px; font-size: 14px;"></i>

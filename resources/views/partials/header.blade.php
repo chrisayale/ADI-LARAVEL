@@ -10,8 +10,8 @@
 
                 <!-- Brand Logo -->
                 <a class="navbar-brand d-flex align-items-center me-auto me-md-0" href="{{
-                    auth()->user()->hasRole('admin') ? route('admin.dashboard') :
-                    (auth()->user()->hasRole('treasurer') ? route('treasurer.dashboard') : route('member.dashboard'))
+                    auth()->check() && auth()->user()->hasRole('admin') ? route('admin.dashboard') :
+                    (auth()->check() && auth()->user()->hasRole('treasurer') ? route('treasurer.dashboard') : route('member.dashboard'))
                 }}">
                     <div class="d-flex align-items-center">
                         <div class="brand-icon bg-white rounded-circle p-2 me-2">
@@ -28,14 +28,14 @@
                 <div class="d-flex d-md-none align-items-center ms-auto me-2">
                     <div class="text-white text-end me-2">
                         <small class="d-block opacity-75" style="font-size: 0.7rem;">Total Sav.</small>
-                        <strong class="d-block fw-semibold" style="font-size: 0.85rem;">UGX {{ number_format(auth()->user()->total_savings ?? 0, 0) }}</strong>
+                        <strong class="d-block fw-semibold" style="font-size: 0.85rem;">UGX {{ number_format(auth()->check() ? auth()->user()->total_savings ?? 0 : 0, 0) }}</strong>
                     </div>
                 </div>
             </div>
 
             <!-- Desktop Stats -->
             <div class="d-none d-md-flex align-items-center ms-auto me-3 me-lg-4">
-                @if(auth()->user()->hasRole('admin'))
+                @if(auth()->check() && auth()->user()->hasRole('admin'))
                 <div class="text-white text-center me-3 me-xl-4">
                     <small class="d-block opacity-75" style="font-size: 0.75rem;">Total Members</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\User::count() }}</strong>
@@ -45,7 +45,7 @@
                     <small class="d-block opacity-75" style="font-size: 0.75rem;">Pending Loans</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\LoanApplication::where('status', 'pending')->count() }}</strong>
                 </div>
-                @elseif(auth()->user()->hasRole('treasurer'))
+                @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                 <div class="text-white text-center me-3 me-xl-4">
                     <small class="d-block opacity-75" style="font-size: 0.75rem;">Assigned Loans</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\LoanApplication::where('treasurer_id', auth()->id())->whereIn('status', ['pending', 'under_verification'])->count() }}</strong>
@@ -91,10 +91,10 @@
                         <div class="d-flex align-items-center">
                             <div class="avatar avatar-sm bg-white text-success d-flex align-items-center justify-content-center rounded-circle me-1 me-md-2"
                                  style="width: 32px; height: 32px; font-weight: 600;">
-                                {{ substr(auth()->user()->name, 0, 1) }}{{ substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1) }}
+                                {{ auth()->check() ? (substr(auth()->user()->name, 0, 1) . substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1)) : 'U' }}
                             </div>
                             <div class="d-none d-sm-block text-start">
-                                <span class="d-block fw-medium" style="font-size: 0.875rem;">{{ explode(' ', auth()->user()->name)[0] }}</span>
+                                <span class="d-block fw-medium" style="font-size: 0.875rem;">{{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'User' }}</span>
                             </div>
                         </div>
                     </a>
@@ -104,12 +104,12 @@
                                 <div class="d-flex align-items-center">
                                     <div class="avatar avatar-md bg-success text-white d-flex align-items-center justify-content-center rounded-circle me-3"
                                          style="width: 48px; height: 48px; font-size: 1.25rem; font-weight: 600;">
-                                        {{ substr(auth()->user()->name, 0, 1) }}{{ substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1) }}
+                                        {{ auth()->check() ? (substr(auth()->user()->name, 0, 1) . substr(auth()->user()->name, strpos(auth()->user()->name, ' ') + 1, 1) ?? substr(auth()->user()->name, 1, 1)) : 'U' }}
                                     </div>
                                     <div style="min-width: 0;">
-                                        <strong class="d-block text-truncate">{{ auth()->user()->name }}</strong>
-                                        <small class="text-muted d-block text-truncate">{{ auth()->user()->email }}</small>
-                                        @if(auth()->user()->membership_number)
+                                        <strong class="d-block text-truncate">{{ auth()->check() ? auth()->user()->name : 'Guest User' }}</strong>
+                                        <small class="text-muted d-block text-truncate">{{ auth()->check() ? auth()->user()->email : '' }}</small>
+                                        @if(auth()->check() && auth()->user()->membership_number)
                                         <small class="text-success fw-medium">{{ auth()->user()->membership_number }}</small>
                                         @endif
                                     </div>

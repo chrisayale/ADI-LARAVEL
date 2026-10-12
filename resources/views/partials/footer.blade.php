@@ -15,7 +15,11 @@
                         </div>
                         <div>
                             <i class="fas fa-clock me-1"></i>
-                            Last login: {{ auth()->user()->last_login_at?->format('M d, Y h:i A') ?? 'First login' }}
+                            Last login: @auth
+                                {{ auth()->user()->last_login_at?->format('M d, Y h:i A') ?? 'First login' }}
+                            @else
+                                First login
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -30,13 +34,17 @@
                         <div>
                             <i class="fas fa-copyright me-1"></i>
                             {{ date('Y') }} Capital Investment Club
-                            @if(auth()->user()->hasRole('admin'))
-                                <span class="badge bg-primary ms-2">Admin</span>
-                            @elseif(auth()->user()->hasRole('treasurer'))
-                                <span class="badge bg-info ms-2">Treasurer</span>
+                            @auth
+                                @if(auth()->user()->hasRole('admin'))
+                                    <span class="badge bg-primary ms-2">Admin</span>
+                                @elseif(auth()->user()->hasRole('treasurer'))
+                                    <span class="badge bg-info ms-2">Treasurer</span>
+                                @else
+                                    <span class="badge bg-secondary ms-2">v1.0.0</span>
+                                @endif
                             @else
-                                <span class="badge bg-secondary ms-2">v1.0.0</span>
-                            @endif
+                                <span class="badge bg-secondary ms-2">Guest</span>
+                            @endauth
                         </div>
                     </div>
                 </div>

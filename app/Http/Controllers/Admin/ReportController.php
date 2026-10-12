@@ -164,7 +164,7 @@ class ReportController extends Controller
         $monthlySavings = SavingsTransaction::whereYear('transaction_date', $year)
             ->where('status', 'approved')
             ->select(
-                DB::raw('MONTH(transaction_date) as month'),
+                DB::raw('CAST(strftime(\'%m\', transaction_date) AS INTEGER) as month'),
                 DB::raw("SUM(CASE WHEN transaction_type = 'deposit' THEN amount ELSE 0 END) as deposits"),
                 DB::raw("SUM(CASE WHEN transaction_type = 'withdrawal' THEN amount ELSE 0 END) as withdrawals")
             )
@@ -177,7 +177,7 @@ class ReportController extends Controller
         $monthlyLoans = LoanApplication::whereYear('created_at', $year)
             ->whereIn('status', ['approved', 'disbursed', 'completed'])
             ->select(
-                DB::raw('MONTH(created_at) as month'),
+                DB::raw('CAST(strftime(\'%m\', created_at) AS INTEGER) as month'),
                 DB::raw('SUM(amount_approved) as approved_amount'),
                 DB::raw('COUNT(*) as loan_count')
             )

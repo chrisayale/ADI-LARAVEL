@@ -22,7 +22,8 @@ class PaymentTransaction extends Model
         'receipt_number',
         'notes',
         'recorded_by',
-        'status'
+        'status',
+        'sacco_id'
     ];
 
     protected $casts = [

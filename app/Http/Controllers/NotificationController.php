@@ -180,11 +180,22 @@ class NotificationController extends Controller
      */
     public function getUnreadCount()
     {
-        $count = MemberNotification::where('user_id', auth()->id())
-            ->unread()
-            ->count();
+        try {
+            $count = MemberNotification::where('user_id', auth()->id())
+                ->unread()
+                ->count();
 
-        return response()->json(['count' => $count]);
+            return response()->json(['count' => $count]);
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Error in NotificationController@getUnreadCount: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => auth()->id() ?? null
+            ]);
+
+            // Return a safe fallback response
+            return response()->json(['count' => 0], 500);
+        }
     }
 
     /**
@@ -192,33 +203,47 @@ class NotificationController extends Controller
      */
     public function getRecent()
     {
-        $notifications = MemberNotification::with('sender')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(function($notification) {
-                return [
-                    'id' => $notification->id,
-                    'title' => $notification->title,
-                    'message' => $notification->message,
-                    'type' => $notification->type,
-                    'icon' => $notification->icon,
-                    'color' => $notification->color,
-                    'is_read' => $notification->isRead(),
-                    'created_at' => $notification->created_at->diffForHumans(),
-                    'url' => route('notifications.show', $notification->id)
-                ];
-            });
+        try {
+            $notifications = MemberNotification::with('sender')
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(function($notification) {
+                    return [
+                        'id' => $notification->id,
+                        'title' => $notification->title,
+                        'message' => $notification->message,
+                        'type' => $notification->type,
+                        'icon' => $notification->icon,
+                        'color' => $notification->color,
+                        'is_read' => $notification->isRead(),
+                        'created_at' => $notification->created_at ? $notification->created_at->diffForHumans() : 'Unknown',
+                        'url' => route('notifications.show', $notification->id)
+                    ];
+                });
 
-        $unreadCount = MemberNotification::where('user_id', auth()->id())
-            ->unread()
-            ->count();
+            $unreadCount = MemberNotification::where('user_id', auth()->id())
+                ->unread()
+                ->count();
 
-        return response()->json([
-            'notifications' => $notifications,
-            'unread_count' => $unreadCount
-        ]);
+            return response()->json([
+                'notifications' => $notifications,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Error in NotificationController@getRecent: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => auth()->id() ?? null
+            ]);
+
+            // Return a safe fallback response
+            return response()->json([
+                'notifications' => [],
+                'unread_count' => 0
+            ], 500);
+        }
     }
 
     /**
@@ -270,20 +295,34 @@ class NotificationController extends Controller
      */
     public function getUserNotifications(Request $request, $userId)
     {
-        if (!auth()->user()->hasRole('admin')) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            if (!auth()->user()->hasRole('admin')) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            $user = User::findOrFail($userId);
+
+            $notifications = MemberNotification::with('sender')
+                ->where('user_id', $userId)
+                ->latest()
+                ->paginate(20);
+
+            return response()->json([
+                'user' => $user->name,
+                'notifications' => $notifications
+            ]);
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Log::error('Error in NotificationController@getUserNotifications: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => auth()->id() ?? null,
+                'target_user_id' => $userId
+            ]);
+
+            // Return a safe fallback response
+            return response()->json([
+                'error' => 'Internal server error'
+            ], 500);
         }
-
-        $user = User::findOrFail($userId);
-
-        $notifications = MemberNotification::with('sender')
-            ->where('user_id', $userId)
-            ->latest()
-            ->paginate(20);
-
-        return response()->json([
-            'user' => $user->name,
-            'notifications' => $notifications
-        ]);
     }
 }
