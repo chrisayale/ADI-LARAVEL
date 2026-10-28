@@ -4,6 +4,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -18,10 +19,14 @@ return new class extends Migration
             $table->string('branch')->nullable()->after('employee_id');
             $table->date('employment_date')->nullable()->after('branch');
             $table->string('position')->nullable()->after('employment_date');
-
-            // Add 'pending' to status enum
-            $table->enum('status', ['active', 'inactive', 'suspended', 'pending'])->default('pending')->change();
         });
+
+        // For PostgreSQL compatibility: change status column to text and add check constraint
+        // instead of using enum which is not easily alterable in PostgreSQL
+        DB::statement("ALTER TABLE users ALTER COLUMN status TYPE VARCHAR(255)");
+        DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'pending'");
+        DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
+        DB::statement("ALTER TABLE users ADD CONSTRAINT users_status_check CHECK (status IN ('active', 'inactive', 'suspended', 'pending'))");
     }
 
     /**
@@ -31,9 +36,10 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn(['employee_id', 'branch', 'employment_date', 'position']);
-
-            // Revert status enum
-            $table->enum('status', ['active', 'inactive', 'suspended'])->default('active')->change();
         });
+
+        // Revert status column
+        DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
+        DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'active'");
     }
 };
