@@ -24,19 +24,13 @@ return new class extends Migration
             'meeting_notices',
             'member_notifications'
         ];
-        
+
         foreach ($tablesWithDirectSacco as $tableName) {
             Schema::table($tableName, function (Blueprint $table) use ($tableName) {
                 // Pour SQLite, on doit recréer la table pour modifier une colonne en NOT NULL
                 // Mais puisque nous venons de vérifier que toutes les lignes ont un sacco_id,
                 // nous pouvons utiliser la méthode standard de Laravel
                 $table->foreignId('sacco_id')->nullable(false)->change();
-                
-                // S'assurer que la clé étrangère utilise restrictOnDelete
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('restrict')
-                    ->change();
             });
         }
     }
@@ -58,16 +52,10 @@ return new class extends Migration
             'meeting_notices',
             'member_notifications'
         ];
-        
+
         foreach ($tablesWithDirectSacco as $tableName) {
             Schema::table($tableName, function (Blueprint $table) {
                 $table->foreignId('sacco_id')->nullable()->change();
-                
-                // Remettre la contrainte de clé étrangère standard (sans restrictOnDelete spécifique)
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('cascade')  // Retour au comportement par défaut pour le rollback
-                    ->change();
             });
         }
     }
