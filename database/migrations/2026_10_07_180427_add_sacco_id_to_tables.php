@@ -26,7 +26,7 @@ return new class extends Migration
         
         foreach ($tablesWithDirectSacco as $tableName) {
             Schema::table($tableName, function (Blueprint $blueprint) use ($tableName) {
-                $blueprint->foreignId('sacco_id')->nullable()->constrained()->onDelete('restrict');
+                $blueprint->foreignId('sacco_id')->nullable()->constrained('sacos')->onDelete('restrict');
                 $blueprint->index('sacco_id');
 
                 // Indexes supplémentaires pour les tables financières critiques
