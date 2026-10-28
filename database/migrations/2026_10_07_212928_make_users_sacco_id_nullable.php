@@ -58,26 +58,15 @@ return new class extends Migration
                 Schema::dropIfExists('users');
                 Schema::rename('users_new', 'users');
 
-                // Now add the foreign key constraint
-                Schema::table('users', function (Blueprint $table) {
-                    $table->foreign('sacco_id')
-                        ->references('id')->on('sacos')
-                        ->onDelete('restrict');
-                });
+                // Foreign key constraint already exists from previous migrations
             } finally {
                 // Re-enable foreign key constraints
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
+            // For other databases (MySQL, PostgreSQL), only change column nullability
             Schema::table('users', function (Blueprint $table) {
                 $table->foreignId('sacco_id')->nullable()->change();
-
-                // Update foreign key constraint to use restrictOnDelete
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('restrict')
-                    ->change();
             });
         }
     }
@@ -133,26 +122,15 @@ return new class extends Migration
                 Schema::dropIfExists('users');
                 Schema::rename('users_new', 'users');
 
-                // Now add the foreign key constraint back
-                Schema::table('users', function (Blueprint $table) {
-                    $table->foreign('sacco_id')
-                        ->references('id')->on('sacos')
-                        ->onDelete('cascade');
-                });
+                // Foreign key constraint already exists from previous migrations
             } finally {
                 // Re-enable foreign key constraints
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
+            // For other databases (MySQL, PostgreSQL), only change column nullability
             Schema::table('users', function (Blueprint $table) {
                 $table->foreignId('sacco_id')->nullable(false)->change();
-
-                // Revert foreign key constraint to use cascadeOnDelete for rollback
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('cascade')
-                    ->change();
             });
         }
     }
