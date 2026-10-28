@@ -100,8 +100,16 @@ return new class extends Migration
             // Drop old table and rename new table
             Schema::dropIfExists('payment_transactions');
             Schema::rename($tempTableName, 'payment_transactions');
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // For PostgreSQL: use VARCHAR + CHECK constraint instead of ENUM
+            // First change column type to VARCHAR if it's an enum
+            DB::statement("ALTER TABLE payment_transactions ALTER COLUMN payment_type TYPE VARCHAR(255)");
+            // Drop existing check constraint if any
+            DB::statement("ALTER TABLE payment_transactions DROP CONSTRAINT IF EXISTS payment_transactions_payment_type_check");
+            // Add new check constraint with loan_disbursement
+            DB::statement("ALTER TABLE payment_transactions ADD CONSTRAINT payment_transactions_payment_type_check CHECK (payment_type IN ('savings_deposit', 'savings_withdrawal', 'loan_repayment', 'penalty', 'loan_disbursement'))");
         } else {
-            // For other databases (MySQL, PostgreSQL), use the direct approach
+            // For MySQL, use the direct approach
             DB::statement("ALTER TABLE payment_transactions MODIFY payment_type ENUM('savings_deposit', 'savings_withdrawal', 'loan_repayment', 'penalty', 'loan_disbursement') NOT NULL");
         }
     }
@@ -197,8 +205,12 @@ return new class extends Migration
             // Drop old table and rename new table
             Schema::dropIfExists('payment_transactions');
             Schema::rename($tempTableName, 'payment_transactions');
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // For PostgreSQL: revert check constraint
+            DB::statement("ALTER TABLE payment_transactions DROP CONSTRAINT IF EXISTS payment_transactions_payment_type_check");
+            DB::statement("ALTER TABLE payment_transactions ADD CONSTRAINT payment_transactions_payment_type_check CHECK (payment_type IN ('savings_deposit', 'savings_withdrawal', 'loan_repayment', 'penalty'))");
         } else {
-            // For other databases (MySQL, PostgreSQL), use the direct approach
+            // For MySQL, use the direct approach
             DB::statement("ALTER TABLE payment_transactions MODIFY payment_type ENUM('savings_deposit', 'savings_withdrawal', 'loan_repayment', 'penalty') NOT NULL");
         }
     }
