@@ -46,15 +46,9 @@ return new class extends Migration
             Schema::dropIfExists('users');
             Schema::rename('users_new', 'users');
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
+            // For other databases (MySQL, PostgreSQL), only change column nullability
             Schema::table('users', function (Blueprint $table) {
                 $table->foreignId('sacco_id')->nullable()->change();
-                
-                // Update foreign key constraint to use restrictOnDelete
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('restrict')
-                    ->change();
             });
         }
     }
@@ -98,15 +92,9 @@ return new class extends Migration
             Schema::dropIfExists('users');
             Schema::rename('users_new', 'users');
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
+            // For other databases (MySQL, PostgreSQL), only change column nullability
             Schema::table('users', function (Blueprint $table) {
                 $table->foreignId('sacco_id')->nullable(false)->change();
-                
-                // Revert foreign key constraint to use cascadeOnDelete for rollback
-                $table->foreign('sacco_id')
-                    ->references('id')->on('sacos')
-                    ->onDelete('cascade')
-                    ->change();
             });
         }
     }
