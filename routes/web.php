@@ -91,10 +91,10 @@ Route::get('/force-login', function () {
     $user = \App\Models\User::where('email', 'admin@sacco.com')->first();
     if ($user) {
         auth()->login($user);
-        session()->regenerate();
+        request()->session()->regenerate();
         return redirect('/dashboard');
     }
-    return 'User not found';
+    return 'Admin user not found in database.';
 });
 
 // ==================== NOTIFICATION ROUTES (COMPLETE) ====================
