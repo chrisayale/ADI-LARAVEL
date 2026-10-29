@@ -86,6 +86,17 @@ Route::middleware('auth')->get('/dashboard', function () {
     }
 })->name('dashboard');
 
+// Temporary force-login route for debugging session persistence
+Route::get('/force-login', function () {
+    $user = \App\Models\User::where('email', 'admin@sacco.com')->first();
+    if ($user) {
+        auth()->login($user);
+        session()->regenerate();
+        return redirect('/dashboard');
+    }
+    return 'User not found';
+});
+
 // ==================== NOTIFICATION ROUTES (COMPLETE) ====================
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
