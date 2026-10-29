@@ -402,7 +402,6 @@ Route::get('/debug-insert', function () {
     return "Inserted ID: {$requestSacco->id}";
 });
 
-// Temporary route to force seed admin user in production
 // Quick admin creation route (lightweight, no seeder)
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -414,9 +413,11 @@ Route::get('/quick-admin', function () {
             'name' => 'Admin SACCO',
             'password' => Hash::make('password'),
             'role' => 'admin',
+            'status' => 'active',
+            'is_active' => true,
             'email_verified_at' => now(),
         ]
     );
 
-    return 'Succès : Compte admin créé/mis à jour avec ID ' . $user->id;
+    return 'Succès : Compte admin réactivé et prêt avec ID ' . $user->id;
 });
