@@ -20,14 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
-        // Configure TrustProxies for Render's HTTPS proxy (official Render config)
+        // Configure TrustProxies for Render's HTTPS proxy
         $middleware->trustProxies(at: '*');
-        $middleware->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR |
-            Request::HEADER_X_FORWARDED_HOST |
-            Request::HEADER_X_FORWARDED_PORT |
-            Request::HEADER_X_FORWARDED_PROTO |
-            Request::HEADER_X_FORWARDED_AWS_ELB
-        );
 
         // Add middleware to groups if needed
         $middleware->group('web', [
