@@ -413,10 +413,12 @@ Route::get('/quick-admin', function () {
             'name' => 'Admin SACCO',
             'password' => Hash::make('password'),
             'role' => 'admin',
+            'status' => 'active',
+            'is_active' => true,
             'email_verified_at' => now(),
         ]
     );
 
-    return 'Succès : Compte admin créé/mis à jour avec ID ' . $user->id;
+    return 'Succès : Compte admin réactivé et prêt avec ID ' . $user->id;
 });
 
