@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Configure TrustProxies for Render's HTTPS proxy
         $middleware->trustProxies(at: '*');
+        $middleware->trustProxies(headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST | \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT | \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO);
 
         // Add middleware to groups if needed
         $middleware->group('web', [
