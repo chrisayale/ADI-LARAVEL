@@ -402,3 +402,21 @@ Route::get('/debug-insert', function () {
     return "Inserted ID: {$requestSacco->id}";
 });
 
+// Quick admin creation route (lightweight, no seeder)
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+Route::get('/quick-admin', function () {
+    $user = User::updateOrCreate(
+        ['email' => 'admin@sacco.com'],
+        [
+            'name' => 'Admin SACCO',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]
+    );
+
+    return 'Succès : Compte admin créé/mis à jour avec ID ' . $user->id;
+});
+
