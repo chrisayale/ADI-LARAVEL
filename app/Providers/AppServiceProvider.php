@@ -20,8 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->environment('production') || str_contains(config('app.url'), 'https://')) {
-            URL::forceScheme('https');
-        }
+        // TrustProxies handles HTTPS detection from Render's proxy headers
+        // URL::forceScheme('https'); // Disabled - let TrustProxies handle it
     }
 }
