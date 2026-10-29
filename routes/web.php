@@ -20,6 +20,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SuperAdmin\SaccoController as SuperAdminSaccoController;
 use App\Http\Controllers\RequestSaccoController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -366,10 +367,10 @@ Route::middleware(['auth'])->prefix('request-sacco')->name('request-sacco.')->gr
 Route::middleware(['auth', 'role:super_admin'])->prefix('admin/request-sacco')->name('admin.request-sacco.')->group(function () {
     Route::get('/', [AdminRequestSaccoController::class, 'index'])->name('index');
     Route::get('/{requestSacco}', [AdminRequestSaccoController::class, 'show'])->name('show');
-    Route::get('/{requestSacco}/approve', [RequestSaccoController::class, 'approve'])->name('approve');
-    Route::get('/{requestSacco}/reject', [RequestSaccoController::class, 'reject'])->name('reject');
-    Route::post('/{requestSacco}/approve', [RequestSaccoController::class, 'storeApproval'])->name('storeApproval');
-    Route::post('/{requestSacco}/reject', [RequestSaccoController::class, 'storeRejection'])->name('storeRejection');
+    Route::get('/{requestSacco}/approve', [AdminRequestSaccoController::class, 'approve'])->name('approve');
+    Route::post('/{requestSacco}/approve', [AdminRequestSaccoController::class, 'storeApproval'])->name('storeApproval');
+    Route::get('/{requestSacco}/reject', [AdminRequestSaccoController::class, 'reject'])->name('reject');
+    Route::post('/{requestSacco}/reject', [AdminRequestSaccoController::class, 'storeRejection'])->name('storeRejection');
 });
 
 
@@ -400,4 +401,10 @@ Route::get('/debug-insert', function () {
         'status' => 'pending',
     ]);
     return "Inserted ID: {$requestSacco->id}";
+});
+
+// Temporary route to force seed admin user in production
+Route::get('/force-seed-admin', function () {
+    Artisan::call('db:seed', ['--force' => true]);
+    return 'Base de données peuplée avec succès ! Vous pouvez maintenant vous connecter.';
 });
