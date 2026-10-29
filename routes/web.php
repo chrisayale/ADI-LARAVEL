@@ -64,17 +64,26 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
 
 // Dashboard redirect based on role
 Route::middleware('auth')->get('/dashboard', function () {
-    $user = Auth::user();
+    try {
+        $user = Auth::user();
 
-    if ($user->hasRole('admin')) {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->hasRole('treasurer')) {
-        return redirect()->route('treasurer.dashboard');
-    } elseif ($user->hasRole('member')) {
-        return redirect()->route('member.dashboard');
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('treasurer')) {
+            return redirect()->route('treasurer.dashboard');
+        } elseif ($user->hasRole('member')) {
+            return redirect()->route('member.dashboard');
+        }
+
+        return view('dashboard');
+    } catch (\Throwable $e) {
+        dd([
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
     }
-
-    return view('dashboard');
 })->name('dashboard');
 
 // ==================== NOTIFICATION ROUTES (COMPLETE) ====================
