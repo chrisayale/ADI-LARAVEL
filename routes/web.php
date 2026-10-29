@@ -405,6 +405,7 @@ Route::get('/debug-insert', function () {
 // Quick admin creation route (lightweight, no seeder)
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 Route::get('/quick-admin', function () {
     $user = User::updateOrCreate(
@@ -418,6 +419,10 @@ Route::get('/quick-admin', function () {
             'email_verified_at' => now(),
         ]
     );
+
+    // Assign Spatie role for hasRole() to work
+    $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+    $user->assignRole($adminRole);
 
     return 'Succès : Compte admin réactivé et prêt avec ID ' . $user->id;
 });
