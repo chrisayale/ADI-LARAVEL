@@ -4,7 +4,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\TrustProxies;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Configure TrustProxies for Render's HTTPS proxy
-        $middleware->trustProxies(at: '*', headers: TrustProxies::HEADER_X_FORWARDED_ALL);
+        $middleware->trustProxies(at: '*');
 
         // Add middleware to groups if needed
         $middleware->group('web', [
