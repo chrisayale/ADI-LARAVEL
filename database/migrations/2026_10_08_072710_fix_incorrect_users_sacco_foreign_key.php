@@ -58,16 +58,43 @@ return new class extends Migration
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
-            // First drop the incorrect foreign key constraint
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropForeign(['sacco_id']); // This will drop ALL foreign keys on sacco_id
-            });
+            // For other databases (MySQL, PostgreSQL), only fix foreign key constraint
+            // Drop incorrect foreign key if it exists (on 'saccos' table)
+            // We need to check which foreign key is the incorrect one
+            $foreignKeys = DB::select("
+                SELECT conname
+                FROM pg_constraint
+                WHERE conrelid = 'users'::regclass
+                AND contype = 'f'
+                AND conname LIKE '%sacco_id%'
+            ");
 
-            // Then add back the correct foreign key constraint
-            Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('sacco_id')->nullable()->constrained('sacos')->onDelete('restrict');
-            });
+            foreach ($foreignKeys as $fk) {
+                $fkDetails = DB::select("
+                    SELECT confrelid::regclass as referenced_table
+                    FROM pg_constraint
+                    WHERE conname = ?
+                ", [$fk->conname]);
+
+                if (!empty($fkDetails) && $fkDetails[0]->referenced_table === 'saccos') {
+                    // This is the incorrect foreign key referencing 'saccos' instead of 'sacos'
+                    DB::statement("ALTER TABLE users DROP CONSTRAINT {$fk->conname}");
+                }
+            }
+
+            // Ensure the correct foreign key exists (on 'sacos' table)
+            $correctFkExists = DB::select("
+                SELECT 1
+                FROM pg_constraint
+                WHERE conrelid = 'users'::regclass
+                AND contype = 'f'
+                AND confrelid = 'sacos'::regclass
+                AND conname LIKE '%sacco_id%'
+            ");
+
+            if (empty($correctFkExists)) {
+                DB::statement("ALTER TABLE users ADD CONSTRAINT users_sacco_id_foreign FOREIGN KEY (sacco_id) REFERENCES sacos(id) ON DELETE RESTRICT");
+            }
         }
     }
 
@@ -86,8 +113,6 @@ return new class extends Migration
                 Schema::dropIfExists('users_new');
 
                 // For SQLite, we need to recreate the table to restore the original state
-                // Note: We don't know exactly what the original state was, but for rollback purposes
-                // we'll recreate with both foreign keys (the correct one and the incorrect one)
                 Schema::create('users_new', function (Blueprint $table) {
                     $table->id();
                     $table->string('name');
@@ -137,20 +162,23 @@ return new class extends Migration
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
-            // First drop the foreign key constraint
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropForeign(['sacco_id']);
-            });
+            // For other databases (MySQL, PostgreSQL), restore both foreign keys for rollback
+            // Drop current foreign key
+            $foreignKeys = DB::select("
+                SELECT conname
+                FROM pg_constraint
+                WHERE conrelid = 'users'::regclass
+                AND contype = 'f'
+                AND conname LIKE '%sacco_id%'
+            ");
 
-            // Then add back both foreign key constraints (for rollback to original broken state)
-            Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('sacco_id')->nullable()->constrained('sacos')->onDelete('restrict');
-            });
+            foreach ($foreignKeys as $fk) {
+                DB::statement("ALTER TABLE users DROP CONSTRAINT {$fk->conname}");
+            }
 
-            Schema::table('users', function (Blueprint $table) {
-                $table->foreignId('sacco_id')->nullable()->constrained('saccos')->onDelete('restrict');
-            });
+            // Add back both foreign key constraints (for rollback to original broken state)
+            DB::statement("ALTER TABLE users ADD CONSTRAINT users_sacco_id_foreign FOREIGN KEY (sacco_id) REFERENCES sacos(id) ON DELETE RESTRICT");
+            DB::statement("ALTER TABLE users ADD CONSTRAINT users_sacco_id_foreign_2 FOREIGN KEY (sacco_id) REFERENCES saccos(id) ON DELETE RESTRICT");
         }
     }
 };
