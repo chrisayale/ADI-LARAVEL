@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure TrustProxies for Render's HTTPS proxy
         $middleware->trustProxies(at: '*');
 
+        // Configure authentication redirects
+        $middleware->redirectTo(
+            guests: '/login',
+            users: '/dashboard'
+        );
+
         // Add middleware to groups if needed
         $middleware->group('web', [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
