@@ -20,7 +20,6 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SuperAdmin\SaccoController as SuperAdminSaccoController;
 use App\Http\Controllers\RequestSaccoController;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -404,7 +403,3 @@ Route::get('/debug-insert', function () {
 });
 
 // Temporary route to force seed admin user in production
-Route::get('/force-seed-admin', function () {
-    Artisan::call('db:seed', ['--force' => true]);
-    return 'Base de données peuplée avec succès ! Vous pouvez maintenant vous connecter.';
-});
