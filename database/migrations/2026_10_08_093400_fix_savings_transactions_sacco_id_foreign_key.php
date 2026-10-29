@@ -55,14 +55,42 @@ return new class extends Migration
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
-            Schema::table('savings_transactions', function (Blueprint $table) {
-                // Drop existing foreign key constraint
-                $table->dropForeign(['sacco_id']);
+            // For other databases (MySQL, PostgreSQL), only fix foreign key constraint
+            // Drop incorrect foreign key if it exists (on 'saccos' table)
+            $foreignKeys = DB::select("
+                SELECT conname
+                FROM pg_constraint
+                WHERE conrelid = 'savings_transactions'::regclass
+                AND contype = 'f'
+                AND conname LIKE '%sacco_id%'
+            ");
 
-                // Recreate with correct reference
-                $table->foreignId('sacco_id')->nullable()->constrained('sacos')->onDelete('restrict');
-            });
+            foreach ($foreignKeys as $fk) {
+                $fkDetails = DB::select("
+                    SELECT confrelid::regclass as referenced_table
+                    FROM pg_constraint
+                    WHERE conname = ?
+                ", [$fk->conname]);
+
+                if (!empty($fkDetails) && $fkDetails[0]->referenced_table === 'saccos') {
+                    // This is the incorrect foreign key referencing 'saccos' instead of 'sacos'
+                    DB::statement("ALTER TABLE savings_transactions DROP CONSTRAINT {$fk->conname}");
+                }
+            }
+
+            // Ensure the correct foreign key exists (on 'sacos' table)
+            $correctFkExists = DB::select("
+                SELECT 1
+                FROM pg_constraint
+                WHERE conrelid = 'savings_transactions'::regclass
+                AND contype = 'f'
+                AND confrelid = 'sacos'::regclass
+                AND conname LIKE '%sacco_id%'
+            ");
+
+            if (empty($correctFkExists)) {
+                DB::statement("ALTER TABLE savings_transactions ADD CONSTRAINT savings_transactions_sacco_id_foreign FOREIGN KEY (sacco_id) REFERENCES sacos(id) ON DELETE RESTRICT");
+            }
         }
     }
 
@@ -123,14 +151,22 @@ return new class extends Migration
                 DB::statement('PRAGMA foreign_keys = ON');
             }
         } else {
-            // For other databases (MySQL, PostgreSQL), use the standard approach
-            Schema::table('savings_transactions', function (Blueprint $table) {
-                // Drop existing foreign key constraint
-                $table->dropForeign(['sacco_id']);
+            // For other databases (MySQL, PostgreSQL), restore incorrect foreign key for rollback
+            // Drop current foreign key
+            $foreignKeys = DB::select("
+                SELECT conname
+                FROM pg_constraint
+                WHERE conrelid = 'savings_transactions'::regclass
+                AND contype = 'f'
+                AND conname LIKE '%sacco_id%'
+            ");
 
-                // Recreate with incorrect reference for rollback
-                $table->foreignId('sacco_id')->nullable()->constrained('saccos')->onDelete('restrict');
-            });
+            foreach ($foreignKeys as $fk) {
+                DB::statement("ALTER TABLE savings_transactions DROP CONSTRAINT {$fk->conname}");
+            }
+
+            // Add back the incorrect foreign key constraint (for rollback)
+            DB::statement("ALTER TABLE savings_transactions ADD CONSTRAINT savings_transactions_sacco_id_foreign FOREIGN KEY (sacco_id) REFERENCES saccos(id) ON DELETE RESTRICT");
         }
     }
 };
