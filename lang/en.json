@@ -595,7 +595,7 @@
     "reject_loan_application": "Reject Loan Application",
     "reject_action_warning": "This action rejects the loan application. The member may submit a new application.",
     "rejection_reason": "Rejection Reason",
-    "rejection_reason_placeholder": "Explain the reason for rejection...",
+    "rejection_reason_placeholder": "Please provide a reason for rejecting this transaction...",
     "reject_loan": "Reject Loan",
     "view_documents": "View Documents",
     "completed_loans": "Completed Loans",
@@ -679,5 +679,17 @@
     "failed_to_load_member_details": "Failed to load member details.",
     "please_select_valid_member": "Please select a valid member first.",
     "insufficient_balance": "Insufficient balance",
-    "please_select_member_first": "Please select a member first."
+    "please_select_member_first": "Please select a member first.",
+    "approved_on": "Approved on",
+    "transaction_information": "Transaction Information",
+    "not_generated_yet": "Not generated yet",
+    "recorded_on": "Recorded On",
+    "member_information": "Member Information",
+    "balance_before": "Balance Before",
+    "view_member_profile": "View Member Profile",
+    "recent_transactions_for": "Recent Transactions for",
+    "no_other_transactions_found": "No other transactions found",
+    "approve_transaction": "Approve Transaction",
+    "sure_approve_transaction": "Are you sure you want to approve this transaction?",
+    "reject_transaction": "Reject Transaction"
 }

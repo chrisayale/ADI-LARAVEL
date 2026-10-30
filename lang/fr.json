@@ -595,7 +595,7 @@
     "reject_loan_application": "Rejeter la demande de prêt",
     "reject_action_warning": "Cette action rejette la demande de prêt. Le membre peut faire une nouvelle demande.",
     "rejection_reason": "Motif du rejet",
-    "rejection_reason_placeholder": "Expliquez le motif du rejet...",
+    "rejection_reason_placeholder": "Veuillez fournir un motif pour le rejet de cette transaction...",
     "reject_loan": "Rejeter le prêt",
     "view_documents": "Voir les documents",
     "completed_loans": "Prêts terminés",
@@ -679,5 +679,17 @@
     "failed_to_load_member_details": "Échec du chargement des détails du membre.",
     "please_select_valid_member": "Veuillez sélectionner un membre valide d'abord.",
     "insufficient_balance": "Solde insuffisant",
-    "please_select_member_first": "Veuillez d'abord sélectionner un membre."
+    "please_select_member_first": "Veuillez d'abord sélectionner un membre.",
+    "approved_on": "Approuvé le",
+    "transaction_information": "Informations sur la transaction",
+    "not_generated_yet": "Pas encore généré",
+    "recorded_on": "Enregistré le",
+    "member_information": "Informations du membre",
+    "balance_before": "Solde avant",
+    "view_member_profile": "Voir le profil du membre",
+    "recent_transactions_for": "Transactions récentes pour",
+    "no_other_transactions_found": "Aucune autre transaction trouvée",
+    "approve_transaction": "Approuver la transaction",
+    "sure_approve_transaction": "Êtes-vous sûr de vouloir approuver cette transaction ?",
+    "reject_transaction": "Rejeter la transaction"
 }
