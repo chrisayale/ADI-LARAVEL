@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Payment Receipt - {{ $transaction->receipt_number }}</title>
+    <title>{{ __('payment_receipt') }} - {{ $transaction->receipt_number }}</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -69,45 +69,55 @@
 <body>
     <div class="receipt">
         <div class="header">
-            <h2>CAPITAL INVESTMENT CLUB</h2>
-            <h4>PAYMENT RECEIPT</h4>
+            <h2>{{ config('app.name', 'CAPITAL INVESTMENT CLUB') }}</h2>
+            <h4>{{ __('payment_receipt') }}</h4>
         </div>
 
         <div class="details">
             <table>
                 <tr>
-                    <td><strong>Receipt No:</strong></td>
+                    <td><strong>{{ __('receipt_number') }}:</strong></td>
                     <td class="text-right">{{ $transaction->receipt_number }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Date:</strong></td>
+                    <td><strong>{{ __('date') }}:</strong></td>
                     <td class="text-right">{{ $transaction->payment_date->format('d/m/Y H:i') }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Member:</strong></td>
+                    <td><strong>{{ __('member') }}:</strong></td>
                     <td class="text-right">{{ $transaction->user->name }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Membership No:</strong></td>
+                    <td><strong>{{ __('membership_number') }}:</strong></td>
                     <td class="text-right">{{ $transaction->user->membership_number }}</td>
                 </tr>
                 @if($transaction->loanRepayment)
                 <tr>
-                    <td><strong>Loan #:</strong></td>
+                    <td><strong>{{ __('loan') }} #:</strong></td>
                     <td class="text-right">{{ $transaction->loanRepayment->loanApplication->application_number }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Installment:</strong></td>
+                    <td><strong>{{ __('installment') }}:</strong></td>
                     <td class="text-right">{{ $transaction->loanRepayment->installment_number }}</td>
                 </tr>
                 @endif
                 <tr>
-                    <td><strong>Payment Method:</strong></td>
-                    <td class="text-right">{{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}</td>
+                    <td><strong>{{ __('payment_method') }}:</strong></td>
+                    <td class="text-right">
+                        @if($transaction->payment_method == 'cash')
+                            {{ __('cash') }}
+                        @elseif($transaction->payment_method == 'bank_transfer')
+                            {{ __('bank_transfer') }}
+                        @elseif($transaction->payment_method == 'mobile_money')
+                            {{ __('mobile_money') }}
+                        @else
+                            {{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}
+                        @endif
+                    </td>
                 </tr>
                 @if($transaction->reference_number)
                 <tr>
-                    <td><strong>Reference:</strong></td>
+                    <td><strong>{{ __('reference_number') }}:</strong></td>
                     <td class="text-right">{{ $transaction->reference_number }}</td>
                 </tr>
                 @endif
@@ -117,42 +127,42 @@
         <div class="line"></div>
 
         <div class="amount">
-            Amount Paid: UGX {{ number_format($transaction->amount, 2) }}
+            {{ __('amount_paid') }}: UGX {{ number_format($transaction->amount, 2) }}
         </div>
 
         <div class="line"></div>
 
         @if($transaction->notes)
         <div class="details">
-            <p><strong>Notes:</strong> {{ $transaction->notes }}</p>
+            <p><strong>{{ __('notes') }}:</strong> {{ $transaction->notes }}</p>
         </div>
         @endif
 
         <div class="details">
             <table>
                 <tr>
-                    <td><strong>Received By:</strong></td>
+                    <td><strong>{{ __('received_by') }}:</strong></td>
                     <td class="text-right">{{ $transaction->recorder->name }}</td>
                 </tr>
                 <tr>
-                    <td><strong>Signature:</strong></td>
+                    <td><strong>{{ __('signature') }}:</strong></td>
                     <td class="text-right">_________________</td>
                 </tr>
             </table>
         </div>
 
         <div class="footer">
-            <p>This is a computer generated receipt. No signature required.</p>
-            <p>Thank you for your payment!</p>
+            <p>{{ __('computer_generated_receipt_no_signature') }}</p>
+            <p>{{ __('thank_you_for_payment') }}</p>
         </div>
     </div>
 
     <div class="text-center no-print my-4">
     <button type="button" onclick="window.print()" class="btn btn-success me-2">
-        <i class="fas fa-print me-2"></i>Print Receipt
+        <i class="fas fa-print me-2"></i>{{ __('print_receipt') }}
     </button>
     <button type="button" onclick="goBack()" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Go Back
+        <i class="fas fa-arrow-left me-2"></i>{{ __('go_back') }}
     </button>
 </div>
 

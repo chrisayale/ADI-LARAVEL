@@ -630,7 +630,7 @@
     "filter_payments": "Filter Payments",
     "all_members": "All Members",
     "all_methods": "All Methods",
-    "receipt_number": "Receipt Number",
+    "receipt_number": "Receipt #",
     "collected_by": "Collected By",
     "print_receipt": "Print Receipt",
     "no_payment_transactions_found": "No payment transactions found",
@@ -702,5 +702,11 @@
     "authorized_signature": "Authorized Signature",
     "computer_generated_receipt": "This is a computer generated receipt",
     "thank_you_for_banking": "Thank you for banking with us!",
-    "powered_by_sacco_system": "Powered by Capital Investment Club Sacco System"
+    "powered_by_sacco_system": "Powered by Capital Investment Club Sacco System",
+    "payment_receipt": "Payment Receipt",
+    "received_by": "Received By",
+    "signature": "Signature",
+    "computer_generated_receipt_no_signature": "This is a computer generated receipt. No signature required.",
+    "thank_you_for_payment": "Thank you for your payment!",
+    "go_back": "Go Back"
 }

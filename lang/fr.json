@@ -702,5 +702,11 @@
     "authorized_signature": "Signature autorisée",
     "computer_generated_receipt": "Ce reçu est généré par ordinateur",
     "thank_you_for_banking": "Merci d'avoir fait affaire avec nous !",
-    "powered_by_sacco_system": "Propulsé par le système Sacco Capital Investment Club"
+    "powered_by_sacco_system": "Propulsé par le système Sacco Capital Investment Club",
+    "payment_receipt": "Reçu de paiement",
+    "received_by": "Reçu par",
+    "signature": "Signature",
+    "computer_generated_receipt_no_signature": "Ceci est un reçu généré par ordinateur. Aucune signature requise.",
+    "thank_you_for_payment": "Merci pour votre paiement !",
+    "go_back": "Retour"
 }
