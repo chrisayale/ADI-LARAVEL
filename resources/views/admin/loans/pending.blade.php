@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Pending Loan Applications')
+@section('title', __('pending_loan_applications'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,10 +8,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Pending Loan Applications</h3>
+                    <h3 class="card-title">{{ __('pending_loan_applications') }}</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.loans.create') }}" class="btn btn-success btn-sm">
-                            <i class="fas fa-plus"></i> New Loan Application
+                            <i class="fas fa-plus"></i> {{ __('new_loan_application') }}
                         </a>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                             <div class="small-box bg-warning">
                                 <div class="inner">
                                     <h3>{{ $totalPending }}</h3>
-                                    <p>Total Pending Applications</p>
+                                    <p>{{ __('total_pending_applications') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-clock"></i>
@@ -33,7 +33,7 @@
                             <div class="small-box bg-info">
                                 <div class="inner">
                                     <h3>{{ number_format($totalAmount, 2) }}</h3>
-                                    <p>Total Amount Applied</p>
+                                    <p>{{ __('total_amount_applied') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-money-bill-wave"></i>
@@ -48,14 +48,14 @@
                             <input type="text"
                                    name="search"
                                    class="form-control"
-                                   placeholder="Search by member name or membership number..."
+                                   placeholder="{{ __('search_member_placeholder') }}"
                                    value="{{ request('search') }}">
                             <button class="btn btn-outline-secondary" type="submit">
-                                <i class="fas fa-search"></i> Search
+                                <i class="fas fa-search"></i> {{ __('search') }}
                             </button>
                             @if(request('search'))
                                 <a href="{{ route('admin.loans.pending') }}" class="btn btn-outline-danger">
-                                    <i class="fas fa-times"></i> Clear
+                                    <i class="fas fa-times"></i> {{ __('clear') }}
                                 </a>
                             @endif
                         </div>
@@ -66,13 +66,13 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th>Application #</th>
-                                    <th>Member</th>
-                                    <th>Membership #</th>
-                                    <th>Amount Applied</th>
-                                    <th>Purpose</th>
-                                    <th>Applied Date</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('application_number') }}</th>
+                                    <th>{{ __('member') }}</th>
+                                    <th>{{ __('membership_number') }}</th>
+                                    <th>{{ __('amount_applied') }}</th>
+                                    <th>{{ __('purpose') }}</th>
+                                    <th>{{ __('applied_date') }}</th>
+                                    <th>{{ __('actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,13 +87,13 @@
                                     <td>
                                         <a href="{{ route('admin.loans.show', $loan) }}"
                                            class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {{ __('view') }}
                                         </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center">No pending loan applications found.</td>
+                                    <td colspan="7" class="text-center">{{ __('no_pending_loan_applications_found') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>

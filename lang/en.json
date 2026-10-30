@@ -18,7 +18,7 @@
     "phone": "Phone",
     "address": "Address",
     "national_id": "National ID",
-    "membership_number": "Membership Number",
+    "membership_number": "Membership #",
     "membership_date": "Membership Date",
     "status": "Status",
     "active": "Active",
@@ -469,7 +469,7 @@
     "all_applications": "All Applications",
     "filter_loans": "Filter Loans",
     "search_member": "Search Member",
-    "search_member_placeholder": "Name or Membership No...",
+    "search_member_placeholder": "Search by member name or membership number...",
     "date_from": "Date From",
     "approved_loans": "Approved Loans",
     "disbursed_loans": "Disbursed Loans",
@@ -555,5 +555,11 @@
     "next_follow_up_date": "Next Follow-up Date",
     "save_follow_up": "Save Follow-up",
     "assign_defaulter_follow_up": "Assign Defaulter for Follow-up",
-    "no_defaulters_found": "No defaulters found"
+    "no_defaulters_found": "No defaulters found",
+    "pending_loan_applications": "Pending Loan Applications",
+    "total_pending_applications": "Total Pending Applications",
+    "total_amount_applied": "Total Amount Applied",
+    "clear": "Clear",
+    "application_number": "Application #",
+    "no_pending_loan_applications_found": "No pending loan applications found."
 }

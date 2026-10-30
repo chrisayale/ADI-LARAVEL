@@ -18,7 +18,7 @@
     "phone": "Téléphone",
     "address": "Adresse",
     "national_id": "Numéro national",
-    "membership_number": "Numéro d'adhésion",
+    "membership_number": "N° adhésion",
     "membership_date": "Date d'adhésion",
     "status": "Statut",
     "active": "Actif",
@@ -469,7 +469,7 @@
     "all_applications": "Toutes les demandes",
     "filter_loans": "Filtrer les prêts",
     "search_member": "Rechercher un membre",
-    "search_member_placeholder": "Nom ou N° adhésion...",
+    "search_member_placeholder": "Rechercher par nom ou numéro de membre...",
     "date_from": "Date de début",
     "approved_loans": "Prêts approuvés",
     "disbursed_loans": "Prêts décaissés",
@@ -555,5 +555,11 @@
     "next_follow_up_date": "Date du prochain suivi",
     "save_follow_up": "Enregistrer le suivi",
     "assign_defaulter_follow_up": "Assigner un défaut pour suivi",
-    "no_defaulters_found": "Aucun défaut trouvé"
+    "no_defaulters_found": "Aucun défaut trouvé",
+    "pending_loan_applications": "Demandes de prêt en attente",
+    "total_pending_applications": "Total demandes en attente",
+    "total_amount_applied": "Montant total demandé",
+    "clear": "Effacer",
+    "application_number": "N° demande",
+    "no_pending_loan_applications_found": "Aucune demande de prêt en attente trouvée."
 }
