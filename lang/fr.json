@@ -561,5 +561,8 @@
     "total_amount_applied": "Montant total demandé",
     "clear": "Effacer",
     "application_number": "N° demande",
-    "no_pending_loan_applications_found": "Aucune demande de prêt en attente trouvée."
+    "no_pending_loan_applications_found": "Aucune demande de prêt en attente trouvée.",
+    "loan_applications_under_verification": "Demandes de prêt en vérification",
+    "assigned_date": "Date d'assignation",
+    "no_loans_under_verification_found": "Aucun prêt en vérification trouvé."
 }

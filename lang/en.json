@@ -561,5 +561,8 @@
     "total_amount_applied": "Total Amount Applied",
     "clear": "Clear",
     "application_number": "Application #",
-    "no_pending_loan_applications_found": "No pending loan applications found."
+    "no_pending_loan_applications_found": "No pending loan applications found.",
+    "loan_applications_under_verification": "Loan Applications Under Verification",
+    "assigned_date": "Assigned Date",
+    "no_loans_under_verification_found": "No loans under verification."
 }
