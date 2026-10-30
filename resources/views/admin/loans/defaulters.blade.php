@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Loan Defaulters')
+@section('title', __('loan_defaulters'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Loan Defaulters</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('loan_defaulters') }}</h1>
         <div>
             <a href="{{ route('admin.loans.index') }}" class="btn btn-info">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <i class="fas fa-arrow-left"></i> {{ __('back_to_dashboard') }}
             </a>
             <button type="button" class="btn btn-primary" onclick="exportDefaulterList()">
-                <i class="fas fa-download"></i> Export List
+                <i class="fas fa-download"></i> {{ __('export_list') }}
             </button>
         </div>
     </div>
@@ -25,7 +25,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Total Defaulters</div>
+                                {{ __('total_defaulters') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalDefaulters ?? $defaulters->total() }}</div>
                         </div>
                         <div class="col-auto">
@@ -42,7 +42,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Total Overdue Amount</div>
+                                {{ __('total_overdue_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totalOverdue ?? 0, 2) }}
                             </div>
@@ -61,8 +61,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Average Overdue Days</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ round($avgOverdueDays ?? 0) }} days</div>
+                                {{ __('average_overdue_days') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ round($avgOverdueDays ?? 0) }} {{ __('days') }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
@@ -78,7 +78,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Highest Risk</div>
+                                {{ __('highest_risk') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $highRiskCount ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
@@ -93,30 +93,30 @@
     <!-- Filter and Search -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Defaulters</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_defaulters') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.loans.defaulters') }}" class="row">
                 <div class="col-md-3 mb-3">
-                    <label for="search">Search Member</label>
+                    <label for="search">{{ __('search_member') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Name or Membership No...">
+                           value="{{ request('search') }}" placeholder="{{ __('search_member_placeholder') }}">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="status">Follow-up Status</label>
+                    <label for="status">{{ __('follow_up_status') }}</label>
                     <select class="form-control" id="status" name="status">
-                        <option value="all">All Status</option>
-                        <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>New</option>
-                        <option value="follow_up_1" {{ request('status') == 'follow_up_1' ? 'selected' : '' }}>First Follow-up</option>
-                        <option value="follow_up_2" {{ request('status') == 'follow_up_2' ? 'selected' : '' }}>Second Follow-up</option>
-                        <option value="final_notice" {{ request('status') == 'final_notice' ? 'selected' : '' }}>Final Notice</option>
-                        <option value="legal_action" {{ request('status') == 'legal_action' ? 'selected' : '' }}>Legal Action</option>
+                        <option value="all">{{ __('all_status') }}</option>
+                        <option value="new" {{ request('status') == 'new' ? 'selected' : '' }}>{{ __('new') }}</option>
+                        <option value="follow_up_1" {{ request('status') == 'follow_up_1' ? 'selected' : '' }}>{{ __('follow_up_1') }}</option>
+                        <option value="follow_up_2" {{ request('status') == 'follow_up_2' ? 'selected' : '' }}>{{ __('follow_up_2') }}</option>
+                        <option value="final_notice" {{ request('status') == 'final_notice' ? 'selected' : '' }}>{{ __('final_notice') }}</option>
+                        <option value="legal_action" {{ request('status') == 'legal_action' ? 'selected' : '' }}>{{ __('legal_action') }}</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="assigned_to">Assigned To</label>
+                    <label for="assigned_to">{{ __('assigned_to') }}</label>
                     <select class="form-control" id="assigned_to" name="assigned_to">
-                        <option value="all">All Treasurers</option>
+                        <option value="all">{{ __('all_treasurers') }}</option>
                         @foreach($treasurers ?? [] as $treasurer)
                             <option value="{{ $treasurer->id }}" {{ request('assigned_to') == $treasurer->id ? 'selected' : '' }}>
                                 {{ $treasurer->name }}
@@ -126,7 +126,7 @@
                 </div>
                 <div class="col-md-3 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary mr-2">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> {{ __('filter') }}
                     </button>
                     <a href="{{ route('admin.loans.defaulters') }}" class="btn btn-secondary">
                         <i class="fas fa-redo"></i>
@@ -139,7 +139,7 @@
     <!-- Defaulters Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Defaulters List</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('defaulters_list') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -147,15 +147,15 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Member</th>
-                            <th>Loan Details</th>
-                            <th>Overdue Amount</th>
-                            <th>Days Overdue</th>
-                            <th>Last Payment</th>
-                            <th>Follow-up Status</th>
-                            <th>Assigned To</th>
-                            <th>Last Follow-up</th>
-                            <th>Actions</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('loan_details') }}</th>
+                            <th>{{ __('overdue_amount') }}</th>
+                            <th>{{ __('days_overdue') }}</th>
+                            <th>{{ __('last_payment') }}</th>
+                            <th>{{ __('follow_up_status') }}</th>
+                            <th>{{ __('assigned_to') }}</th>
+                            <th>{{ __('last_follow_up') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,16 +175,16 @@
                                     @endif
                                     <div>
                                         <strong>{{ $defaulter->user->name }}</strong><br>
-                                        <small class="text-muted">{{ $defaulter->user->membership_number ?? 'N/A' }}</small>
+                                        <small class="text-muted">{{ $defaulter->user->membership_number ?? __('n_a') }}</small>
                                         <br>
-                                        <small>{{ $defaulter->user->phone_number ?? 'No phone' }}</small>
+                                        <small>{{ $defaulter->user->phone_number ?? __('no_phone') }}</small>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <strong>{{ $defaulter->loanApplication->application_number }}</strong><br>
-                                <small>Amount: UGX {{ number_format($defaulter->loanApplication->amount_approved, 2) }}</small><br>
-                                <small>Monthly: UGX {{ number_format($defaulter->loanApplication->monthly_repayment, 2) }}</small>
+                                <small>{{ __('amount') }}: UGX {{ number_format($defaulter->loanApplication->amount_approved, 2) }}</small><br>
+                                <small>{{ __('monthly') }}: UGX {{ number_format($defaulter->loanApplication->monthly_repayment, 2) }}</small>
                             </td>
                             <td>
                                 <span class="badge badge-danger px-3 py-2">
@@ -193,7 +193,7 @@
                             </td>
                             <td>
                                 <span class="badge badge-{{ $defaulter->days_overdue >= 90 ? 'danger' : ($defaulter->days_overdue >= 60 ? 'warning' : 'info') }} px-3 py-2">
-                                    {{ $defaulter->days_overdue }} days
+                                    {{ $defaulter->days_overdue }} {{ __('days') }}
                                 </span>
                             </td>
                             <td>
@@ -207,7 +207,7 @@
                                     {{ $lastRepayment->paid_date->format('d M Y') }}<br>
                                     <small>UGX {{ number_format($lastRepayment->amount_paid, 2) }}</small>
                                 @else
-                                    <span class="text-muted">Never</span>
+                                    <span class="text-muted">{{ __('never') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -220,11 +220,11 @@
                                         'legal_action' => 'dark'
                                     ];
                                     $statusLabels = [
-                                        'new' => 'New',
-                                        'follow_up_1' => '1st Follow-up',
-                                        'follow_up_2' => '2nd Follow-up',
-                                        'final_notice' => 'Final Notice',
-                                        'legal_action' => 'Legal Action'
+                                        'new' => __('new'),
+                                        'follow_up_1' => __('follow_up_1'),
+                                        'follow_up_2' => __('follow_up_2'),
+                                        'final_notice' => __('final_notice'),
+                                        'legal_action' => __('legal_action')
                                     ];
                                 @endphp
                                 <span class="badge badge-{{ $statusColors[$defaulter->status] ?? 'secondary' }} px-3 py-2">
@@ -235,7 +235,7 @@
                                 @if($defaulter->assignedTo)
                                     {{ $defaulter->assignedTo->name }}
                                 @else
-                                    <span class="text-muted">Unassigned</span>
+                                    <span class="text-muted">{{ __('unassigned') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -243,32 +243,32 @@
                                     {{ $defaulter->last_follow_up->format('d M Y') }}
                                     @if($defaulter->next_follow_up)
                                         <br>
-                                        <small>Next: {{ $defaulter->next_follow_up->format('d M Y') }}</small>
+                                        <small>{{ __('next') }}: {{ $defaulter->next_follow_up->format('d M Y') }}</small>
                                     @endif
                                 @else
-                                    <span class="text-muted">Not followed up</span>
+                                    <span class="text-muted">{{ __('not_followed_up') }}</span>
                                 @endif
                             </td>
                             <td>
-                                <button type="button" class="btn btn-primary btn-sm mb-1" title="Follow Up"
+                                <button type="button" class="btn btn-primary btn-sm mb-1" title="{{ __('follow_up') }}"
                                         onclick="openFollowUpModal({{ $defaulter->id }})">
                                     <i class="fas fa-phone-alt"></i>
                                 </button>
 
-                                <button type="button" class="btn btn-info btn-sm mb-1" title="Assign"
+                                <button type="button" class="btn btn-info btn-sm mb-1" title="{{ __('assign') }}"
                                         onclick="openAssignModal({{ $defaulter->id }})">
                                     <i class="fas fa-user-tie"></i>
                                 </button>
 
                                 <a href="{{ route('admin.loans.show', $defaulter->loanApplication) }}"
-                                   class="btn btn-info btn-sm mb-1" title="View Loan">
+                                   class="btn btn-info btn-sm mb-1" title="{{ __('view_loan') }}">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-4">No defaulters found</td>
+                            <td colspan="10" class="text-center py-4">{{ __('no_defaulters_found') }}</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -290,27 +290,27 @@
             <form id="followUpForm" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Record Follow-up</h5>
+                    <h5 class="modal-title">{{ __('record_follow_up') }}</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="follow_up_notes">Follow-up Notes</label>
+                        <label for="follow_up_notes">{{ __('follow_up_notes') }}</label>
                         <textarea class="form-control" id="follow_up_notes" name="follow_up_notes"
-                                  rows="4" required placeholder="Enter details of the follow-up..."></textarea>
+                                  rows="4" required placeholder="{{ __('follow_up_notes_placeholder') }}"></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="next_follow_up">Next Follow-up Date</label>
+                        <label for="next_follow_up">{{ __('next_follow_up_date') }}</label>
                         <input type="date" class="form-control" id="next_follow_up" name="next_follow_up"
                                min="{{ now()->format('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Follow-up</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('save_follow_up') }}</button>
                 </div>
             </form>
         </div>
@@ -324,16 +324,16 @@
             <form id="assignDefaulterForm" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Assign Defaulter for Follow-up</h5>
+                    <h5 class="modal-title">{{ __('assign_defaulter_follow_up') }}</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="assigned_to">Select Treasurer</label>
+                        <label for="assigned_to">{{ __('select_treasurer') }}</label>
                         <select class="form-control" id="assigned_to" name="assigned_to" required>
-                            <option value="">Choose Treasurer...</option>
+                            <option value="">{{ __('choose_treasurer') }}</option>
                             @foreach($treasurers ?? [] as $treasurer)
                                 <option value="{{ $treasurer->id }}">{{ $treasurer->name }}</option>
                             @endforeach
@@ -341,8 +341,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Assign</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('assign') }}</button>
                 </div>
             </form>
         </div>
