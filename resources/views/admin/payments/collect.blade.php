@@ -1,7 +1,7 @@
 {{-- resources/views/admin/payments/collect.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Collect Payment')
+@section('title', __('collect_loan_payment'))
 
 @section('content')
 <div class="container-fluid">
@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Collect Loan Payment</h3>
+                    <h3 class="card-title">{{ __('collect_loan_payment') }}</h3>
                 </div>
                 <div class="card-body">
                     <!-- Member Search -->
@@ -20,11 +20,11 @@
                                     <input type="text"
                                            name="search"
                                            class="form-control"
-                                           placeholder="Search by Membership Number, Phone Number, or Name..."
+                                           placeholder="{{ __('search_payment_member_placeholder') }}"
                                            value="{{ $search }}"
                                            autofocus>
                                     <button class="btn btn-success" type="submit">
-                                        <i class="fas fa-search"></i> Find Member
+                                        <i class="fas fa-search"></i> {{ __('find_member') }}
                                     </button>
                                 </div>
                             </form>
@@ -37,12 +37,12 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <h5><i class="fas fa-user"></i> {{ $member->name }}</h5>
-                                    <p class="mb-1"><strong>Membership #:</strong> {{ $member->membership_number }}</p>
-                                    <p class="mb-1"><strong>Phone:</strong> {{ $member->phone }}</p>
+                                    <p class="mb-1"><strong>{{ __('membership_number') }}:</strong> {{ $member->membership_number }}</p>
+                                    <p class="mb-1"><strong>{{ __('phone') }}:</strong> {{ $member->phone }}</p>
                                 </div>
                                 <div class="col-md-6 text-md-right">
                                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshMemberSummary({{ $member->id }})">
-                                        <i class="fas fa-sync-alt"></i> Refresh
+                                        <i class="fas fa-sync-alt"></i> {{ __('refresh') }}
                                     </button>
                                 </div>
                             </div>
@@ -51,7 +51,7 @@
                         @if($loans->isEmpty())
                             <div class="alert alert-warning">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                No active loans found for this member.
+                                {{ __('no_active_loans_found_for_member') }}
                             </div>
                         @else
                             <!-- Active Loans -->
@@ -61,10 +61,10 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <h5 class="mb-0">
                                                 <i class="fas fa-file-invoice"></i>
-                                                Loan #{{ $loan->application_number }}
+                                                {{ __('loan') }} #{{ $loan->application_number }}
                                             </h5>
                                             <span class="badge bg-light text-dark">
-                                                Balance: {{ number_format($loan->balance, 2) }}
+                                                {{ __('balance') }}: {{ number_format($loan->balance, 2) }}
                                             </span>
                                         </div>
                                     </div>
@@ -77,12 +77,12 @@
                                                                class="select-all"
                                                                data-loan="{{ $loan->id }}">
                                                     </th>
-                                                    <th>Installment</th>
-                                                    <th>Due Date</th>
-                                                    <th>Amount Due</th>
-                                                    <th>Amount Paid</th>
-                                                    <th>Balance</th>
-                                                    <th>Status</th>
+                                                    <th>{{ __('installment') }}</th>
+                                                    <th>{{ __('due_date') }}</th>
+                                                    <th>{{ __('amount_due') }}</th>
+                                                    <th>{{ __('amount_paid') }}</th>
+                                                    <th>{{ __('balance') }}</th>
+                                                    <th>{{ __('status') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -108,13 +108,13 @@
                                                         <td class="font-weight-bold">{{ number_format($balance, 2) }}</td>
                                                         <td>
                                                             @if($repayment->status == 'paid')
-                                                                <span class="badge bg-success">Paid</span>
+                                                                <span class="badge bg-success">{{ translate_status('paid') }}</span>
                                                             @elseif($repayment->status == 'partial')
-                                                                <span class="badge bg-warning">Partial</span>
+                                                                <span class="badge bg-warning">{{ translate_status('partial') }}</span>
                                                             @elseif($isOverdue)
-                                                                <span class="badge bg-danger">Overdue</span>
+                                                                <span class="badge bg-danger">{{ translate_status('overdue') }}</span>
                                                             @else
-                                                                <span class="badge bg-secondary">Pending</span>
+                                                                <span class="badge bg-secondary">{{ translate_status('pending') }}</span>
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -129,7 +129,7 @@
                             <!-- Payment Form -->
                             <div class="card mt-4 border-primary">
                                 <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Process Payment</h5>
+                                    <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> {{ __('process_payment') }}</h5>
                                 </div>
                                 <div class="card-body">
                                     <form method="POST" action="{{ route('admin.payments.process') }}" id="paymentForm">
@@ -140,13 +140,13 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Selected Installments</label>
+                                                    <label>{{ __('selected_installments') }}</label>
                                                     <div class="form-control bg-light" id="selectedCount">0</div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Total Amount Due</label>
+                                                    <label>{{ __('total_amount_due') }}</label>
                                                     <div class="form-control bg-light font-weight-bold" id="totalAmount">0.00</div>
                                                 </div>
                                             </div>
@@ -155,7 +155,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="amount">Payment Amount *</label>
+                                                    <label for="amount">{{ __('payment_amount') }} *</label>
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text">UGX</span>
@@ -172,11 +172,11 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="payment_method">Payment Method *</label>
+                                                    <label for="payment_method">{{ __('payment_method') }} *</label>
                                                     <select name="payment_method" id="payment_method" class="form-control form-control-lg" required>
-                                                        <option value="cash">Cash</option>
-                                                        <option value="bank_transfer">Bank Transfer</option>
-                                                        <option value="mobile_money">Mobile Money</option>
+                                                        <option value="cash">{{ __('cash') }}</option>
+                                                        <option value="bank_transfer">{{ __('bank_transfer') }}</option>
+                                                        <option value="mobile_money">{{ __('mobile_money') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -185,7 +185,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="reference_number">Reference Number (Optional)</label>
+                                                    <label for="reference_number">{{ __('reference_number') }} ({{ __('optional') }})</label>
                                                     <input type="text"
                                                            name="reference_number"
                                                            id="reference_number"
@@ -195,12 +195,12 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="notes">Notes (Optional)</label>
+                                                    <label for="notes">{{ __('notes') }} ({{ __('optional') }})</label>
                                                     <input type="text"
                                                            name="notes"
                                                            id="notes"
                                                            class="form-control"
-                                                           placeholder="Any additional notes">
+                                                           placeholder="{{ __('any_additional_notes') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -208,7 +208,7 @@
                                         <div class="row mt-3">
                                             <div class="col-12">
                                                 <button type="submit" class="btn btn-success btn-lg btn-block" id="submitBtn" disabled>
-                                                    <i class="fas fa-check-circle"></i> Process Payment
+                                                    <i class="fas fa-check-circle"></i> {{ __('process_payment') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -219,13 +219,13 @@
                     @elseif($search)
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-circle"></i>
-                            No member found with "{{ $search }}". Please try again.
+                            {{ __('no_member_found_with_search') }} "{{ $search }}". {{ __('please_try_again') }}.
                         </div>
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-hand-holding-usd fa-4x text-muted mb-3"></i>
-                            <h4>Search for a member to collect payment</h4>
-                            <p class="text-muted">Enter membership number, phone number, or name above</p>
+                            <h4>{{ __('search_member_to_collect') }}</h4>
+                            <p class="text-muted">{{ __('enter_membership_number_above') }}</p>
                         </div>
                     @endif
                 </div>
@@ -339,5 +339,4 @@ $(document).ready(function() {
 
 });
 </script>
-
 @endpush
