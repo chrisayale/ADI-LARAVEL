@@ -86,17 +86,6 @@ Route::middleware('auth')->get('/dashboard', function () {
     }
 })->name('dashboard');
 
-// Temporary force-login route for debugging session persistence
-Route::get('/force-login', function () {
-    $user = \App\Models\User::where('email', 'admin@sacco.com')->first();
-    if ($user) {
-        auth()->login($user);
-        request()->session()->regenerate();
-        return redirect('/dashboard');
-    }
-    return 'Admin user not found in database.';
-});
-
 // ==================== NOTIFICATION ROUTES (COMPLETE) ====================
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
@@ -227,8 +216,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 });
 
-// ========== ADMIN SACCO MANAGEMENT ==========
-Route::middleware(['auth', 'role:admin'])->prefix('admin/sacos')->name('admin.sacos.')->group(function () {
+// ========== ADMIN SACCO MANAGEMENT (Super Admin only) ==========
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin/sacos')->name('admin.sacos.')->group(function () {
     Route::get('/', [AdminSaccoController::class, 'index'])->name('index');
     Route::get('/create', [AdminSaccoController::class, 'create'])->name('create');
     Route::post('/', [AdminSaccoController::class, 'store'])->name('store');

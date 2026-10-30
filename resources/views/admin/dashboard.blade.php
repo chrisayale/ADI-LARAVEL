@@ -86,7 +86,8 @@
             </div>
         </div>
 
-        <!-- Pending SACCO Requests Card -->
+        @if(auth()->check() && auth()->user()->hasRole('super_admin'))
+        <!-- Pending SACCO Requests Card (Super Admin only) -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
@@ -103,6 +104,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 
     <!-- Charts Row -->

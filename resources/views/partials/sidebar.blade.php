@@ -208,7 +208,8 @@
                     </a>
                 </li>
 
-                <!-- SACCO Requests -->
+                @if(auth()->check() && auth()->user()->hasRole('super_admin'))
+                <!-- SACCO Requests (Super Admin only) -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">SACCO Requests</small>
                 </li>
@@ -225,7 +226,7 @@
                     </a>
                 </li>
 
-                <!-- Gestion des SACCOs -->
+                <!-- Gestion des SACCOs (Super Admin only) -->
                 <li class="nav-section mt-3 mb-1 px-3">
                     <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Gestion des SACCOs</small>
                 </li>
@@ -240,6 +241,7 @@
                         <span style="font-size: 11px; opacity: 0.8;">{{ $activeSacos }}/{{ $totalSacos }} actifs</span>
                     </a>
                 </li>
+                @endif
 
                 <!-- Reports -->
                 <li class="nav-section mt-3 mb-1 px-3">
