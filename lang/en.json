@@ -502,5 +502,15 @@
     "purpose": "Purpose",
     "disburse_loan": "Disburse Loan",
     "confirm_disburse": "Are you sure you want to disburse this loan?",
-    "no_applications_found": "No applications found"
+    "no_applications_found": "No applications found",
+    "total_approved": "Total Approved",
+    "total_interest": "Total Interest",
+    "filter_approved_loans": "Filter Approved Loans",
+    "approval_date": "Approval Date",
+    "approved_loans_list": "Approved Loans List",
+    "monthly_payment": "Monthly Payment",
+    "total_repayable": "Total Repayable",
+    "approved_date": "Approved Date",
+    "approved_by": "Approved By",
+    "no_approved_loans_found": "No approved loans found"
 }
