@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Disbursed Loans')
+@section('title', __('disbursed_loans'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Disbursed Loans</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('disbursed_loans') }}</h1>
         <div>
             <a href="{{ route('admin.loans.index') }}" class="btn btn-info">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <i class="fas fa-arrow-left"></i> {{ __('back_to_dashboard') }}
             </a>
         </div>
     </div>
@@ -22,7 +22,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Disbursed</div>
+                                {{ __('total_disbursed') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeLoans ?? $disbursedLoans->total() }}</div>
                         </div>
                         <div class="col-auto">
@@ -39,7 +39,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Amount</div>
+                                {{ __('total_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totalDisbursed ?? 0, 2) }}
                             </div>
@@ -58,7 +58,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Repaid</div>
+                                {{ __('total_repaid') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totalRepaid ?? 0, 2) }}
                             </div>
@@ -77,7 +77,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Outstanding</div>
+                                {{ __('outstanding') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($outstandingBalance ?? 0, 2) }}
                             </div>
@@ -94,32 +94,32 @@
     <!-- Filter and Search -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Disbursed Loans</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_disbursed_loans') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.loans.disbursed') }}" class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="search">Search Member</label>
+                    <label for="search">{{ __('search_member') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Name or Membership Number...">
+                           value="{{ request('search') }}" placeholder="{{ __('search_member_placeholder') }}">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="repayment_status">Repayment Status</label>
+                    <label for="repayment_status">{{ __('repayment_status') }}</label>
                     <select class="form-control" id="repayment_status" name="repayment_status">
-                        <option value="all">All</option>
-                        <option value="on_track" {{ request('repayment_status') == 'on_track' ? 'selected' : '' }}>On Track</option>
-                        <option value="overdue" {{ request('repayment_status') == 'overdue' ? 'selected' : '' }}>Overdue</option>
-                        <option value="completed" {{ request('repayment_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="all">{{ __('all') }}</option>
+                        <option value="on_track" {{ request('repayment_status') == 'on_track' ? 'selected' : '' }}>{{ __('on_track') }}</option>
+                        <option value="overdue" {{ request('repayment_status') == 'overdue' ? 'selected' : '' }}>{{ __('overdue') }}</option>
+                        <option value="completed" {{ request('repayment_status') == 'completed' ? 'selected' : '' }}>{{ __('completed') }}</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="disbursed_date">Disbursed Date</label>
+                    <label for="disbursed_date">{{ __('disbursed_date') }}</label>
                     <input type="month" class="form-control" id="disbursed_date" name="disbursed_date"
                            value="{{ request('disbursed_date') }}">
                 </div>
                 <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary mr-2">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> {{ __('filter') }}
                     </button>
                     <a href="{{ route('admin.loans.disbursed') }}" class="btn btn-secondary">
                         <i class="fas fa-redo"></i>
@@ -132,7 +132,7 @@
     <!-- Disbursed Loans Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Disbursed Loans List</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('disbursed_loans_list') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -140,18 +140,18 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Application No.</th>
-                            <th>Member</th>
-                            <th>Amount Disbursed</th>
-                            <th>Interest Rate</th>
-                            <th>Duration</th>
-                            <th>Monthly Payment</th>
-                            <th>Total Repayable</th>
-                            <th>Disbursed Date</th>
-                            <th>Amount Repaid</th>
-                            <th>Balance</th>
-                            <th>Progress</th>
-                            <th>Actions</th>
+                            <th>{{ __('application_no') }}</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('amount_disbursed') }}</th>
+                            <th>{{ __('interest_rate') }}</th>
+                            <th>{{ __('duration') }}</th>
+                            <th>{{ __('monthly_payment') }}</th>
+                            <th>{{ __('total_repayable') }}</th>
+                            <th>{{ __('disbursed_date') }}</th>
+                            <th>{{ __('amount_repaid') }}</th>
+                            <th>{{ __('balance') }}</th>
+                            <th>{{ __('progress') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -184,13 +184,13 @@
                                     @endif
                                     <div>
                                         <strong>{{ $loan->user->name }}</strong><br>
-                                        <small class="text-muted">{{ $loan->user->membership_number ?? 'N/A' }}</small>
+                                        <small class="text-muted">{{ $loan->user->membership_number ?? __('n_a') }}</small>
                                     </div>
                                 </div>
                             </td>
                             <td><strong>UGX {{ number_format($loan->amount_approved, 2) }}</strong></td>
                             <td>{{ $loan->interest_rate }}%</td>
-                            <td>{{ $loan->duration_months }} months</td>
+                            <td>{{ $loan->duration_months }} {{ __('months') }}</td>
                             <td>UGX {{ number_format($loan->monthly_repayment, 2) }}</td>
                             <td>UGX {{ number_format($loan->total_repayable, 2) }}</td>
                             <td>{{ $loan->disbursed_at->format('d M Y') }}</td>
@@ -210,15 +210,15 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ route('admin.loans.show', $loan) }}" class="btn btn-info btn-sm" title="View Details">
+                                <a href="{{ route('admin.loans.show', $loan) }}" class="btn btn-info btn-sm" title="{{ __('view_details') }}">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
                                 @if($balance == 0)
                                 <form action="{{ route('admin.loans.mark-completed', $loan) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-success btn-sm" title="Mark as Completed"
-                                            onclick="return confirm('Mark this loan as completed?')">
+                                    <button type="submit" class="btn btn-success btn-sm" title="{{ __('mark_as_completed') }}"
+                                            onclick="return confirm('{{ __('confirm_mark_completed') }}')">
                                         <i class="fas fa-check-double"></i>
                                     </button>
                                 </form>
@@ -227,7 +227,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="13" class="text-center py-4">No disbursed loans found</td>
+                            <td colspan="13" class="text-center py-4">{{ __('no_disbursed_loans_found') }}</td>
                         </tr>
                         @endforelse
                     </tbody>

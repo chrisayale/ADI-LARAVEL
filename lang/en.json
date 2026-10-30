@@ -512,5 +512,19 @@
     "total_repayable": "Total Repayable",
     "approved_date": "Approved Date",
     "approved_by": "Approved By",
-    "no_approved_loans_found": "No approved loans found"
+    "no_approved_loans_found": "No approved loans found",
+    "total_disbursed": "Total Disbursed",
+    "total_repaid": "Total Repaid",
+    "outstanding": "Outstanding",
+    "filter_disbursed_loans": "Filter Disbursed Loans",
+    "repayment_status": "Repayment Status",
+    "disbursed_date": "Disbursed Date",
+    "on_track": "On Track",
+    "disbursed_loans_list": "Disbursed Loans List",
+    "amount_disbursed": "Amount Disbursed",
+    "amount_repaid": "Amount Repaid",
+    "progress": "Progress",
+    "mark_as_completed": "Mark as Completed",
+    "confirm_mark_completed": "Mark this loan as completed?",
+    "no_disbursed_loans_found": "No disbursed loans found"
 }

@@ -512,5 +512,19 @@
     "total_repayable": "Total remboursable",
     "approved_date": "Date d'approbation",
     "approved_by": "Approuvé par",
-    "no_approved_loans_found": "Aucun prêt approuvé trouvé"
+    "no_approved_loans_found": "Aucun prêt approuvé trouvé",
+    "total_disbursed": "Total décaissé",
+    "total_repaid": "Total remboursé",
+    "outstanding": "En cours",
+    "filter_disbursed_loans": "Filtrer les prêts décaissés",
+    "repayment_status": "Statut de remboursement",
+    "disbursed_date": "Date de décaissement",
+    "on_track": "En bonne voie",
+    "disbursed_loans_list": "Liste des prêts décaissés",
+    "amount_disbursed": "Montant décaissé",
+    "amount_repaid": "Montant remboursé",
+    "progress": "Progression",
+    "mark_as_completed": "Marquer comme terminé",
+    "confirm_mark_completed": "Marquer ce prêt comme terminé ?",
+    "no_disbursed_loans_found": "Aucun prêt décaissé trouvé"
 }
