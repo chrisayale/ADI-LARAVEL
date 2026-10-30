@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Verified Loan Applications')
+@section('title', __('verified_loan_applications_ready'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,10 +8,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Verified Loan Applications (Ready for Approval)</h3>
+                    <h3 class="card-title">{{ __('verified_loan_applications_ready') }}</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.loans.index') }}" class="btn btn-default btn-sm">
-                            <i class="fas fa-arrow-left"></i> Back to All Loans
+                            <i class="fas fa-arrow-left"></i> {{ __('back_to_all_loans') }}
                         </a>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                             <div class="small-box bg-success">
                                 <div class="inner">
                                     <h3>{{ $loans->total() }}</h3>
-                                    <p>Total Verified Applications</p>
+                                    <p>{{ __('total_verified_applications') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-check-circle"></i>
@@ -36,7 +36,7 @@
                                         $totalAmount = $loans->sum('amount_applied');
                                     @endphp
                                     <h3>{{ number_format($totalAmount, 2) }}</h3>
-                                    <p>Total Amount Applied</p>
+                                    <p>{{ __('total_amount_applied') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-money-bill-wave"></i>
@@ -50,7 +50,7 @@
                                         $avgAmount = $loans->count() > 0 ? $totalAmount / $loans->count() : 0;
                                     @endphp
                                     <h3>{{ number_format($avgAmount, 2) }}</h3>
-                                    <p>Average Loan Amount</p>
+                                    <p>{{ __('average_loan_amount') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-chart-line"></i>
@@ -67,15 +67,15 @@
                                     <input type="text"
                                            name="search"
                                            class="form-control"
-                                           placeholder="Search by member name, membership number, or application number..."
+                                           placeholder="{{ __('search_verified_placeholder') }}"
                                            value="{{ request('search') }}">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary" type="submit">
-                                            <i class="fas fa-search"></i> Search
+                                            <i class="fas fa-search"></i> {{ __('search') }}
                                         </button>
                                         @if(request('search') || request('treasurer_id') || request('date_from') || request('date_to'))
                                             <a href="{{ route('admin.loans.verified') }}" class="btn btn-outline-danger">
-                                                <i class="fas fa-times"></i> Clear Filters
+                                                <i class="fas fa-times"></i> {{ __('clear_filters') }}
                                             </a>
                                         @endif
                                     </div>
@@ -87,7 +87,7 @@
                     <!-- Advanced Filters (Collapsible) -->
                     <div class="mb-4">
                         <button class="btn btn-sm btn-link" type="button" data-toggle="collapse" data-target="#advancedFilters">
-                            <i class="fas fa-filter"></i> Advanced Filters
+                            <i class="fas fa-filter"></i> {{ __('advanced_filters') }}
                         </button>
                         <div class="collapse {{ request('date_from') || request('date_to') || request('treasurer_id') ? 'show' : '' }}" id="advancedFilters">
                             <div class="card card-body bg-light">
@@ -99,7 +99,7 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Date From</label>
+                                                <label>{{ __('date_from') }}</label>
                                                 <input type="date"
                                                        name="date_from"
                                                        class="form-control"
@@ -108,7 +108,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Date To</label>
+                                                <label>{{ __('date_to') }}</label>
                                                 <input type="date"
                                                        name="date_to"
                                                        class="form-control"
@@ -117,7 +117,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Min Amount</label>
+                                                <label>{{ __('min_amount') }}</label>
                                                 <input type="number"
                                                        name="min_amount"
                                                        class="form-control"
@@ -127,7 +127,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Max Amount</label>
+                                                <label>{{ __('max_amount') }}</label>
                                                 <input type="number"
                                                        name="max_amount"
                                                        class="form-control"
@@ -139,7 +139,7 @@
                                     <div class="row mt-2">
                                         <div class="col-md-12 text-right">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-filter"></i> Apply Filters
+                                                <i class="fas fa-filter"></i> {{ __('apply_filters') }}
                                             </button>
                                         </div>
                                     </div>
@@ -154,13 +154,13 @@
                             <thead class="bg-success text-white">
                                 <tr>
                                     <th width="50">#</th>
-                                    <th>Application #</th>
-                                    <th>Member Details</th>
-                                    <th>Loan Details</th>
-                                    <th>Verification Info</th>
-                                    <th>Guarantors</th>
-                                    <th>Documents</th>
-                                    <th width="150">Actions</th>
+                                    <th>{{ __('application_number') }}</th>
+                                    <th>{{ __('member_details') }}</th>
+                                    <th>{{ __('loan_details') }}</th>
+                                    <th>{{ __('verification_info') }}</th>
+                                    <th>{{ __('guarantors') }}</th>
+                                    <th>{{ __('documents') }}</th>
+                                    <th width="150">{{ __('actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -170,36 +170,36 @@
                                     <td>
                                         <strong>{{ $loan->application_number }}</strong>
                                         <br>
-                                        <small class="text-muted">Applied: {{ $loan->created_at->format('d/m/Y') }}</small>
+                                        <small class="text-muted">{{ __('applied') }}: {{ $loan->created_at->format('d/m/Y') }}</small>
                                     </td>
                                     <td>
                                         <strong>{{ $loan->user->name }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-id-card"></i> {{ $loan->user->membership_number ?? 'N/A' }}
+                                            <i class="fas fa-id-card"></i> {{ $loan->user->membership_number ?? __('n_a') }}
                                             <br>
-                                            <i class="fas fa-phone"></i> {{ $loan->user->phone ?? 'N/A' }}
+                                            <i class="fas fa-phone"></i> {{ $loan->user->phone ?? __('n_a') }}
                                         </small>
                                     </td>
                                     <td>
                                         <strong class="text-primary">{{ number_format($loan->amount_applied, 2) }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-calendar"></i> {{ $loan->duration_months ?? 'N/A' }} months
+                                            <i class="fas fa-calendar"></i> {{ $loan->duration_months ?? __('n_a') }} {{ __('months') }}
                                             <br>
-                                            <span class="badge bg-success">Verified</span>
+                                            <span class="badge bg-success">{{ translate_status('verified') }}</span>
                                         </small>
                                     </td>
                                     <td>
-                                        <strong>By: {{ $loan->verifier->name ?? $loan->treasurer->name ?? 'N/A' }}</strong>
+                                        <strong>{{ __('verified_by') }}: {{ $loan->verifier->name ?? $loan->treasurer->name ?? __('n_a') }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-clock"></i> {{ $loan->verified_at ? $loan->verified_at->format('d/m/Y H:i') : 'N/A' }}
+                                            <i class="fas fa-clock"></i> {{ $loan->verified_at ? $loan->verified_at->format('d/m/Y H:i') : __('n_a') }}
                                         </small>
                                         @if($loan->verification_notes)
                                             <br>
                                             <span class="badge bg-info" title="{{ $loan->verification_notes }}">
-                                                <i class="fas fa-sticky-note"></i> Notes
+                                                <i class="fas fa-sticky-note"></i> {{ __('notes') }}
                                             </span>
                                         @endif
                                     </td>
@@ -209,11 +209,11 @@
                                             $totalCount = $loan->guarantors->count();
                                         @endphp
                                         <span class="badge bg-{{ $verifiedCount == $totalCount ? 'success' : 'warning' }}">
-                                            {{ $verifiedCount }}/{{ $totalCount }} Verified
+                                            {{ $verifiedCount }}/{{ $totalCount }} {{ __('verified') }}
                                         </span>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-user-check"></i> All verified
+                                            <i class="fas fa-user-check"></i> {{ __('all_verified') }}
                                         </small>
                                     </td>
                                     <td>
@@ -222,53 +222,53 @@
                                             $verifiedDocCount = $loan->documents->where('verification_status', 'verified')->count();
                                         @endphp
                                         <span class="badge bg-{{ $docCount > 0 ? 'success' : 'secondary' }}">
-                                            {{ $docCount }} Files
+                                            {{ $docCount }} {{ __('files') }}
                                         </span>
                                         @if($docCount > 0)
                                             <br>
                                             <small class="text-muted">
-                                                {{ $verifiedDocCount }} verified
+                                                {{ $verifiedDocCount }} {{ __('verified') }}
                                             </small>
                                         @endif
                                     </td>
                                    <td>
-    <div class="btn-group">
-        <a href="{{ route('admin.loans.show', $loan) }}"
-           class="btn btn-sm btn-info"
-           title="View Details">
-            <i class="fas fa-eye"></i>
-        </a>
-        <button type="button"
-                class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                title="Actions">
-            <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="{{ route('admin.loans.show', $loan) }}">
-                <i class="fas fa-eye text-info"></i> View Details
-            </a>
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#approveModal{{ $loan->id }}">  <!-- Changed data-target to data-bs-target -->
-                <i class="fas fa-check-circle text-success"></i> Approve Loan
-            </a>
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $loan->id }}">   <!-- Changed data-target to data-bs-target -->
-                <i class="fas fa-times-circle text-danger"></i> Reject Loan
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{{ route('admin.loans.show', $loan) }}#documents">
-                <i class="fas fa-file-alt text-warning"></i> View Documents
-            </a>
-        </div>
-    </div>
-</td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('admin.loans.show', $loan) }}"
+                                           class="btn btn-sm btn-info"
+                                           title="{{ __('view_details') }}">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-success dropdown-toggle dropdown-toggle-split"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
+                                                title="{{ __('actions') }}">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ route('admin.loans.show', $loan) }}">
+                                                <i class="fas fa-eye text-info"></i> {{ __('view_details') }}
+                                            </a>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#approveModal{{ $loan->id }}">
+                                                <i class="fas fa-check-circle text-success"></i> {{ __('approve_loan') }}
+                                            </a>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $loan->id }}">
+                                                <i class="fas fa-times-circle text-danger"></i> {{ __('reject_loan') }}
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="{{ route('admin.loans.show', $loan) }}#documents">
+                                                <i class="fas fa-file-alt text-warning"></i> {{ __('view_documents') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="8" class="text-center py-4">
                                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted mb-0">No verified loan applications found.</p>
-                                        <p class="text-muted small">Loans that have been verified by treasurers will appear here.</p>
+                                        <p class="text-muted mb-0">{{ __('no_verified_loan_applications_found') }}</p>
+                                        <p class="text-muted small">{{ __('verified_loans_will_appear') }}</p>
                                     </td>
                                 </tr>
                                 @endforelse
@@ -299,22 +299,20 @@
                 @csrf
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title" id="approveModalLabel{{ $loan->id }}">
-                        <i class="fas fa-check-circle"></i> Approve Loan Application
+                        <i class="fas fa-check-circle"></i> {{ __('approve_loan_application') }}
                     </h5>
-                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
-                        Application #: <strong>{{ $loan->application_number }}</strong><br>
-                        Member: <strong>{{ $loan->user->name }}</strong><br>
-                        Amount Applied: <strong>{{ number_format($loan->amount_applied, 2) }}</strong>
+                        {{ __('application_number') }}: <strong>{{ $loan->application_number }}</strong><br>
+                        {{ __('member') }}: <strong>{{ $loan->user->name }}</strong><br>
+                        {{ __('amount_applied') }}: <strong>{{ number_format($loan->amount_applied, 2) }}</strong>
                     </div>
 
                     <div class="form-group">
-                        <label for="amount_approved{{ $loan->id }}">Approved Amount *</label>
+                        <label for="amount_approved{{ $loan->id }}">{{ __('approved_amount') }} *</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">UGX</span>
@@ -329,13 +327,13 @@
                                    max="{{ $loan->amount_applied }}"
                                    value="{{ $loan->amount_applied }}">
                         </div>
-                        <small class="text-muted">Maximum amount: {{ number_format($loan->amount_applied, 2) }}</small>
+                        <small class="text-muted">{{ __('maximum_amount') }}: {{ number_format($loan->amount_applied, 2) }}</small>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="interest_rate{{ $loan->id }}">Interest Rate (%) *</label>
+                                <label for="interest_rate{{ $loan->id }}">{{ __('interest_rate') }} (%) *</label>
                                 <div class="input-group">
                                     <input type="number"
                                            name="interest_rate"
@@ -354,7 +352,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="duration_months{{ $loan->id }}">Duration (Months) *</label>
+                                <label for="duration_months{{ $loan->id }}">{{ __('duration_months') }} *</label>
                                 <input type="number"
                                        name="duration_months"
                                        id="duration_months{{ $loan->id }}"
@@ -368,28 +366,28 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="approval_notes{{ $loan->id }}">Approval Notes</label>
+                        <label for="approval_notes{{ $loan->id }}">{{ __('approval_notes') }}</label>
                         <textarea name="approval_notes"
                                   id="approval_notes{{ $loan->id }}"
                                   class="form-control"
                                   rows="3"
-                                  placeholder="Enter any notes or conditions for approval..."></textarea>
+                                  placeholder="{{ __('approval_notes_placeholder') }}"></textarea>
                     </div>
 
                     <!-- Calculated Summary -->
                     <div class="card bg-light mt-3">
                         <div class="card-body">
-                            <h6>Loan Summary (Calculated)</h6>
+                            <h6>{{ __('loan_summary_calculated') }}</h6>
                             <div class="row">
-                                <div class="col-6">Monthly Payment:</div>
+                                <div class="col-6">{{ __('monthly_payment') }}:</div>
                                 <div class="col-6 text-right">
                                     <strong id="monthly{{ $loan->id }}">-</strong>
                                 </div>
-                                <div class="col-6">Total Interest:</div>
+                                <div class="col-6">{{ __('total_interest') }}:</div>
                                 <div class="col-6 text-right">
                                     <strong id="interest{{ $loan->id }}">-</strong>
                                 </div>
-                                <div class="col-6">Total Repayable:</div>
+                                <div class="col-6">{{ __('total_repayable') }}:</div>
                                 <div class="col-6 text-right">
                                     <strong id="total{{ $loan->id }}">-</strong>
                                 </div>
@@ -399,10 +397,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancel
+                        <i class="fas fa-times"></i> {{ __('cancel') }}
                     </button>
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check-circle"></i> Approve Loan
+                        <i class="fas fa-check-circle"></i> {{ __('approve_loan') }}
                     </button>
                 </div>
             </form>
@@ -418,32 +416,32 @@
                 @csrf
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="rejectModalLabel{{ $loan->id }}">
-                        <i class="fas fa-times-circle"></i> Reject Loan Application
+                        <i class="fas fa-times-circle"></i> {{ __('reject_loan_application') }}
                     </h5>
-                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        You are about to reject this loan application. This action cannot be undone.
+                        {{ __('reject_action_warning') }}
                     </div>
 
                     <div class="form-group">
-                        <label for="rejection_reason{{ $loan->id }}">Rejection Reason *</label>
+                        <label for="rejection_reason{{ $loan->id }}">{{ __('rejection_reason') }} *</label>
                         <textarea name="rejection_reason"
                                   id="rejection_reason{{ $loan->id }}"
                                   class="form-control"
                                   rows="4"
                                   required
-                                  placeholder="Please provide a detailed reason for rejection..."></textarea>
+                                  placeholder="{{ __('rejection_reason_placeholder') }}"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancel
+                        <i class="fas fa-times"></i> {{ __('cancel') }}
                     </button>
                     <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-times-circle"></i> Reject Loan
+                        <i class="fas fa-times-circle"></i> {{ __('reject_loan') }}
                     </button>
                 </div>
             </form>
