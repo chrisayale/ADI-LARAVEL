@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'All Loan Applications')
+@section('title', __('all_loan_applications'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">All Loan Applications</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('all_loan_applications') }}</h1>
         <div>
             <a href="{{ route('admin.loans.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Loan Application
+                <i class="fas fa-plus"></i> {{ __('new_loan_application') }}
             </a>
             <a href="{{ route('admin.loans.index') }}" class="btn btn-info">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <i class="fas fa-arrow-left"></i> {{ __('back_to_dashboard') }}
             </a>
         </div>
     </div>
@@ -25,7 +25,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Applications</div>
+                                {{ __('total_applications') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $applications->total() }}</div>
                         </div>
                         <div class="col-auto">
@@ -42,7 +42,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending</div>
+                                {{ __('pending') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingCount ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
@@ -59,7 +59,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Under Verification</div>
+                                {{ __('under_verification') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $verificationCount ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
@@ -76,7 +76,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Amount</div>
+                                {{ __('total_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totalAmount ?? 0, 2) }}
                             </div>
@@ -93,43 +93,43 @@
     <!-- Filter and Search -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Applications</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_applications') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.loans.applications') }}" class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="search">Search Member</label>
+                    <label for="search">{{ __('search_member') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Name or Membership Number...">
+                           value="{{ request('search') }}" placeholder="{{ __('search_member_placeholder') }}">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="status">Application Status</label>
+                    <label for="status">{{ __('application_status') }}</label>
                     <select class="form-control" id="status" name="status">
-                        <option value="all">All Status</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="under_verification" {{ request('status') == 'under_verification' ? 'selected' : '' }}>Under Verification</option>
-                        <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
-                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                        <option value="disbursed" {{ request('status') == 'disbursed' ? 'selected' : '' }}>Disbursed</option>
-                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="defaulted" {{ request('status') == 'defaulted' ? 'selected' : '' }}>Defaulted</option>
+                        <option value="all">{{ __('all_status') }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ __('pending') }}</option>
+                        <option value="under_verification" {{ request('status') == 'under_verification' ? 'selected' : '' }}>{{ __('under_verification') }}</option>
+                        <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>{{ __('verified') }}</option>
+                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>{{ __('approved') }}</option>
+                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>{{ __('rejected') }}</option>
+                        <option value="disbursed" {{ request('status') == 'disbursed' ? 'selected' : '' }}>{{ __('disbursed') }}</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>{{ __('completed') }}</option>
+                        <option value="defaulted" {{ request('status') == 'defaulted' ? 'selected' : '' }}>{{ __('defaulted') }}</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="date_range">Date Range</label>
+                    <label for="date_range">{{ __('date_range') }}</label>
                     <select class="form-control" id="date_range" name="date_range">
-                        <option value="">All Time</option>
-                        <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
-                        <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
-                        <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month</option>
-                        <option value="quarter" {{ request('date_range') == 'quarter' ? 'selected' : '' }}>This Quarter</option>
-                        <option value="year" {{ request('date_range') == 'year' ? 'selected' : '' }}>This Year</option>
+                        <option value="">{{ __('all_time') }}</option>
+                        <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>{{ __('today') }}</option>
+                        <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>{{ __('this_week') }}</option>
+                        <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>{{ __('this_month') }}</option>
+                        <option value="quarter" {{ request('date_range') == 'quarter' ? 'selected' : '' }}>{{ __('this_quarter') }}</option>
+                        <option value="year" {{ request('date_range') == 'year' ? 'selected' : '' }}>{{ __('this_year') }}</option>
                     </select>
                 </div>
                 <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary mr-2">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> {{ __('filter') }}
                     </button>
                     <a href="{{ route('admin.loans.applications') }}" class="btn btn-secondary">
                         <i class="fas fa-redo"></i>
@@ -142,7 +142,7 @@
     <!-- Applications Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Applications List</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('applications_list') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -150,16 +150,16 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Application No.</th>
-                            <th>Member</th>
-                            <th>Membership No.</th>
-                            <th>Amount Applied</th>
-                            <th>Amount Approved</th>
-                            <th>Purpose</th>
-                            <th>Status</th>
-                            <th>Treasurer</th>
-                            <th>Applied Date</th>
-                            <th>Actions</th>
+                            <th>{{ __('application_no') }}</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('membership_no') }}</th>
+                            <th>{{ __('amount_applied') }}</th>
+                            <th>{{ __('amount_approved') }}</th>
+                            <th>{{ __('purpose') }}</th>
+                            <th>{{ __('status') }}</th>
+                            <th>{{ __('treasurer') }}</th>
+                            <th>{{ __('applied_date') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -186,13 +186,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ $application->user->membership_number ?? 'N/A' }}</td>
+                            <td>{{ $application->user->membership_number ?? __('n_a') }}</td>
                             <td>UGX {{ number_format($application->amount_applied, 2) }}</td>
                             <td>
                                 @if($application->amount_approved)
                                     UGX {{ number_format($application->amount_approved, 2) }}
                                 @else
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">{{ __('n_a') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -215,24 +215,24 @@
                                     $color = $statusColors[$application->status] ?? 'secondary';
                                 @endphp
                                 <span class="badge badge-{{ $color }} px-3 py-2">
-                                    {{ str_replace('_', ' ', ucfirst($application->status)) }}
+                                    {{ translate_status($application->status) }}
                                 </span>
                             </td>
                             <td>
                                 @if($application->treasurer)
                                     {{ $application->treasurer->name }}
                                 @else
-                                    <span class="text-muted">Not Assigned</span>
+                                    <span class="text-muted">{{ __('not_assigned') }}</span>
                                 @endif
                             </td>
                             <td>{{ $application->created_at->format('d M Y') }}</td>
                             <td>
-                                <a href="{{ route('admin.loans.show', $application) }}" class="btn btn-info btn-sm" title="View Details">
+                                <a href="{{ route('admin.loans.show', $application) }}" class="btn btn-info btn-sm" title="{{ __('view_details') }}">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
                                 @if($application->status == 'pending')
-                                    <button type="button" class="btn btn-primary btn-sm" title="Assign Treasurer"
+                                    <button type="button" class="btn btn-primary btn-sm" title="{{ __('assign_treasurer') }}"
                                             onclick="openAssignTreasurerModal({{ $application->id }})">
                                         <i class="fas fa-user-tie"></i>
                                     </button>
@@ -241,8 +241,8 @@
                                 @if($application->status == 'approved')
                                     <form action="{{ route('admin.loans.disburse', $application) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-success btn-sm" title="Disburse Loan"
-                                                onclick="return confirm('Are you sure you want to disburse this loan?')">
+                                        <button type="submit" class="btn btn-success btn-sm" title="{{ __('disburse_loan') }}"
+                                                onclick="return confirm('{{ __('confirm_disburse') }}')">
                                             <i class="fas fa-hand-holding-usd"></i>
                                         </button>
                                     </form>
@@ -251,7 +251,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="11" class="text-center py-4">No applications found</td>
+                            <td colspan="11" class="text-center py-4">{{ __('no_applications_found') }}</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -273,16 +273,16 @@
             <form id="assignTreasurerForm" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Assign Treasurer</h5>
+                    <h5 class="modal-title">{{ __('assign_treasurer') }}</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="treasurer_id">Select Treasurer</label>
+                        <label for="treasurer_id">{{ __('select_treasurer') }}</label>
                         <select class="form-control" id="treasurer_id" name="treasurer_id" required>
-                            <option value="">Choose Treasurer...</option>
+                            <option value="">{{ __('choose_treasurer') }}</option>
                             @foreach($treasurers ?? [] as $treasurer)
                                 <option value="{{ $treasurer->id }}">{{ $treasurer->name }}</option>
                             @endforeach
@@ -290,8 +290,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Assign</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('assign') }}</button>
                 </div>
             </form>
         </div>
