@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt - {{ $saving->receipt_number }}</title>
+    <title>{{ __('receipt') }} - {{ $saving->receipt_number }}</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -106,65 +106,65 @@
 <body>
     <div class="receipt">
         <div class="header">
-            <h2>CAPITAL INVESTMENT CLUB</h2>
-            <h4>Savings Transaction Receipt</h4>
-            <p>Your Trusted Financial Partner</p>
-            <p>Tel: +256 XXX XXX XXX | Email: info@capitalinvestment.club</p>
+            <h2>{{ config('app.name', 'CAPITAL INVESTMENT CLUB') }}</h2>
+            <h4>{{ __('savings_transaction_receipt') }}</h4>
+            <p>{{ __('your_trusted_financial_partner') }}</p>
+            <p>{{ __('contact_info') }}</p>
         </div>
 
         <div class="receipt-title">
             @if($saving->transaction_type == 'deposit')
-                DEPOSIT RECEIPT
+                {{ __('deposit_receipt') }}
             @else
-                WITHDRAWAL RECEIPT
+                {{ __('withdrawal_receipt') }}
             @endif
         </div>
 
         <div class="details">
             <div class="detail-row">
-                <span class="detail-label">Receipt Number:</span>
+                <span class="detail-label">{{ __('receipt_number') }}:</span>
                 <span>{{ $saving->receipt_number }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Transaction #:</span>
+                <span class="detail-label">{{ __('transaction_number') }}:</span>
                 <span>{{ $saving->transaction_number }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Date:</span>
+                <span class="detail-label">{{ __('date') }}:</span>
                 <span>{{ $saving->transaction_date->format('d/m/Y') }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Time:</span>
+                <span class="detail-label">{{ __('time') }}:</span>
                 <span>{{ $saving->created_at->format('H:i:s') }}</span>
             </div>
         </div>
 
         <div class="details">
             <div class="detail-row">
-                <span class="detail-label">Member Name:</span>
+                <span class="detail-label">{{ __('member_name') }}:</span>
                 <span>{{ $saving->user->name }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Membership #:</span>
-                <span>{{ $saving->user->membership_number ?? 'N/A' }}</span>
+                <span class="detail-label">{{ __('membership_number') }}:</span>
+                <span>{{ $saving->user->membership_number ?? __('n_a') }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Phone:</span>
-                <span>{{ $saving->user->phone_number ?? 'N/A' }}</span>
+                <span class="detail-label">{{ __('phone') }}:</span>
+                <span>{{ $saving->user->phone_number ?? __('n_a') }}</span>
             </div>
         </div>
 
         <div class="details">
             <div class="amount-row">
-                <span class="detail-label">Transaction Type:</span>
-                <span style="text-transform: uppercase;">{{ $saving->transaction_type }}</span>
+                <span class="detail-label">{{ __('transaction_type') }}:</span>
+                <span style="text-transform: uppercase;">{{ $saving->transaction_type == 'deposit' ? __('deposit') : __('withdrawal') }}</span>
             </div>
             <div class="amount-row">
-                <span class="detail-label">Amount:</span>
+                <span class="detail-label">{{ __('amount') }}:</span>
                 <span style="font-size: 20px;">UGX {{ number_format($saving->amount, 2) }}</span>
             </div>
             <div class="amount-row">
-                <span class="detail-label">Balance After:</span>
+                <span class="detail-label">{{ __('balance_after') }}:</span>
                 <span>UGX {{ number_format($saving->balance_after, 2) }}</span>
             </div>
         </div>
@@ -172,7 +172,7 @@
         @if($saving->notes)
         <div class="details">
             <div class="detail-row">
-                <span class="detail-label">Notes:</span>
+                <span class="detail-label">{{ __('notes') }}:</span>
                 <span>{{ $saving->notes }}</span>
             </div>
         </div>
@@ -180,35 +180,35 @@
 
         <div class="details">
             <div class="detail-row">
-                <span class="detail-label">Recorded By:</span>
+                <span class="detail-label">{{ __('recorded_by') }}:</span>
                 <span>{{ $saving->recorder->name }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Approved By:</span>
-                <span>{{ $saving->approver->name ?? 'System' }}</span>
+                <span class="detail-label">{{ __('approved_by') }}:</span>
+                <span>{{ $saving->approver->name ?? __('system') }}</span>
             </div>
         </div>
 
         <div class="signature">
             <div style="text-align: center;">
                 <div class="signature-line" style="margin: 0 auto;"></div>
-                <p style="margin-top: 5px;">Authorized Signature</p>
+                <p style="margin-top: 5px;">{{ __('authorized_signature') }}</p>
             </div>
         </div>
 
         <div class="footer">
-            <p>This is a computer generated receipt</p>
-            <p>Thank you for banking with us!</p>
+            <p>{{ __('computer_generated_receipt') }}</p>
+            <p>{{ __('thank_you_for_banking') }}</p>
         </div>
 
         <div class="watermark">
-            <p>Powered by Capital Investment Club Sacco System</p>
+            <p>{{ __('powered_by_sacco_system') }}</p>
         </div>
     </div>
 
     <div class="print-button">
-        <button onclick="window.print()">Print Receipt</button>
-        <button onclick="window.close()">Close</button>
+        <button onclick="window.print()">{{ __('print_receipt') }}</button>
+        <button onclick="window.close()">{{ __('close') }}</button>
     </div>
 </body>
 </html>

@@ -330,7 +330,7 @@
     "join_hundreds": "Rejoignez des centaines de membres qui ont déjà transformé leur parcours financier.",
     "existing_member_login": "Connexion Membre Existant",
     "request_new_sacco": "Demander un Nouveau SACCO",
-    "contact_info": "<i class=\"fas fa-phone me-2\"></i>+256 700 123456 | <i class=\"fas fa-envelope ms-3 me-2\"></i>info@capitalclub.org | <i class=\"fas fa-map-marker-alt ms-3 me-2\"></i>Kampala, Ouganda",
+    "contact_info": "Tél: +256 XXX XXX XXX | Email: info@capitalinvestment.club",
     "empowering_members": "Donner du pouvoir aux membres grâce à des solutions financières numériques transparentes et des investissements pilotés par la communauté.",
     "quick_links": "Liens Rapides",
     "member_area_footer": "Espace Membre",
@@ -691,5 +691,16 @@
     "no_other_transactions_found": "Aucune autre transaction trouvée",
     "approve_transaction": "Approuver la transaction",
     "sure_approve_transaction": "Êtes-vous sûr de vouloir approuver cette transaction ?",
-    "reject_transaction": "Rejeter la transaction"
+    "reject_transaction": "Rejeter la transaction",
+    "savings_transaction_receipt": "Reçu de transaction d'épargne",
+    "your_trusted_financial_partner": "Votre partenaire financier de confiance",
+    "deposit_receipt": "REÇU DE DÉPÔT",
+    "withdrawal_receipt": "REÇU DE RETRAIT",
+    "time": "Heure",
+    "member_name": "Nom du membre",
+    "system": "Système",
+    "authorized_signature": "Signature autorisée",
+    "computer_generated_receipt": "Ce reçu est généré par ordinateur",
+    "thank_you_for_banking": "Merci d'avoir fait affaire avec nous !",
+    "powered_by_sacco_system": "Propulsé par le système Sacco Capital Investment Club"
 }
