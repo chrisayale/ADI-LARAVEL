@@ -1,21 +1,21 @@
 @extends('layouts.app')
 
-@section('title', 'Savings Transactions')
+@section('title', __('savings_transactions'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Savings Transactions</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('savings_transactions') }}</h1>
         <div>
             <a href="{{ route('admin.savings.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Transaction
+                <i class="fas fa-plus"></i> {{ __('new_transaction') }}
             </a>
             <a href="{{ route('admin.savings.deposits') }}" class="btn btn-success">
-                <i class="fas fa-arrow-down"></i> Deposits
+                <i class="fas fa-arrow-down"></i> {{ __('deposits') }}
             </a>
             <a href="{{ route('admin.savings.withdrawals') }}" class="btn btn-info">
-                <i class="fas fa-arrow-up"></i> Withdrawals
+                <i class="fas fa-arrow-up"></i> {{ __('withdrawals') }}
             </a>
         </div>
     </div>
@@ -28,7 +28,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Deposits</div>
+                                {{ __('total_deposits') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['total_deposits'], 2) }}</div>
                         </div>
                         <div class="col-auto">
@@ -45,7 +45,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Withdrawals</div>
+                                {{ __('total_withdrawals') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['total_withdrawals'], 2) }}</div>
                         </div>
                         <div class="col-auto">
@@ -62,7 +62,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Transactions</div>
+                                {{ __('pending_transactions') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $summary['pending_count'] }}</div>
                         </div>
                         <div class="col-auto">
@@ -79,9 +79,9 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Today's Total</div>
+                                {{ __('todays_total') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['today_amount'], 2) }}</div>
-                            <small>{{ $summary['today_count'] }} transactions</small>
+                            <small>{{ $summary['today_count'] }} {{ __('transactions') }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
@@ -95,38 +95,38 @@
     <!-- Filter Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Transactions</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_transactions') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('admin.savings.index') }}" class="row">
                 <div class="col-md-3 mb-3">
-                    <label for="search">Search Member</label>
+                    <label for="search">{{ __('search_member') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Name or Membership #">
+                           value="{{ request('search') }}" placeholder="{{ __('name_or_membership') }}">
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="type">Transaction Type</label>
+                    <label for="type">{{ __('transaction_type') }}</label>
                     <select class="form-control" id="type" name="type">
-                        <option value="all">All Types</option>
-                        <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>Deposits</option>
-                        <option value="withdrawal" {{ request('type') == 'withdrawal' ? 'selected' : '' }}>Withdrawals</option>
+                        <option value="all">{{ __('all_types') }}</option>
+                        <option value="deposit" {{ request('type') == 'deposit' ? 'selected' : '' }}>{{ __('deposits') }}</option>
+                        <option value="withdrawal" {{ request('type') == 'withdrawal' ? 'selected' : '' }}>{{ __('withdrawals') }}</option>
                     </select>
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="status">Status</label>
+                    <label for="status">{{ __('status') }}</label>
                     <select class="form-control" id="status" name="status">
-                        <option value="all">All Status</option>
-                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        <option value="all">{{ __('all_status') }}</option>
+                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>{{ translate_status('approved') }}</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>{{ translate_status('pending') }}</option>
+                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>{{ translate_status('rejected') }}</option>
                     </select>
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="date_from">Date From</label>
+                    <label for="date_from">{{ __('date_from') }}</label>
                     <input type="date" class="form-control" id="date_from" name="date_from" value="{{ request('date_from') }}">
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="date_to">Date To</label>
+                    <label for="date_to">{{ __('date_to') }}</label>
                     <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request('date_to') }}">
                 </div>
                 <div class="col-md-1 mb-3 d-flex align-items-end">
@@ -141,7 +141,7 @@
     <!-- Transactions Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">All Transactions</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('all_transactions') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -149,15 +149,15 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Transaction #</th>
-                            <th>Member</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Balance After</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Recorded By</th>
-                            <th>Actions</th>
+                            <th>{{ __('transaction_number') }}</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('type') }}</th>
+                            <th>{{ __('amount') }}</th>
+                            <th>{{ __('balance_after') }}</th>
+                            <th>{{ __('date') }}</th>
+                            <th>{{ __('status') }}</th>
+                            <th>{{ __('recorded_by') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -169,7 +169,7 @@
                                     {{ $transaction->transaction_number }}
                                 </a>
                                 @if($transaction->receipt_number)
-                                    <br><small class="text-muted">Receipt: {{ $transaction->receipt_number }}</small>
+                                    <br><small class="text-muted">{{ __('receipt') }}: {{ $transaction->receipt_number }}</small>
                                 @endif
                             </td>
                             <td>
@@ -194,7 +194,7 @@
                             <td>
                                 <span class="badge badge-{{ $transaction->type_color }} p-2">
                                     <i class="fas fa-{{ $transaction->type_icon }} mr-1"></i>
-                                    {{ ucfirst($transaction->transaction_type) }}
+                                    {{ $transaction->transaction_type == 'deposit' ? __('deposit') : __('withdrawal') }}
                                 </span>
                             </td>
                             <td class="text-right">
@@ -209,7 +209,7 @@
                             </td>
                             <td>
                                 <span class="badge badge-{{ $transaction->status_color }} p-2">
-                                    {{ ucfirst($transaction->status) }}
+                                    {{ translate_status($transaction->status) }}
                                 </span>
                             </td>
                             <td>
@@ -217,13 +217,13 @@
                             </td>
                             <td>
                                 <a href="{{ route('admin.savings.show', $transaction) }}"
-                                   class="btn btn-sm btn-info" title="View">
+                                   class="btn btn-sm btn-info" title="{{ __('view') }}">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @if($transaction->status == 'approved' && $transaction->receipt_number)
                                     <a href="{{ route('admin.savings.print-receipt', $transaction) }}"
                                        target="_blank"
-                                       class="btn btn-sm btn-secondary" title="Print Receipt">
+                                       class="btn btn-sm btn-secondary" title="{{ __('print_receipt') }}">
                                         <i class="fas fa-print"></i>
                                     </a>
                                 @endif
@@ -233,7 +233,7 @@
                         <tr>
                             <td colspan="10" class="text-center py-4">
                                 <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No transactions found</p>
+                                <p class="text-muted">{{ __('no_transactions_found') }}</p>
                             </td>
                         </tr>
                         @endforelse

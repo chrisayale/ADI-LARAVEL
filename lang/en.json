@@ -633,5 +633,21 @@
     "receipt_number": "Receipt #",
     "collected_by": "Collected By",
     "print_receipt": "Print Receipt",
-    "no_payment_transactions_found": "No payment transactions found"
+    "no_payment_transactions_found": "No payment transactions found",
+    "savings_transactions": "Savings Transactions",
+    "new_transaction": "New Transaction",
+    "total_deposits": "Total Deposits",
+    "total_withdrawals": "Total Withdrawals",
+    "pending_transactions": "Pending Transactions",
+    "todays_total": "Today's Total",
+    "transactions": "transactions",
+    "filter_transactions": "Filter Transactions",
+    "name_or_membership": "Name or Membership #",
+    "transaction_type": "Transaction Type",
+    "all_types": "All Types",
+    "transaction_number": "Transaction #",
+    "balance_after": "Balance After",
+    "recorded_by": "Recorded By",
+    "receipt": "Receipt",
+    "no_transactions_found": "No transactions found"
 }

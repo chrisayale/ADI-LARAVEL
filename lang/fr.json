@@ -633,5 +633,21 @@
     "receipt_number": "N° reçu",
     "collected_by": "Encaissé par",
     "print_receipt": "Imprimer le reçu",
-    "no_payment_transactions_found": "Aucune transaction de paiement trouvée"
+    "no_payment_transactions_found": "Aucune transaction de paiement trouvée",
+    "savings_transactions": "Transactions d'épargne",
+    "new_transaction": "Nouvelle transaction",
+    "total_deposits": "Total dépôts",
+    "total_withdrawals": "Total retraits",
+    "pending_transactions": "Transactions en attente",
+    "todays_total": "Total du jour",
+    "transactions": "transactions",
+    "filter_transactions": "Filtrer les transactions",
+    "name_or_membership": "Nom ou N° adhésion",
+    "transaction_type": "Type de transaction",
+    "all_types": "Tous les types",
+    "transaction_number": "N° transaction",
+    "balance_after": "Solde après",
+    "recorded_by": "Enregistré par",
+    "receipt": "Reçu",
+    "no_transactions_found": "Aucune transaction trouvée"
 }
