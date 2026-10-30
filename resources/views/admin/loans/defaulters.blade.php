@@ -44,7 +44,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('total_overdue_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalOverdue ?? 0, 2) }}
+                                CDF {{ number_format($totalOverdue ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -183,12 +183,12 @@
                             </td>
                             <td>
                                 <strong>{{ $defaulter->loanApplication->application_number }}</strong><br>
-                                <small>{{ __('amount') }}: UGX {{ number_format($defaulter->loanApplication->amount_approved, 2) }}</small><br>
-                                <small>{{ __('monthly') }}: UGX {{ number_format($defaulter->loanApplication->monthly_repayment, 2) }}</small>
+                                <small>{{ __('amount') }}: CDF {{ number_format($defaulter->loanApplication->amount_approved, 2) }}</small><br>
+                                <small>{{ __('monthly') }}: CDF {{ number_format($defaulter->loanApplication->monthly_repayment, 2) }}</small>
                             </td>
                             <td>
                                 <span class="badge badge-danger px-3 py-2">
-                                    UGX {{ number_format($defaulter->amount_overdue, 2) }}
+                                    CDF {{ number_format($defaulter->amount_overdue, 2) }}
                                 </span>
                             </td>
                             <td>
@@ -205,7 +205,7 @@
                                 @endphp
                                 @if($lastRepayment)
                                     {{ $lastRepayment->paid_date->format('d M Y') }}<br>
-                                    <small>UGX {{ number_format($lastRepayment->amount_paid, 2) }}</small>
+                                    <small>CDF {{ number_format($lastRepayment->amount_paid, 2) }}</small>
                                 @else
                                     <span class="text-muted">{{ __('never') }}</span>
                                 @endif

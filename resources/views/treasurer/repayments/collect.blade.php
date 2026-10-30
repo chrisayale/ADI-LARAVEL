@@ -89,7 +89,7 @@
                                 Loan #{{ $loan->application_number }}
                             </h5>
                             <span class="badge bg-light text-dark">
-                                Balance: UGX {{ number_format($loan->balance, 2) }}
+                                Balance: CDF {{ number_format($loan->balance, 2) }}
                             </span>
                         </div>
                     </div>
@@ -127,9 +127,9 @@
                                         </td>
                                         <td>{{ $repayment->installment_number }}</td>
                                         <td>{{ $repayment->due_date->format('d/m/Y') }}</td>
-                                        <td>UGX {{ number_format($repayment->amount_due, 2) }}</td>
-                                        <td>UGX {{ number_format($repayment->amount_paid, 2) }}</td>
-                                        <td class="font-weight-bold">UGX {{ number_format($balance, 2) }}</td>
+                                        <td>CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                                        <td>CDF {{ number_format($repayment->amount_paid, 2) }}</td>
+                                        <td class="font-weight-bold">CDF {{ number_format($balance, 2) }}</td>
                                         <td>
                                             @if($repayment->status == 'paid')
                                                 <span class="badge bg-success">Paid</span>
@@ -183,7 +183,7 @@
                                     <label for="amount">Payment Amount *</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text">UGX</span>
+                                            <span class="input-group-text">CDF</span>
                                         </div>
                                         <input type="number"
                                                name="amount"

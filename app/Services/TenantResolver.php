@@ -70,6 +70,19 @@ class TenantResolver
         }
 
         // Cas extrême : utilisateur sans SACCO (devrait être rare après migration)
+        // Les admins, treasurers et super_admins peuvent accéder sans SACCO spécifique
+        if ($user->hasRole('admin') || $user->hasRole('treasurer') || $user->hasRole('super_admin')) {
+            return null;
+        }
+        
+        // Pour les membres sans SACCO, essayer de trouver un SACCO actif par défaut
+        if ($user->hasRole('member')) {
+            $defaultSacco = Sacco::where('status', 'active')->first();
+            if ($defaultSacco) {
+                return $defaultSacco;
+            }
+        }
+        
         throw TenantException::noSaccoAssigned();
     }
     

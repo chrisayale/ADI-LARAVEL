@@ -46,7 +46,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Pending</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['pending_loans'] }}</div>
-                            <small>UGX {{ number_format($stats['pending_amount'], 0) }}</small>
+                            <small>CDF {{ number_format($stats['pending_amount'], 0) }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -103,7 +103,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Approved</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['approved_loans'] }}</div>
-                            <small>UGX {{ number_format($stats['approved_amount'], 0) }}</small>
+                            <small>CDF {{ number_format($stats['approved_amount'], 0) }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-thumbs-up fa-2x text-gray-300"></i>
@@ -122,7 +122,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Disbursed</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['disbursed_loans'] }}</div>
-                            <small>UGX {{ number_format($stats['total_disbursed'], 0) }}</small>
+                            <small>CDF {{ number_format($stats['total_disbursed'], 0) }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -178,7 +178,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Total Disbursed</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($stats['total_disbursed'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($stats['total_disbursed'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
@@ -195,7 +195,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Repaid</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($stats['total_repaid'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($stats['total_repaid'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-coins fa-2x text-gray-300"></i>
@@ -212,7 +212,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Outstanding Balance</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($stats['total_outstanding'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($stats['total_outstanding'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-chart-line fa-2x text-gray-300"></i>
@@ -293,7 +293,7 @@
                         $recoveryRate = ($stats['total_repaid'] / $stats['total_disbursed']) * 100;
                     }
                 @endphp
-                <span class="badge badge-primary p-2 mr-2">Avg Loan: UGX {{ number_format($avgLoan, 0) }}</span>
+                <span class="badge badge-primary p-2 mr-2">Avg Loan: CDF {{ number_format($avgLoan, 0) }}</span>
                 <span class="badge badge-info p-2">Recovery Rate: {{ round($recoveryRate, 1) }}%</span>
             </div>
         </div>
@@ -327,7 +327,7 @@
                                         <strong>{{ $loan->user->name }}</strong>
                                         <br><small class="text-muted">{{ $loan->user->membership_number ?? 'N/A' }}</small>
                                     </td>
-                                    <td class="text-right">UGX {{ number_format($loan->amount_applied, 0) }}</td>
+                                    <td class="text-right">CDF {{ number_format($loan->amount_applied, 0) }}</td>
                                     <td>
                                         @php
                                             $statusColors = [
@@ -342,7 +342,7 @@
                                             ];
                                         @endphp
                                         <span class="badge badge-{{ $statusColors[$loan->status] ?? 'secondary' }}">
-                                            {{ str_replace('_', ' ', ucfirst($loan->status)) }}
+                                            {{ translate_status($loan->status) }}
                                         </span>
                                     </td>
                                     <td>{{ $loan->created_at->format('d M Y') }}</td>
@@ -384,7 +384,7 @@
                                         <strong>{{ $defaulter->user->name }}</strong>
                                         <br><small class="text-muted">{{ $defaulter->user->membership_number ?? 'N/A' }}</small>
                                     </td>
-                                    <td class="text-right text-danger">UGX {{ number_format($defaulter->amount_overdue, 0) }}</td>
+                                    <td class="text-right text-danger">CDF {{ number_format($defaulter->amount_overdue, 0) }}</td>
                                     <td><span class="badge badge-danger">{{ $defaulter->days_overdue }} days</span></td>
                                     <td>
                                         @php

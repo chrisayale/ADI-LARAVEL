@@ -77,7 +77,7 @@
                                 <option value="EUR" {{ (old('primary_currency', $sacco->primary_currency)) === 'EUR' ? 'selected' : '' }}>EUR (Euro)</option>
                                 <option value="CDF" {{ (old('primary_currency', $sacco->primary_currency)) === 'CDF' ? 'selected' : '' }}>CDF (Franc congolais)</option>
                                 <option value="KES" {{ (old('primary_currency', $sacco->primary_currency)) === 'KES' ? 'selected' : '' }}>KES (Shilling kényan)</option>
-                                <option value="UGX" {{ (old('primary_currency', $sacco->primary_currency)) === 'UGX' ? 'selected' : '' }}>UGX (Shilling ougandais)</option>
+                                <option value="CDF" {{ (old('primary_currency', $sacco->primary_currency)) === 'CDF' ? 'selected' : '' }}>CDF (Shilling ougandais)</option>
                                 <option value="TZS" {{ (old('primary_currency', $sacco->primary_currency)) === 'TZS' ? 'selected' : '' }}>TZS (Shilling tanzanien)</option>
                             </select>
                             @error('primary_currency')
@@ -93,7 +93,7 @@
                                 <option value="EUR" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'EUR' ? 'selected' : '' }}>EUR (Euro)</option>
                                 <option value="CDF" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'CDF' ? 'selected' : '' }}>CDF (Franc congolais)</option>
                                 <option value="KES" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'KES' ? 'selected' : '' }}>KES (Shilling kényan)</option>
-                                <option value="UGX" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'UGX' ? 'selected' : '' }}>UGX (Shilling ougandais)</option>
+                                <option value="CDF" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'CDF' ? 'selected' : '' }}>CDF (Shilling ougandais)</option>
                                 <option value="TZS" {{ (old('secondary_currency', $sacco->secondary_currency)) === 'TZS' ? 'selected' : '' }}>TZS (Shilling tanzanien)</option>
                             </select>
                             @error('secondary_currency')

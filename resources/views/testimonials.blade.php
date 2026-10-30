@@ -39,7 +39,7 @@
                         [
                             'name' => 'Joseph Mutebi',
                             'role' => 'Business Owner & Member since 2021',
-                            'text' => 'The platform\'s loan management system helped me grow my retail business. I started with small contributions and now manage a portfolio of over UGX 50 million. The support team is always responsive.',
+                            'text' => 'The platform\'s loan management system helped me grow my retail business. I started with small contributions and now manage a portfolio of over CDF 50 million. The support team is always responsive.',
                             'rating' => 5,
                             'image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                             'featured' => true

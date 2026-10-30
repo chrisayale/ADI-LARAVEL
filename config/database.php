@@ -37,6 +37,11 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+            'charset' => 'utf8mb4',
+            'options' => [
+                PDO::ATTR_PERSISTENT => true,
+                PDO::SQLITE_ATTR_OPEN_FLAGS => PDO::SQLITE_OPEN_READWRITE | PDO::SQLITE_OPEN_CREATE,
+            ],
         ],
 
         'mysql' => [

@@ -89,9 +89,16 @@ class RequestSaccoController extends Controller
      */
     private function generateUniqueRequestCode()
     {
+        $attempts = 0;
         do {
             // Generate a random 8-character uppercase alphanumeric code
             $code = strtoupper(Str::random(8));
+            $attempts++;
+            if ($attempts > 50) {
+                // Fallback: add timestamp to ensure uniqueness
+                $code = strtoupper(Str::random(8)) . time();
+                break;
+            }
         } while (RequestSacco::where('code', $code)->exists());
 
         return $code;
@@ -157,8 +164,15 @@ class RequestSaccoController extends Controller
         // Generate SACCO code if not provided
         $saccoCode = $request->code;
         if (!$saccoCode) {
+            $attempts = 0;
             do {
                 $saccoCode = strtoupper(Str::random(6));
+                $attempts++;
+                if ($attempts > 50) {
+                    // Fallback: add timestamp to ensure uniqueness
+                    $saccoCode = strtoupper(Str::random(6)) . time();
+                    break;
+                }
             } while (Sacco::where('code', $saccoCode)->exists());
         }
 
@@ -167,9 +181,9 @@ class RequestSaccoController extends Controller
             'name' => $requestSacco->name,
             'code' => $saccoCode,
             'registration_number' => $requestSacco->registration_number,
-            'address' => $requestSacco->address,
-            'phone' => $requestSacco->phone_number, // Note: request uses phone_number, db uses phone
-            'email' => $requestSacco->email,
+            'physical_address' => $requestSacco->address,
+            'mobile_money' => $requestSacco->phone_number,
+            'official_email' => $requestSacco->email,
             'primary_currency' => 'USD', // Default values
             'secondary_currency' => 'CDF', // Default values
             'status' => 'active',

@@ -30,7 +30,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Deposits</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totals['total_deposits'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totals['total_deposits'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-down fa-2x text-gray-300"></i>
@@ -47,7 +47,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Total Withdrawals</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totals['total_withdrawals'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totals['total_withdrawals'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
@@ -167,9 +167,9 @@
                                 </span>
                             </td>
                             <td class="text-right">
-                                <strong>UGX {{ number_format($transaction->amount, 2) }}</strong>
+                                <strong>CDF {{ number_format($transaction->amount, 2) }}</strong>
                             </td>
-                            <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                             <td>
                                 {{ $transaction->transaction_date->format('d M Y') }}
                                 <br><small class="text-muted">{{ $transaction->created_at->format('H:i') }}</small>

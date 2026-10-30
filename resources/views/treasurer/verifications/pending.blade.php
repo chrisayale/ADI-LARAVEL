@@ -141,7 +141,7 @@
                                 </div>
                             </td>
                             <td class="text-right">
-                                <strong>UGX {{ number_format($loan->amount_applied, 2) }}</strong>
+                                <strong>CDF {{ number_format($loan->amount_applied, 2) }}</strong>
                             </td>
                             <td>{{ $loan->created_at->format('d M Y') }}</td>
                             <td class="text-center">

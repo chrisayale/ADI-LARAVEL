@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
+@section('title', __('admin_dashboard'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('admin_dashboard') }}</h1>
         <a href="{{ route('admin.reports.financial-summary') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
+            <i class="fas fa-download fa-sm text-white-50"></i> {{ __('generate_report') }}
         </a>
     </div>
 
@@ -21,7 +21,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Members</div>
+                                {{ __('total_members') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalMembers }}</div>
                         </div>
                         <div class="col-auto">
@@ -39,7 +39,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Active Members</div>
+                                {{ __('active_members') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeMembers }}</div>
                         </div>
                         <div class="col-auto">
@@ -57,8 +57,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Savings</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalSavings, 2) }}</div>
+                                {{ __('total_savings') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ __('ugx') }} {{ number_format($totalSavings, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-coins fa-2x text-gray-300"></i>
@@ -75,7 +75,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Loans</div>
+                                {{ __('pending_loans') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingLoans }}</div>
                         </div>
                         <div class="col-auto">
@@ -94,7 +94,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Pending SACCO Requests</div>
+                                {{ __('pending_sacco_requests') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pendingSaccoRequests }}</div>
                         </div>
                         <div class="col-auto">
@@ -113,7 +113,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Monthly Savings Overview ({{ date('Y') }})</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('monthly_savings_overview', ['year' => date('Y')]) }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-area">
@@ -127,7 +127,7 @@
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Loan Status Overview</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('loan_status_overview') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-pie pt-4 pb-2">
@@ -135,13 +135,13 @@
                     </div>
                     <div class="mt-4 text-center small">
                         <span class="mr-2">
-                            <i class="fas fa-circle text-warning"></i> Pending
+                            <i class="fas fa-circle text-warning"></i> {{ __('pending') }}
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Verified
+                            <i class="fas fa-circle text-info"></i> {{ __('verified') }}
                         </span>
                         <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Approved
+                            <i class="fas fa-circle text-success"></i> {{ __('approved') }}
                         </span>
                     </div>
                 </div>
@@ -155,17 +155,17 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Members</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('recent_members') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Membership No.</th>
-                                    <th>Joined</th>
-                                    <th>Status</th>
+                                    <th>{{ __('name') }}</th>
+                                    <th>{{ __('membership_no') }}</th>
+                                    <th>{{ __('joined') }}</th>
+                                    <th>{{ __('status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -176,20 +176,20 @@
                                     <td>{{ $member->created_at->format('d M Y') }}</td>
                                     <td>
                                         <span class="badge badge-{{ $member->status === 'active' ? 'success' : ($member->status === 'inactive' ? 'warning' : 'danger') }}">
-                                            {{ ucfirst($member->status) }}
+                                            {{ translate_status($member->status) }}
                                         </span>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No members found</td>
+                                    <td colspan="4" class="text-center">{{ __('no_members_found') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
                     <div class="text-center mt-3">
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary btn-sm">View All Members</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary btn-sm">{{ __('view_all_members') }}</a>
                     </div>
                 </div>
             </div>
@@ -199,24 +199,24 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Loan Applications</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('recent_loan_applications') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Member</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
+                                    <th>{{ __('member') }}</th>
+                                    <th>{{ __('amount') }}</th>
+                                    <th>{{ __('date') }}</th>
+                                    <th>{{ __('status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($recentLoans as $loan)
                                 <tr>
                                     <td>{{ $loan->user->name }}</td>
-                                    <td>UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                                    <td>{{ __('ugx') }} {{ number_format($loan->amount_applied, 2) }}</td>
                                     <td>{{ $loan->created_at->format('d M Y') }}</td>
                                     <td>
                                         <span class="badge badge-{{
@@ -230,14 +230,14 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No loan applications found</td>
+                                    <td colspan="4" class="text-center">{{ __('no_loan_applications_found') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
                     <div class="text-center mt-3">
-                        <a href="{{ route('admin.loans.index') }}" class="btn btn-primary btn-sm">View All Loans</a>
+                        <a href="{{ route('admin.loans.index') }}" class="btn btn-primary btn-sm">{{ __('view_all_loans') }}</a>
                     </div>
                 </div>
             </div>
@@ -267,13 +267,13 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: months,
             datasets: [{
-                label: 'Deposits',
+                label: '{{ __('deposits') }}',
                 data: deposits,
                 borderColor: '#4e73df',
                 backgroundColor: 'rgba(78, 115, 223, 0.05)',
                 tension: 0.3
             }, {
-                label: 'Withdrawals',
+                label: '{{ __('withdrawals') }}',
                 data: withdrawals,
                 borderColor: '#e74a3b',
                 backgroundColor: 'rgba(231, 74, 59, 0.05)',
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return 'UGX ' + value.toLocaleString();
+                            return '{{ __('ugx') }} ' + value.toLocaleString();
                         }
                     }
                 }
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('loanStatusChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Pending', 'Verified', 'Approved'],
+            labels: ['{{ __('pending') }}', '{{ __('verified') }}', '{{ __('approved') }}'],
             datasets: [{
                 data: [{{ $pendingLoans }}, 5, 8], // Replace with actual data
                 backgroundColor: ['#f6c23e', '#36b9cc', '#1cc88a'],

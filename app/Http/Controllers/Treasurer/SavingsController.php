@@ -111,7 +111,7 @@ class SavingsController extends Controller
         // Validate withdrawal amount
         if ($request->transaction_type === 'withdrawal' && $request->amount > $currentBalance) {
             return redirect()->back()
-                ->with('error', 'Insufficient balance. Current balance: UGX ' . number_format($currentBalance, 2))
+                ->with('error', 'Insufficient balance. Current balance: CDF ' . number_format($currentBalance, 2))
                 ->withInput();
         }
 

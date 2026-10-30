@@ -67,7 +67,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('total_deposits') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totals['total_deposits'], 2) }}
+                                CDF {{ number_format($totals['total_deposits'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -86,7 +86,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('total_withdrawals') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totals['total_withdrawals'], 2) }}
+                                CDF {{ number_format($totals['total_withdrawals'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -105,7 +105,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('net_savings') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totals['net_savings'], 2) }}
+                                CDF {{ number_format($totals['net_savings'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -127,7 +127,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {{ __('loans_approved') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totals['total_loans_approved'], 2) }}
+                                CDF {{ number_format($totals['total_loans_approved'], 2) }}
                             </div>
                             <small>{{ $totals['total_loans_count'] }} {{ __('loans') }}</small>
                         </div>
@@ -165,7 +165,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('average_loan') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totals['total_loans_count'] > 0 ? $totals['total_loans_approved'] / $totals['total_loans_count'] : 0, 2) }}
+                                CDF {{ number_format($totals['total_loans_count'] > 0 ? $totals['total_loans_approved'] / $totals['total_loans_count'] : 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">

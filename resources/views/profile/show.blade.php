@@ -81,7 +81,7 @@
                             <small class="text-muted">Member Since</small>
                         </div>
                         <div class="col-6">
-                            <div class="font-weight-bold text-success">UGX {{ number_format($stats['total_savings'], 0) }}</div>
+                            <div class="font-weight-bold text-success">CDF {{ number_format($stats['total_savings'], 0) }}</div>
                             <small class="text-muted">Total Savings</small>
                         </div>
                     </div>
@@ -385,8 +385,8 @@
                                                 {{ ucfirst($transaction->transaction_type) }}
                                             </span>
                                         </td>
-                                        <td class="text-right">UGX {{ number_format($transaction->amount, 2) }}</td>
-                                        <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($transaction->amount, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -419,7 +419,7 @@
                                     <tr>
                                         <td>{{ $loan->created_at->format('d M Y') }}</td>
                                         <td>{{ $loan->application_number }}</td>
-                                        <td class="text-right">UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($loan->amount_applied, 2) }}</td>
                                         <td>
                                             @php
                                                 $statusColors = [
@@ -468,7 +468,7 @@
                                     <tr>
                                         <td>{{ $loan->user->name }}</td>
                                         <td>{{ $loan->application_number }}</td>
-                                        <td class="text-right">UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($loan->amount_applied, 2) }}</td>
                                         <td>
                                             <span class="badge badge-{{ $statusColors[$loan->status] ?? 'secondary' }}">
                                                 {{ str_replace('_', ' ', ucfirst($loan->status)) }}
@@ -595,7 +595,7 @@
                                 <i class="fas fa-${activity.icon} mr-1"></i>
                                 ${activity.type === 'savings' ? activity.description : 'Loan Application'}
                             </span>
-                            <h6 class="mb-1">${activity.type === 'savings' ? 'UGX ' + activity.amount.toLocaleString() : activity.description}</h6>
+                            <h6 class="mb-1">${activity.type === 'savings' ? 'CDF ' + activity.amount.toLocaleString() : activity.description}</h6>
                             <p class="text-muted small mb-0">
                                 Ref: ${activity.reference}
                                 ${activity.status ? ' • Status: ' + activity.status.replace('_', ' ') : ''}

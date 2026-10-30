@@ -29,7 +29,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('total_deposits') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalDeposits, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalDeposits, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-down fa-2x text-gray-300"></i>
@@ -46,7 +46,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('todays_deposits') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($todayDeposits, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($todayDeposits, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
@@ -64,7 +64,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {{ __('average_deposit') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalDeposits / max($deposits->total(), 1), 2) }}
+                                CDF {{ number_format($totalDeposits / max($deposits->total(), 1), 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -164,9 +164,9 @@
                                 </div>
                             </td>
                             <td class="text-right">
-                                <strong class="text-success">UGX {{ number_format($deposit->amount, 2) }}</strong>
+                                <strong class="text-success">CDF {{ number_format($deposit->amount, 2) }}</strong>
                             </td>
-                            <td class="text-right">UGX {{ number_format($deposit->balance_after, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($deposit->balance_after, 2) }}</td>
                             <td>{{ $deposit->transaction_date->format('d M Y') }}</td>
                             <td>
                                 <span class="badge badge-{{ $deposit->status_color }} p-2">

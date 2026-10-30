@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Sacco;
 use App\Models\User;
+use App\Services\SaccoCodeGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 
@@ -64,15 +64,26 @@ class SaccoController extends Controller
     /**
      * Store a newly created SACCO in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, SaccoCodeGenerator $codeGenerator)
     {
+        // Generate unique SACCO code using dedicated service
+        $code = $codeGenerator->generate();
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:20|unique:sacos',
-            'registration_number' => 'nullable|string|max:100|unique:sacos',
-            'address' => 'nullable|string',
-            'phone_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'mobile_money' => 'required|string|max:20',
+            'official_email' => 'nullable|email|max:255',
+            'province' => 'required|string|max:100',
+            'territory' => 'required|string|max:100',
+            'city_quartier' => 'required|string|max:100',
+            'physical_address' => 'nullable|string',
+            'applicant_name' => 'required|string|max:255',
+            'applicant_role' => 'required|string|max:100',
+            'applicant_email' => 'nullable|email|max:255',
+            'applicant_phone' => 'required|string|max:20',
+            'description' => 'nullable|string',
+            'primary_currency' => 'nullable|string|max:10',
+            'secondary_currency' => 'nullable|string|max:10',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -83,15 +94,12 @@ class SaccoController extends Controller
         }
 
         $input = $request->all();
-        // Map phone_number from form to phone column in database
-        if (isset($input['phone_number'])) {
-            $input['phone'] = $input['phone_number'];
-            unset($input['phone_number']);
-        }
+        $input['code'] = $code;
+
         Sacco::create($input);
 
         return redirect()->route('admin.sacos.index')
-            ->with('success', 'SACCO created successfully.');
+            ->with('success', 'SACCO créé avec succès.');
     }
 
     /**
@@ -117,11 +125,19 @@ class SaccoController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:20|unique:sacos,code,' . $sacco->id,
-            'registration_number' => 'nullable|string|max:100|unique:sacos,registration_number,' . $sacco->id,
-            'address' => 'nullable|string',
-            'phone_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'mobile_money' => 'required|string|max:20',
+            'official_email' => 'nullable|email|max:255',
+            'province' => 'required|string|max:100',
+            'territory' => 'required|string|max:100',
+            'city_quartier' => 'required|string|max:100',
+            'physical_address' => 'nullable|string',
+            'applicant_name' => 'required|string|max:255',
+            'applicant_role' => 'required|string|max:100',
+            'applicant_email' => 'nullable|email|max:255',
+            'applicant_phone' => 'required|string|max:20',
+            'description' => 'nullable|string',
+            'primary_currency' => 'nullable|string|max:10',
+            'secondary_currency' => 'nullable|string|max:10',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -132,15 +148,10 @@ class SaccoController extends Controller
         }
 
         $input = $request->all();
-        // Map phone_number from form to phone column in database
-        if (isset($input['phone_number'])) {
-            $input['phone'] = $input['phone_number'];
-            unset($input['phone_number']);
-        }
         $sacco->update($input);
 
         return redirect()->route('admin.sacos.index')
-            ->with('success', 'SACCO updated successfully.');
+            ->with('success', 'SACCO mis à jour avec succès.');
     }
 
     /**
@@ -156,7 +167,7 @@ class SaccoController extends Controller
         $sacco->delete();
 
         return redirect()->route('admin.sacos.index')
-            ->with('success', 'SACCO deleted successfully.');
+            ->with('success', 'SACCO supprimé avec succès.');
     }
 
     /**
@@ -193,7 +204,7 @@ class SaccoController extends Controller
             $sacco->status = ($sacco->status === 'active') ? 'inactive' : 'active';
             $sacco->save();
 
-            $statusText = $sacco->status === 'active' ? 'activé' : 'désactivé';
+            $statusText = $sacco->status === 'active' ? 'activé' : 'inactif';
 
             return redirect()->route('admin.sacos.index')
                 ->with('success', "Le SACCO a été $statusText avec succès.");
@@ -276,7 +287,7 @@ class SaccoController extends Controller
         $officialUser->save();
 
         // Also update the SACCO's email to match the official account email
-        $sacco->email = $validated['email'];
+        $sacco->official_email = $validated['email'];
         $sacco->save();
 
         return redirect()->route('admin.sacos.official-account', $sacco->id)

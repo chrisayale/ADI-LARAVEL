@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', __('edit_user') . ' - ' . $user->name)
+@section('title', __('edit_user', ['name' => $user->name]))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ __('edit_user') }}: {{ $user->name }}</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('edit_user', ['name' => $user->name]) }}</h1>
         <div>
             <a href="{{ route('admin.users.show', $user) }}" class="btn btn-info">
                 <i class="fas fa-eye"></i> {{ __('view_details') }}

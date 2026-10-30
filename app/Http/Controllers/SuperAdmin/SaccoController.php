@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Sacco;
 use App\Models\User;
+use App\Services\SaccoCodeGenerator;
 use Illuminate\Http\Request;
 use App\Support\TenantContext;
 use App\Services\TenantResolver;
@@ -58,7 +59,7 @@ class SaccoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, SaccoCodeGenerator $codeGenerator)
     {
         // Check if the user is a Super Admin
         if (!Gate::forUser($request->user())->allows('create', Sacco::class)) {
@@ -81,8 +82,8 @@ class SaccoController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        // Generate a unique SACCO code
-        $code = $this->generateUniqueSaccoCode();
+        // Generate a unique SACCO code using service
+        $code = $codeGenerator->generate();
 
         // Prepare settings array with extra fields
         $settings = [
@@ -101,9 +102,9 @@ class SaccoController extends Controller
             'name' => $request->name,
             'code' => $code,
             'registration_number' => null, // Not provided in request form
-            'phone' => $request->phone_number,
-            'email' => $request->email,
-            'address' => $request->address,
+            'mobile_money' => $request->phone_number,
+            'official_email' => $request->email,
+            'physical_address' => $request->address,
             'primary_currency' => 'USD', // Default values
             'secondary_currency' => 'CDF', // Default values
             'status' => 'active', // Default status
@@ -168,9 +169,9 @@ class SaccoController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:20|unique:sacos,code,'.$sacco->id,
             'registration_number' => 'nullable|string|max:100|unique:sacos,registration_number,'.$sacco->id,
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
+            'mobile_money' => 'nullable|string|max:20',
+            'official_email' => 'nullable|email|max:255',
+            'physical_address' => 'nullable|string',
             'primary_currency' => 'required|string|max:3',
             'secondary_currency' => 'required|string|max:3',
             'status' => 'required|in:active,inactive,suspended',
@@ -371,14 +372,22 @@ class SaccoController extends Controller
      *
      * @return string
      */
-    private function generateUniqueSaccoCode()
-    {
-        do {
-            $year = date('Y');
-            $random = strtoupper(Str::random(3));
-            $code = "SC-{$year}-{$random}";
-        } while (Sacco::where('code', $code)->exists());
-
-        return $code;
-    }
+    // DEPRECATED: Use SaccoCodeGenerator service instead
+    // private function generateUniqueSaccoCode()
+    // {
+    //     $attempts = 0;
+    //     do {
+    //         $year = date('Y');
+    //         $random = strtoupper(Str::random(3));
+    //         $code = "SC-{$year}-{$random}";
+    //         $attempts++;
+    //         if ($attempts > 50) {
+    //             // Fallback: add timestamp to ensure uniqueness
+    //             $code = "SC-{$year}-{$random}-" . time();
+    //             break;
+    //         }
+    //     } while (Sacco::where('code', $code)->exists());
+    //
+    //     return $code;
+    // }
 }

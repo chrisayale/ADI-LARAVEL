@@ -52,7 +52,7 @@
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="amount_applied">Amount Applied (UGX) <span class="text-danger">*</span></label>
+                            <label for="amount_applied">Amount Applied (CDF) <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" class="form-control @error('amount_applied') is-invalid @enderror"
                                    id="amount_applied" name="amount_applied" value="{{ old('amount_applied') }}"
                                    required min="1">
@@ -111,7 +111,7 @@
                                 <div class="card bg-success text-white">
                                     <div class="card-body py-2">
                                         <small>Monthly Payment</small>
-                                        <h6 id="monthlyPayment">UGX 0</h6>
+                                        <h6 id="monthlyPayment">CDF 0</h6>
                                     </div>
                                 </div>
                             </div>
@@ -119,7 +119,7 @@
                                 <div class="card bg-info text-white">
                                     <div class="card-body py-2">
                                         <small>Total Interest</small>
-                                        <h6 id="totalInterest">UGX 0</h6>
+                                        <h6 id="totalInterest">CDF 0</h6>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@
                                 <div class="card bg-primary text-white">
                                     <div class="card-body py-2">
                                         <small>Total Payment</small>
-                                        <h6 id="totalPayment">UGX 0</h6>
+                                        <h6 id="totalPayment">CDF 0</h6>
                                     </div>
                                 </div>
                             </div>
@@ -198,7 +198,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="collateral_value">Estimated Value (UGX)</label>
+                                        <label for="collateral_value">Estimated Value (CDF)</label>
                                         <input type="number" step="0.01" class="form-control @error('collateral_value') is-invalid @enderror"
                                                id="collateral_value" name="collateral_value" value="{{ old('collateral_value') }}">
                                         @error('collateral_value')
@@ -618,9 +618,9 @@
         const totalInterest = totalPayment - amount;
 
         // Display summary with formatted numbers
-        document.getElementById('monthlyPayment').textContent = 'UGX ' + Math.round(monthlyPayment).toLocaleString();
-        document.getElementById('totalInterest').textContent = 'UGX ' + Math.round(totalInterest).toLocaleString();
-        document.getElementById('totalPayment').textContent = 'UGX ' + Math.round(totalPayment).toLocaleString();
+        document.getElementById('monthlyPayment').textContent = 'CDF ' + Math.round(monthlyPayment).toLocaleString();
+        document.getElementById('totalInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
+        document.getElementById('totalPayment').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
 
         document.getElementById('loanSummary').style.display = 'flex';
 
@@ -642,10 +642,10 @@
             schedule += `<tr>
                 <td>${i}</td>
                 <td>${dateStr}</td>
-                <td>UGX ${Math.round(monthlyPayment).toLocaleString()}</td>
-                <td>UGX ${Math.round(principalPayment).toLocaleString()}</td>
-                <td>UGX ${Math.round(interestPayment).toLocaleString()}</td>
-                <td>UGX ${Math.max(0, Math.round(balance)).toLocaleString()}</td>
+                <td>CDF ${Math.round(monthlyPayment).toLocaleString()}</td>
+                <td>CDF ${Math.round(principalPayment).toLocaleString()}</td>
+                <td>CDF ${Math.round(interestPayment).toLocaleString()}</td>
+                <td>CDF ${Math.max(0, Math.round(balance)).toLocaleString()}</td>
             </tr>`;
         }
 

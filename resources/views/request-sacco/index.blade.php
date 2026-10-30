@@ -33,7 +33,7 @@
                     <td>
                         <!-- Status badge -->
                         <span class="badge bg-{{ $req->status === 'pending' ? 'warning' : ($req->status === 'approved' ? 'success' : 'danger') }}">
-                            {{ ucfirst($req->status) }}
+                            {{ translate_status($req->status) }}
                         </span>
 
                         <!-- Actions dropdown -->

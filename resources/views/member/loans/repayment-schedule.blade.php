@@ -26,7 +26,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Loan Amount</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($loan->amount_approved, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($loan->amount_approved, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -43,7 +43,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Paid</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalPaid, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalPaid, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -60,7 +60,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Outstanding</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($loan->balance, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($loan->balance, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-chart-line fa-2x text-gray-300"></i>
@@ -77,7 +77,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Monthly Payment</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($loan->monthly_repayment, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($loan->monthly_repayment, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
@@ -120,7 +120,7 @@
             <div>
                 <i class="fas fa-{{ $nextPayment->due_date < now() ? 'exclamation-circle' : 'info-circle' }} mr-2"></i>
                 <strong>Next Payment:</strong>
-                UGX {{ number_format($nextPayment->amount_due - $nextPayment->amount_paid, 2) }}
+                CDF {{ number_format($nextPayment->amount_due - $nextPayment->amount_paid, 2) }}
                 due on {{ $nextPayment->due_date->format('d F Y') }}
                 @if($nextPayment->due_date < now())
                     <span class="badge badge-danger ml-2">OVERDUE</span>
@@ -166,9 +166,9 @@
                                     <br><span class="badge badge-danger">Overdue</span>
                                 @endif
                             </td>
-                            <td class="text-right">UGX {{ number_format($repayment->amount_due, 2) }}</td>
-                            <td class="text-right">UGX {{ number_format($repayment->amount_paid, 2) }}</td>
-                            <td class="text-right"><strong>UGX {{ number_format($balance, 2) }}</strong></td>
+                            <td class="text-right">CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($repayment->amount_paid, 2) }}</td>
+                            <td class="text-right"><strong>CDF {{ number_format($balance, 2) }}</strong></td>
                             <td>
                                 @php
                                     $statusColors = [
@@ -196,9 +196,9 @@
                     <tfoot class="bg-light">
                         <tr>
                             <th colspan="2" class="text-right">Totals:</th>
-                            <th class="text-right">UGX {{ number_format($loan->repayments->sum('amount_due'), 2) }}</th>
-                            <th class="text-right">UGX {{ number_format($loan->repayments->sum('amount_paid'), 2) }}</th>
-                            <th class="text-right">UGX {{ number_format($loan->repayments->sum('balance'), 2) }}</th>
+                            <th class="text-right">CDF {{ number_format($loan->repayments->sum('amount_due'), 2) }}</th>
+                            <th class="text-right">CDF {{ number_format($loan->repayments->sum('amount_paid'), 2) }}</th>
+                            <th class="text-right">CDF {{ number_format($loan->repayments->sum('balance'), 2) }}</th>
                             <th colspan="3"></th>
                         </tr>
                     </tfoot>

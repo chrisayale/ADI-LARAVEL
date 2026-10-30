@@ -83,7 +83,7 @@ class SavingsTransaction extends Model
     // Accessors
     public function getFormattedAmountAttribute()
     {
-        return 'UGX ' . number_format($this->amount, 2);
+        return 'CDF ' . number_format($this->amount, 2);
     }
 
     public function getStatusColorAttribute()

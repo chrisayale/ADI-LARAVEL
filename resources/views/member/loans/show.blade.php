@@ -34,7 +34,7 @@
                 ];
             @endphp
             <div class="alert alert-{{ $statusColors[$loan->status] ?? 'secondary' }} mb-0">
-                <strong>Status:</strong> {{ str_replace('_', ' ', ucfirst($loan->status)) }}
+                <strong>Status:</strong> {{ translate_status($loan->status) }}
                 @if($loan->status == 'approved' && $loan->approved_at)
                     - Approved on {{ $loan->approved_at->format('d M Y') }}
                 @elseif($loan->status == 'disbursed' && $loan->disbursed_at)
@@ -71,12 +71,12 @@
                                 </tr>
                                 <tr>
                                     <th>Amount Applied:</th>
-                                    <td><strong>UGX {{ number_format($loan->amount_applied, 2) }}</strong></td>
+                                    <td><strong>CDF {{ number_format($loan->amount_applied, 2) }}</strong></td>
                                 </tr>
                                 @if($loan->amount_approved)
                                 <tr>
                                     <th>Amount Approved:</th>
-                                    <td><strong class="text-success">UGX {{ number_format($loan->amount_approved, 2) }}</strong></td>
+                                    <td><strong class="text-success">CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
                                 </tr>
                                 @endif
                             </table>
@@ -98,13 +98,13 @@
                                 @if($loan->monthly_repayment)
                                 <tr>
                                     <th>Monthly Repayment:</th>
-                                    <td><strong>UGX {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
+                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
                                 </tr>
                                 @endif
                                 @if($loan->total_repayable)
                                 <tr>
                                     <th>Total Repayable:</th>
-                                    <td><strong>UGX {{ number_format($loan->total_repayable, 2) }}</strong></td>
+                                    <td><strong>CDF {{ number_format($loan->total_repayable, 2) }}</strong></td>
                                 </tr>
                                 @endif
                                 @if($loan->first_payment_date)
@@ -219,7 +219,7 @@
                             <strong>Type:</strong> {{ ucfirst($loan->collateral_type) }}
                         </div>
                         <div class="col-md-4">
-                            <strong>Value:</strong> UGX {{ number_format($loan->collateral_value, 2) }}
+                            <strong>Value:</strong> CDF {{ number_format($loan->collateral_value, 2) }}
                         </div>
                         <div class="col-md-12 mt-3">
                             <strong>Description:</strong>
@@ -317,9 +317,9 @@
                                 <tr class="{{ $repayment->due_date < now() && $repayment->status != 'paid' ? 'table-danger' : '' }}">
                                     <td>{{ $repayment->installment_number }}</td>
                                     <td>{{ $repayment->due_date->format('d M Y') }}</td>
-                                    <td class="text-right">UGX {{ number_format($repayment->amount_due, 2) }}</td>
-                                    <td class="text-right">UGX {{ number_format($repayment->amount_paid, 2) }}</td>
-                                    <td class="text-right">UGX {{ number_format($repayment->amount_due - $repayment->amount_paid, 2) }}</td>
+                                    <td class="text-right">CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                                    <td class="text-right">CDF {{ number_format($repayment->amount_paid, 2) }}</td>
+                                    <td class="text-right">CDF {{ number_format($repayment->amount_due - $repayment->amount_paid, 2) }}</td>
                                     <td>
                                         @php
                                             $repaymentStatusColors = [
@@ -355,14 +355,14 @@
                     <div class="mb-3">
                         <div class="small text-gray-500">Total Paid</div>
                         <div class="h5 mb-0 font-weight-bold text-success">
-                            UGX {{ number_format($loan->repayments->sum('amount_paid'), 2) }}
+                            CDF {{ number_format($loan->repayments->sum('amount_paid'), 2) }}
                         </div>
                     </div>
                     <hr>
                     <div class="mb-3">
                         <div class="small text-gray-500">Outstanding Balance</div>
                         <div class="h5 mb-0 font-weight-bold {{ $loan->balance > 0 ? 'text-danger' : 'text-success' }}">
-                            UGX {{ number_format($loan->balance, 2) }}
+                            CDF {{ number_format($loan->balance, 2) }}
                         </div>
                     </div>
                     <hr>
@@ -391,7 +391,7 @@
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-3">
-                        <h3 class="font-weight-bold">UGX {{ number_format($nextPayment->amount_due - $nextPayment->amount_paid, 2) }}</h3>
+                        <h3 class="font-weight-bold">CDF {{ number_format($nextPayment->amount_due - $nextPayment->amount_paid, 2) }}</h3>
                         <p class="mb-0">Due: {{ $nextPayment->due_date->format('d F Y') }}</p>
                         @if($nextPayment->due_date < now())
                             <span class="badge badge-danger mt-2">Overdue</span>

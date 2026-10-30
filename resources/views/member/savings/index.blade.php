@@ -23,7 +23,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Savings</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalSavings, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalSavings, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-piggy-bank fa-2x text-gray-300"></i>
@@ -40,7 +40,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Pending Transactions</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($pendingSavings, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($pendingSavings, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -107,11 +107,11 @@
                                     {{ ucfirst($transaction->transaction_type) }}
                                 </span>
                             </td>
-                            <td class="text-right">UGX {{ number_format($transaction->amount, 2) }}</td>
-                            <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($transaction->amount, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                             <td>
                                 <span class="badge badge-{{ $transaction->status_color }}">
-                                    {{ ucfirst($transaction->status) }}
+                                    {{ translate_status($transaction->status) }}
                                 </span>
                             </td>
                         </tr>
@@ -168,7 +168,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'UGX ' + value.toLocaleString();
+                                return 'CDF ' + value.toLocaleString();
                             }
                         }
                     }

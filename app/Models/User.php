@@ -70,11 +70,6 @@ public function guaranteedLoans()
 }
 
 
-public function guarantorLoans()
-{
-    return $this->hasMany(LoanGuarantor::class, 'id');
-}
-
 
     public function assignedLoans()
     {

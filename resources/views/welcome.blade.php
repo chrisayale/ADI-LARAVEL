@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Capital Investment Club - Empowering Members Through Digital Finance')
+@section('title', __('welcome_saving_sacco') . ' - ' . __('login_to_access'))
 
 @section('content')
     <!-- Particle Background -->
@@ -14,7 +14,7 @@
                 <div class="logo-icon">
                     <i class="fas fa-hand-holding-usd"></i>
                 </div>
-                <span>Capital Investment</span>
+                <span>{{ __('welcome_saving_sacco') }}</span>
             </a>
 
             <!-- Toggler for mobile -->
@@ -27,26 +27,26 @@
                 <ul class="navbar-nav ms-auto">
                     <!-- Standard Links -->
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a>
+                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">{{ __('home') }}</a>
                     </li>
                     {{-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('home') }}">Features</a>
                     </li> --}}
                     <li class="nav-item">
-                        <a class="nav-link" href="/services">Services</a>
+                        <a class="nav-link" href="/services">{{ __('services') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/team">Team</a>
+                        <a class="nav-link" href="/team">{{ __('team') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/testimonials">Testimonials</a>
+                        <a class="nav-link" href="/testimonials">{{ __('testimonials') }}</a>
                     </li>
 
                     <!-- Member Area Dropdown -->
                     <li class="nav-item dropdown ms-2">
                         <a class="nav-link dropdown-toggle btn btn-outline-success px-4" href="#" id="memberMenu"
                             role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-2"></i>Member Area
+                            <i class="fas fa-user-circle me-2"></i>{{ __('member_area') }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end animate__animated animate__fadeIn">
                             <li>
@@ -56,8 +56,8 @@
                                             <i class="fas fa-sign-in-alt text-success"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Login</h6>
-                                            <small class="text-muted">Access your dashboard</small>
+                                            <h6 class="mb-0">{{ __('login') }}</h6>
+                                            <small class="text-muted">{{ __('access_your_dashboard') }}</small>
                                         </div>
                                     </div>
                                 </a>
@@ -73,8 +73,8 @@
                                             <i class="fas fa-tachometer-alt text-info"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Dashboard</h6>
-                                            <small class="text-muted">View your portfolio</small>
+                                            <h6 class="mb-0">{{ __('dashboard') }}</h6>
+                                            <small class="text-muted">{{ __('view_your_portfolio') }}</small>
                                         </div>
                                     </div>
                                 </a>
@@ -95,35 +95,34 @@
                     <div class="mb-4">
                         <span
                             class="badge bg-light text-success px-4 py-2 rounded-pill mb-3 animate__animated animate__pulse animate__infinite">
-                            <i class="fas fa-star me-2"></i>Trusted by 250+ Members
+                            <i class="fas fa-star me-2"></i>{{ __('trusted_by_members', ['count' => 250]) }}
                         </span>
                     </div>
                     <h1 class="display-3 fw-bold text-white mb-4 hero-text">
-                        Empowering <span class="shine-text">Financial Growth</span> Through Digital Innovation
+                        {!! __('empowering_financial_growth') !!}
                     </h1>
                     <p class="lead text-light mb-4 opacity-75">
-                        Track contributions, manage loans, and coordinate meetings — all in one secure, intuitive platform
-                        designed for modern investment clubs.
+                        {{ __('track_contributions') }}
                     </p>
                     <div class="mt-5">
 
                         <a href="#features" class="btn btn-outline-light btn-lg px-5 py-3">
-                            <i class="fas fa-play-circle me-2"></i>See How It Works
+                            <i class="fas fa-play-circle me-2"></i>{{ __('see_how_it_works') }}
                         </a>
                     </div>
                     <div class="mt-5 d-flex flex-wrap gap-4">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-shield-alt fa-2x text-light me-3"></i>
                             <div>
-                                <h5 class="text-white mb-0">Bank-Level Security</h5>
-                                <small class="text-light opacity-75">256-bit encryption</small>
+                                <h5 class="text-white mb-0">{{ __('bank_level_security') }}</h5>
+                                <small class="text-light opacity-75">{{ __('256_bit_encryption') }}</small>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="fas fa-bolt fa-2x text-warning me-3"></i>
                             <div>
-                                <h5 class="text-white mb-0">Real-time Updates</h5>
-                                <small class="text-light opacity-75">Instant notifications</small>
+                                <h5 class="text-white mb-0">{{ __('real_time_updates') }}</h5>
+                                <small class="text-light opacity-75">{{ __('instant_notifications') }}</small>
                             </div>
                         </div>
                     </div>
@@ -173,28 +172,28 @@
                         <div class="stat-number display-4 fw-bold gradient-text counter" data-count="250">0</div>
                         <i class="fas fa-plus fa-2x text-success position-absolute top-0 end-0"></i>
                     </div>
-                    <p class="text-muted mt-2">Active Members</p>
+                    <p class="text-muted mt-2">{{ __('active_members') }}</p>
                 </div>
                 <div class="col-md-3 col-6 mb-5" data-aos="fade-up" data-aos-delay="200">
                     <div class="position-relative">
                         <div class="stat-number display-4 fw-bold gradient-text counter" data-count="5.2">0</div>
                         <i class="fas fa-dollar-sign fa-2x text-success position-absolute top-0 end-0"></i>
                     </div>
-                    <p class="text-muted mt-2">Million in Contributions</p>
+                    <p class="text-muted mt-2">{{ __('million_contributions') }}</p>
                 </div>
                 <div class="col-md-3 col-6 mb-5" data-aos="fade-up" data-aos-delay="300">
                     <div class="position-relative">
                         <div class="stat-number display-4 fw-bold gradient-text counter" data-count="150">0</div>
                         <i class="fas fa-check-circle fa-2x text-success position-absolute top-0 end-0"></i>
                     </div>
-                    <p class="text-muted mt-2">Loans Approved</p>
+                    <p class="text-muted mt-2">{{ __('loans_approved') }}</p>
                 </div>
                 <div class="col-md-3 col-6 mb-5" data-aos="fade-up" data-aos-delay="400">
                     <div class="position-relative">
                         <div class="stat-number display-4 fw-bold gradient-text counter" data-count="98">0</div>
                         <i class="fas fa-percent fa-2x text-success position-absolute top-0 end-0"></i>
                     </div>
-                    <p class="text-muted mt-2">Member Satisfaction</p>
+                    <p class="text-muted mt-2">{{ __('member_satisfaction') }}</p>
                 </div>
             </div>
         </div>
@@ -205,10 +204,10 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill mb-3">
-                    <i class="fas fa-bolt me-2"></i>Features
+                    <i class="fas fa-bolt me-2"></i>{{ __('features') }}
                 </span>
-                <h2 class="display-5 fw-bold mb-3 reveal-text">Powerful Features for Modern Investment Clubs</h2>
-                <p class="lead text-muted">Everything you need to manage your investment club efficiently and transparently
+                <h2 class="display-5 fw-bold mb-3 reveal-text">{{ __('powerful_features') }}</h2>
+                <p class="lead text-muted">{{ __('everything_you_need') }}
                 </p>
             </div>
 
@@ -220,19 +219,17 @@
                             <div class="feature-icon">
                                 <i class="fas fa-piggy-bank"></i>
                             </div>
-                            <h4 class="mb-3">Smart Contributions</h4>
-                            <p class="text-muted mb-4">Track your monthly savings with full transparency. Automated
-                                reminders and detailed history at your fingertips.</p>
+                            <h4 class="mb-3">{{ __('smart_contributions') }}</h4>
+                            <p class="text-muted mb-4">{{ __('track_monthly_savings') }}</p>
                             <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Automated tracking
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('automated_tracking') }}
                                 </li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Real-time updates
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('real_time_updates_short') }}
                                 </li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Mobile
-                                    notifications</li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('mobile_notifications') }}</li>
                             </ul>
                             <a href="#" class="btn btn-link text-success text-decoration-none fw-bold">
-                                Explore Feature <i class="fas fa-arrow-right ms-1"></i>
+                                {{ __('explore_feature') }} <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -245,19 +242,18 @@
                             <div class="feature-icon">
                                 <i class="fas fa-hand-holding-usd"></i>
                             </div>
-                            <h4 class="mb-3">Loan Management</h4>
-                            <p class="text-muted mb-4">Apply for internal loans and monitor repayment status easily.
-                                Real-time updates and flexible payment options.</p>
+                            <h4 class="mb-3">{{ __('loan_management') }}</h4>
+                            <p class="text-muted mb-4">{{ __('apply_internal_loans') }}</p>
                             <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Quick applications
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('quick_applications') }}
                                 </li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Automated
-                                    approvals</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Flexible repayment
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('automated_approvals') }}
+                                </li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('flexible_repayment') }}
                                 </li>
                             </ul>
                             <a href="#" class="btn btn-link text-success text-decoration-none fw-bold">
-                                Explore Feature <i class="fas fa-arrow-right ms-1"></i>
+                                {{ __('explore_feature') }} <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -270,19 +266,18 @@
                             <div class="feature-icon">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <h4 class="mb-3">Meeting Coordination</h4>
-                            <p class="text-muted mb-4">Stay updated on upcoming meetings and access archived minutes. Never
-                                miss an important decision.</p>
+                            <h4 class="mb-3">{{ __('meeting_coordination') }}</h4>
+                            <p class="text-muted mb-4">{{ __('stay_updated_meetings') }}</p>
                             <ul class="list-unstyled text-start">
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Calendar
-                                    integration</li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Minutes archive
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('calendar_integration') }}
                                 </li>
-                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Attendance
-                                    tracking</li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('minutes_archive') }}
+                                </li>
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ __('attendance_tracking') }}
+                                </li>
                             </ul>
                             <a href="#" class="btn btn-link text-success text-decoration-none fw-bold">
-                                Explore Feature <i class="fas fa-arrow-right ms-1"></i>
+                                {{ __('explore_feature') }} <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -297,10 +292,10 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="badge bg-light text-success px-4 py-2 rounded-pill mb-3">
-                    <i class="fas fa-cogs me-2"></i>Our Services
+                    <i class="fas fa-cogs me-2"></i>{{ __('our_services') }}
                 </span>
-                <h2 class="display-5 fw-bold text-white mb-3">Comprehensive Financial Solutions</h2>
-                <p class="lead text-light opacity-75">We provide end-to-end solutions for all your investment club needs
+                <h2 class="display-5 fw-bold text-white mb-3">{{ __('comprehensive_financial') }}</h2>
+                <p class="lead text-light opacity-75">{{ __('end_to_end_solutions') }}
                 </p>
             </div>
 
@@ -309,38 +304,38 @@
                     $services = [
                         [
                             'icon' => 'fa-chart-pie',
-                            'title' => 'Portfolio Management',
-                            'desc' => 'Track and optimize your investment portfolio',
+                            'title' => 'portfolio_management',
+                            'desc' => 'track_optimize_portfolio',
                             'color' => 'success',
                         ],
                         [
                             'icon' => 'fa-file-invoice-dollar',
-                            'title' => 'Financial Reporting',
-                            'desc' => 'Detailed reports and analytics',
+                            'title' => 'financial_reporting',
+                            'desc' => 'detailed_reports_analytics',
                             'color' => 'warning',
                         ],
                         [
                             'icon' => 'fa-shield-alt',
-                            'title' => 'Secure Transactions',
-                            'desc' => 'Bank-level security for all transactions',
+                            'title' => 'secure_transactions',
+                            'desc' => 'bank_level_security_desc',
                             'color' => 'info',
                         ],
                         [
                             'icon' => 'fa-mobile-alt',
-                            'title' => 'Mobile Access',
-                            'desc' => 'Access your account anywhere, anytime',
+                            'title' => 'mobile_access',
+                            'desc' => 'access_anywhere',
                             'color' => 'primary',
                         ],
                         [
                             'icon' => 'fa-headset',
-                            'title' => '24/7 Support',
-                            'desc' => 'Round-the-clock customer support',
+                            'title' => 'support_24_7',
+                            'desc' => 'round_clock_support',
                             'color' => 'danger',
                         ],
                         [
                             'icon' => 'fa-sync',
-                            'title' => 'Auto-sync',
-                            'desc' => 'Automatic data synchronization',
+                            'title' => 'auto_sync',
+                            'desc' => 'auto_data_sync',
                             'color' => 'purple',
                         ],
                     ];
@@ -354,10 +349,10 @@
                                     class="icon-wrapper bg-{{ $service['color'] }} bg-opacity-10 rounded-circle p-4 d-inline-block mb-4">
                                     <i class="fas {{ $service['icon'] }} fa-2x text-{{ $service['color'] }}"></i>
                                 </div>
-                                <h4 class="text-white mb-3">{{ $service['title'] }}</h4>
-                                <p class="text-light opacity-75 mb-4">{{ $service['desc'] }}</p>
+                                <h4 class="text-white mb-3">{{ __($service['title']) }}</h4>
+                                <p class="text-light opacity-75 mb-4">{{ __($service['desc']) }}</p>
                                 <a href="#" class="btn btn-outline-light btn-sm">
-                                    Learn More <i class="fas fa-arrow-right ms-1"></i>
+                                    {{ __('learn_more') }} <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
@@ -372,38 +367,35 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill mb-3">
-                    <i class="fas fa-users me-2"></i>Our Team
+                    <i class="fas fa-users me-2"></i>{{ __('our_team') }}
                 </span>
-                <h2 class="display-5 fw-bold mb-3 reveal-text">Meet Our Leadership Team</h2>
-                <p class="lead text-muted">Dedicated professionals guiding our investment club to success</p>
+                <h2 class="display-5 fw-bold mb-3 reveal-text">{{ __('meet_leadership') }}</h2>
+                <p class="lead text-muted">{{ __('dedicated_professionals') }}</p>
             </div>
 
             <div class="row g-4">
                 @php
                     $team = [
                         [
-                            'name' => 'Jane Namutebi',
-                            'role' => 'Chairperson',
-                            'desc' =>
-                                'Oversees club governance and strategic direction with over 10 years of investment experience.',
+                            'name' => 'jane_namutebi',
+                            'role' => 'chairperson',
+                            'desc' => 'jane_desc',
                             'image' =>
                                 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                             'initials' => 'JN',
                         ],
                         [
-                            'name' => 'David Kato',
-                            'role' => 'Treasurer',
-                            'desc' =>
-                                'Manages contributions, loans, and financial reporting with precision and transparency.',
+                            'name' => 'david_kato',
+                            'role' => 'treasurer',
+                            'desc' => 'david_desc',
                             'image' =>
                                 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                             'initials' => 'DK',
                         ],
                         [
-                            'name' => 'Sarah Nansubuga',
-                            'role' => 'Secretary',
-                            'desc' =>
-                                'Coordinates meetings and maintains member records with exceptional organizational skills.',
+                            'name' => 'sarah_nansubuga',
+                            'role' => 'secretary',
+                            'desc' => 'sarah_desc',
                             'image' =>
                                 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                             'initials' => 'SN',
@@ -417,7 +409,7 @@
                             <div class="card-body p-4 text-center">
                                 <!-- Circular Profile Image -->
                                 <div class="position-relative mb-4" style="width: 150px; height: 150px; margin: 0 auto;">
-                                    <img src="{{ $member['image'] }}" alt="{{ $member['name'] }}"
+                                    <img src="{{ $member['image'] }}" alt="{{ __($member['name']) }}"
                                         class="rounded-circle w-100 h-100 object-fit-cover shadow-sm border border-4 border-white">
                                     {{-- <div class="position-absolute bottom-0 end-0 bg-success text-white rounded-circle p-2 border border-3 border-white">
                                 @if ($member['role'] == 'Chairperson')
@@ -431,13 +423,13 @@
                                 </div>
 
                                 <!-- Name and Role -->
-                                <h4 class="mb-1">{{ $member['name'] }}</h4>
+                                <h4 class="mb-1">{{ __($member['name']) }}</h4>
                                 <div class="badge bg-success bg-opacity-10 text-success px-3 py-1 mb-3">
-                                    {{ $member['role'] }}
+                                    {{ __($member['role']) }}
                                 </div>
 
                                 <!-- Description -->
-                                <p class="text-muted mb-4">{{ $member['desc'] }}</p>
+                                <p class="text-muted mb-4">{{ __($member['desc']) }}</p>
 
                                 <!-- Social Links -->
                                 <div class="d-flex justify-content-center">
@@ -483,33 +475,31 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill mb-3">
-                    <i class="fas fa-star me-2"></i>Testimonials
+                    <i class="fas fa-star me-2"></i>{{ __('testimonials') }}
                 </span>
-                <h2 class="display-5 fw-bold mb-3 reveal-text">What Our Members Say</h2>
-                <p class="lead text-muted">Join thousands of satisfied members who trust our platform</p>
+                <h2 class="display-5 fw-bold mb-3 reveal-text">{{ __('what_members_say') }}</h2>
+                <p class="lead text-muted">{{ __('join_satisfied_members') }}</p>
             </div>
 
             <div class="row g-4">
                 @php
                     $testimonials = [
                         [
-                            'name' => 'John Musoke',
-                            'role' => 'Member since 2023',
-                            'text' =>
-                                'This platform transformed how our investment club operates. The transparency and ease of use are incredible!',
+                            'name' => 'john_musoke',
+                            'role' => 'member_since_2023',
+                            'text' => 'john_testimonial',
                             'rating' => 5,
                         ],
                         [
-                            'name' => 'Mary Nakato',
-                            'role' => 'Business Owner',
-                            'text' =>
-                                'The loan management system saved us countless hours. Highly recommended for any investment group!',
+                            'name' => 'mary_nakato',
+                            'role' => 'business_owner',
+                            'text' => 'mary_testimonial',
                             'rating' => 5,
                         ],
                         [
-                            'name' => 'Robert Ssemwanga',
-                            'role' => 'Club Treasurer',
-                            'text' => 'Best decision we made for our club. The reporting features alone are worth it!',
+                            'name' => 'robert_ssemwanga',
+                            'role' => 'club_treasurer',
+                            'text' => 'robert_testimonial',
                             'rating' => 5,
                         ],
                     ];
@@ -527,11 +517,11 @@
                                         </div>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <h5 class="mb-1">{{ $testimonial['name'] }}</h5>
-                                        <small class="text-muted">{{ $testimonial['role'] }}</small>
+                                        <h5 class="mb-1">{{ __($testimonial['name']) }}</h5>
+                                        <small class="text-muted">{{ __($testimonial['role']) }}</small>
                                     </div>
                                 </div>
-                                <p class="text-muted mb-4">"{{ $testimonial['text'] }}"</p>
+                                <p class="text-muted mb-4">"{{ __($testimonial['text']) }}"</p>
                                 <div class="star-rating">
                                     @for ($i = 0; $i < $testimonial['rating']; $i++)
                                         <i class="fas fa-star text-warning"></i>
@@ -552,14 +542,14 @@
                 <div class="col-lg-6">
                     <div class="mb-5" data-aos="fade-right">
                         <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill mb-3">
-                            <i class="fas fa-question-circle me-2"></i>FAQ
+                            <i class="fas fa-question-circle me-2"></i>{{ __('faq') }}
                         </span>
-                        <h2 class="display-5 fw-bold mb-4">Frequently Asked Questions</h2>
-                        <p class="lead text-muted">Find answers to common questions about our investment club and platform.
+                        <h2 class="display-5 fw-bold mb-4">{{ __('frequently_asked') }}</h2>
+                        <p class="lead text-muted">{{ __('find_answers') }}
                         </p>
                         <div class="mt-4">
                             <a href="#contact" class="btn btn-success btn-lg">
-                                <i class="fas fa-comments me-2"></i>Ask a Question
+                                <i class="fas fa-comments me-2"></i>{{ __('ask_question') }}
                             </a>
                         </div>
                     </div>
@@ -570,24 +560,20 @@
                         @php
                             $faqs = [
                                 [
-                                    'q' => 'Who can join the club?',
-                                    'a' =>
-                                        'Any resident of Kampala with a commitment to monthly contributions and ethical investment practices. We welcome individuals who are serious about financial growth and community development.',
+                                    'q' => 'who_can_join',
+                                    'a' => 'who_can_join_a',
                                 ],
                                 [
-                                    'q' => 'How are loans approved?',
-                                    'a' =>
-                                        'Loan applications are reviewed by the executive committee and approved based on contribution history, purpose, and repayment capacity. Decisions are typically made within 3-5 business days.',
+                                    'q' => 'how_loans_approved',
+                                    'a' => 'how_loans_approved_a',
                                 ],
                                 [
-                                    'q' => 'What are the contribution requirements?',
-                                    'a' =>
-                                        'Members are required to make monthly contributions as agreed upon during registration. Minimum contribution is UGX 50,000 per month. Contributions can be made through mobile money or bank deposit.',
+                                    'q' => 'contribution_requirements',
+                                    'a' => 'contribution_requirements_a',
                                 ],
                                 [
-                                    'q' => 'Is my data secure?',
-                                    'a' =>
-                                        'Yes! We use bank-level security encryption to protect your data. All transactions are logged and monitored. We never share your personal information with third parties without your consent.',
+                                    'q' => 'is_data_secure',
+                                    'a' => 'is_data_secure_a',
                                 ],
                             ];
                         @endphp
@@ -598,13 +584,13 @@
                                     <button class="accordion-button collapsed rounded" type="button"
                                         data-bs-toggle="collapse" data-bs-target="#faq{{ $index }}">
                                         <i class="fas fa-question-circle text-success me-3"></i>
-                                        {{ $faq['q'] }}
+                                        {{ __($faq['q']) }}
                                     </button>
                                 </h2>
                                 <div id="faq{{ $index }}" class="accordion-collapse collapse"
                                     data-bs-parent="#faqAccordion">
                                     <div class="accordion-body">
-                                        {{ $faq['a'] }}
+                                        {{ __($faq['a']) }}
                                     </div>
                                 </div>
                             </div>
@@ -622,21 +608,18 @@
                 <div class="col-lg-8" data-aos="zoom-in">
                     <div class="card border-0 shadow-lg hover-card" style="background: rgba(255, 255, 255, 0.95);">
                         <div class="card-body p-5">
-                            <h2 class="display-5 fw-bold text-dark mb-4">Ready to Transform Your Investment Club?</h2>
-                            <p class="lead text-muted mb-5">Join hundreds of successful members who have already
-                                transformed their financial journey.</p>
+                            <h2 class="display-5 fw-bold text-dark mb-4">{{ __('ready_to_transform') }}</h2>
+                            <p class="lead text-muted mb-5">{{ __('join_hundreds') }}</p>
 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
         <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg px-5 py-3">
-            <i class="fas fa-sign-in-alt me-2"></i>Existing Member Login
+            <i class="fas fa-sign-in-alt me-2"></i>{{ __('existing_member_login') }}
         </a>
         <a href="{{ route('request-sacco.create') }}" class="btn btn-success btn-lg px-5 py-3">
-            <i class="fas fa-plus me-2"></i>Request New SACCO
+            <i class="fas fa-plus me-2"></i>{{ __('request_new_sacco') }}
         </a>
     </div>
                             <p class="mt-5 mb-0 text-muted">
-                                <i class="fas fa-phone me-2"></i>+256 700 123456 |
-                                <i class="fas fa-envelope ms-3 me-2"></i>info@capitalclub.org |
-                                <i class="fas fa-map-marker-alt ms-3 me-2"></i>Kampala, Uganda
+                                {!! __('contact_info') !!}
                             </p>
                         </div>
                     </div>
@@ -655,10 +638,9 @@
                         <div class="logo-icon text-warning">
                             <i class="fas fa-hand-holding-usd"></i>
                         </div>
-                        <h4 class="text-white mb-0 ms-2">Capital Investment Club</h4>
+                        <h4 class="text-white mb-0 ms-2">{{ __('welcome_saving_sacco') }}</h4>
                     </div>
-                    <p class="text-light opacity-75 mb-4">Empowering members through transparent digital finance solutions
-                        and community-driven investments.</p>
+                    <p class="text-light opacity-75 mb-4">{{ __('empowering_members') }}</p>
                     <div class="social-links">
                         <a href="#" class="floating" style="animation-delay: 0s;"><i
                                 class="fab fa-facebook-f"></i></a>
@@ -673,42 +655,42 @@
 
                 <!-- Quick Links -->
                 <div class="col-lg-2 col-md-4 mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="100">
-                    <h6 class="text-white mb-3">Quick Links</h6>
+                    <h6 class="text-white mb-3">{{ __('quick_links') }}</h6>
                     <div class="footer-links">
-                        <div class="mb-2"><a href="{{ url('/') }}">Home</a></div>
-                        <div class="mb-2"><a href="#features">Features</a></div>
-                        <div class="mb-2"><a href="#services">Services</a></div>
-                        <div class="mb-2"><a href="#team">Our Team</a></div>
+                        <div class="mb-2"><a href="{{ url('/') }}">{{ __('home') }}</a></div>
+                        <div class="mb-2"><a href="#features">{{ __('features') }}</a></div>
+                        <div class="mb-2"><a href="#services">{{ __('services') }}</a></div>
+                        <div class="mb-2"><a href="#team">{{ __('team') }}</a></div>
                     </div>
                 </div>
 
                 <!-- Member Area -->
                 <div class="col-lg-3 col-md-4 mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="200">
-                    <h6 class="text-white mb-3">Member Area</h6>
+                    <h6 class="text-white mb-3">{{ __('member_area_footer') }}</h6>
                     <div class="footer-links">
-                        <div class="mb-2"><a href="{{ route('login') }}">Member Login</a></div>
+                        <div class="mb-2"><a href="{{ route('login') }}">{{ __('member_login') }}</a></div>
 
-                        <div class="mb-2"><a href="#">Dashboard</a></div>
-                        <div class="mb-2"><a href="#">Help Center</a></div>
-                        <div class="mb-2"><a href="#">Contact Support</a></div>
+                        <div class="mb-2"><a href="#">{{ __('dashboard') }}</a></div>
+                        <div class="mb-2"><a href="#">{{ __('help_center') }}</a></div>
+                        <div class="mb-2"><a href="#">{{ __('contact_support') }}</a></div>
                     </div>
                 </div>
 
                 <!-- Contact -->
                 <div class="col-lg-3 col-md-4" data-aos="fade-up" data-aos-delay="300">
-                    <h6 class="text-white mb-3">Contact Info</h6>
+                    <h6 class="text-white mb-3">{{ __('contact_info_footer') }}</h6>
                     <div class="footer-links">
                         <div class="mb-3 d-flex align-items-start">
                             <i class="fas fa-map-marker-alt mt-1 me-3"></i>
-                            <span class="text-white">Plot 123, Kampala Road<br>Kampala, Uganda</span>
+                            <span class="text-white">{{ __('address_footer') }}</span>
                         </div>
                         <div class="mb-3 d-flex align-items-center">
                             <i class="fas fa-phone me-3"></i>
-                            <span class="text-white">+256 700 123456</span>
+                            <span class="text-white">{{ __('phone_footer') }}</span>
                         </div>
                         <div class="mb-3 d-flex align-items-center">
                             <i class="fas fa-envelope me-3"></i>
-                            <span class="text-white">info@capitalclub.org</span>
+                            <span class="text-white">{{ __('email_footer') }}</span>
                         </div>
                     </div>
                 </div>
@@ -719,13 +701,13 @@
             <!-- Copyright -->
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="mb-0 text-light opacity-75">&copy; 2025 Capital Investment Club. All rights reserved.</p>
+                    <p class="mb-0 text-light opacity-75">{{ __('copyright') }}</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="footer-links">
-                        <a href="#" class="me-3">Privacy Policy</a>
-                        <a href="#" class="me-3">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
+                        <a href="#" class="me-3">{{ __('privacy_policy') }}</a>
+                        <a href="#" class="me-3">{{ __('terms_of_service') }}</a>
+                        <a href="#">{{ __('cookie_policy') }}</a>
                     </div>
                 </div>
             </div>

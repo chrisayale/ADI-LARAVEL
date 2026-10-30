@@ -41,7 +41,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {{ __('total_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalApprovedAmount ?? 0, 2) }}
+                                CDF {{ number_format($totalApprovedAmount ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -77,7 +77,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('total_interest') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalInterest ?? 0, 2) }}
+                                CDF {{ number_format($totalInterest ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -173,11 +173,11 @@
                                 </div>
                             </td>
                             <td>{{ $loan->user->membership_number ?? __('n_a') }}</td>
-                            <td><strong>UGX {{ number_format($loan->amount_approved, 2) }}</strong></td>
+                            <td><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
                             <td>{{ $loan->interest_rate }}%</td>
                             <td>{{ $loan->duration_months }} {{ __('months') }}</td>
-                            <td>UGX {{ number_format($loan->monthly_repayment, 2) }}</td>
-                            <td>UGX {{ number_format($loan->total_repayable, 2) }}</td>
+                            <td>CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
+                            <td>CDF {{ number_format($loan->total_repayable, 2) }}</td>
                             <td>{{ $loan->approved_at->format('d M Y') }}</td>
                             <td>{{ $loan->approver->name ?? __('n_a') }}</td>
                             <td>

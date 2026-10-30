@@ -41,7 +41,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('total_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalDisbursed ?? 0, 2) }}
+                                CDF {{ number_format($totalDisbursed ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -60,7 +60,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('total_repaid') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalRepaid ?? 0, 2) }}
+                                CDF {{ number_format($totalRepaid ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -79,7 +79,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('outstanding') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($outstandingBalance ?? 0, 2) }}
+                                CDF {{ number_format($outstandingBalance ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -188,16 +188,16 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><strong>UGX {{ number_format($loan->amount_approved, 2) }}</strong></td>
+                            <td><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
                             <td>{{ $loan->interest_rate }}%</td>
                             <td>{{ $loan->duration_months }} {{ __('months') }}</td>
-                            <td>UGX {{ number_format($loan->monthly_repayment, 2) }}</td>
-                            <td>UGX {{ number_format($loan->total_repayable, 2) }}</td>
+                            <td>CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
+                            <td>CDF {{ number_format($loan->total_repayable, 2) }}</td>
                             <td>{{ $loan->disbursed_at->format('d M Y') }}</td>
-                            <td>UGX {{ number_format($totalPaid, 2) }}</td>
+                            <td>CDF {{ number_format($totalPaid, 2) }}</td>
                             <td>
                                 <span class="badge badge-{{ $balance > 0 ? 'warning' : 'success' }} px-3 py-2">
-                                    UGX {{ number_format($balance, 2) }}
+                                    CDF {{ number_format($balance, 2) }}
                                 </span>
                             </td>
                             <td>

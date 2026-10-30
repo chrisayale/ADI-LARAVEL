@@ -174,7 +174,7 @@
             @endif
             <div class="amount-row">
                 <span class="detail-label">Amount Paid:</span>
-                <span style="font-size: 20px;">UGX {{ number_format($transaction->amount, 2) }}</span>
+                <span style="font-size: 20px;">CDF {{ number_format($transaction->amount, 2) }}</span>
             </div>
         </div>
 

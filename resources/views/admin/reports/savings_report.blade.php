@@ -66,7 +66,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('total_deposits') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['total_deposits'], 2) }}
+                                CDF {{ number_format($summary['total_deposits'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -85,7 +85,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('total_withdrawals') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['total_withdrawals'], 2) }}
+                                CDF {{ number_format($summary['total_withdrawals'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -104,7 +104,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('pending_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['pending_amount'], 2) }}
+                                CDF {{ number_format($summary['pending_amount'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -182,8 +182,8 @@
                                     {{ ucfirst($transaction->transaction_type) }}
                                 </span>
                             </td>
-                            <td class="text-right">UGX {{ number_format($transaction->amount, 2) }}</td>
-                            <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($transaction->amount, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                             <td>
                                 <span class="badge badge-{{ $transaction->status_color }}">
                                     {{ ucfirst($transaction->status) }}

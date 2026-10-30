@@ -10,16 +10,16 @@
                                 <span>Secure Connection</span>
                             @else
                                 <i class="fas fa-exclamation-triangle text-warning me-1"></i>
-                                <span>Not Secure</span>
+                                <span>{{ __('not_secure') }}</span>
                             @endif
                         </div>
                         <div>
                             <i class="fas fa-clock me-1"></i>
-                            Last login: @auth
-                                {{ auth()->user()->last_login_at?->format('M d, Y h:i A') ?? 'First login' }}
-                            @else
-                                First login
-                            @endauth
+                        {{ __('last_login') }} @auth
+                            {{ auth()->user()->last_login_at?->format('M d, Y h:i A') ?? __('first_login') }}
+                        @else
+                            {{ __('first_login') }}
+                        @endauth
                         </div>
                     </div>
                 </div>

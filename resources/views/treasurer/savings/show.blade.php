@@ -48,7 +48,7 @@
                                 </tr>
                                 <tr>
                                     <th>Amount:</th>
-                                    <td><h4 class="text-{{ $saving->transaction_type == 'deposit' ? 'success' : 'info' }}">UGX {{ number_format($saving->amount, 2) }}</h4></td>
+                                    <td><h4 class="text-{{ $saving->transaction_type == 'deposit' ? 'success' : 'info' }}">CDF {{ number_format($saving->amount, 2) }}</h4></td>
                                 </tr>
                             </table>
                         </div>
@@ -109,7 +109,7 @@
                             <div class="card bg-light mb-3">
                                 <div class="card-body text-center py-3">
                                     <small class="text-muted">Balance After Transaction</small>
-                                    <h5 class="mb-0 text-primary">UGX {{ number_format($saving->balance_after, 2) }}</h5>
+                                    <h5 class="mb-0 text-primary">CDF {{ number_format($saving->balance_after, 2) }}</h5>
                                 </div>
                             </div>
                         </div>

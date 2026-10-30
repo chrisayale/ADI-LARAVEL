@@ -1,0 +1,103 @@
+fr.json MOJIBAKE in monthly_savings: Ãpargne mensuelle
+fr.json MOJIBAKE in my_savings: Mon Ãpargne
+fr.json MOJIBAKE in installment: Ãchéance
+fr.json MOJIBAKE in team: Ãquipe
+OK: fr.json: No BOM
+OK: fr.json: Valid UTF-8
+OK: en.json: Clean UTF-8, 407 keys, no mojibake
+OK: en.json: No BOM
+OK: en.json: Valid UTF-8
+
+=== KEY TRANSLATIONS ===
+  fr.savings = Épargne
+  fr.all_loans = Tous les prêts
+  fr.applications = Demandes de prêt
+  fr.active = Actif
+  fr.not_secure = Non sécurisé
+  fr.last_login = Dernière connexion : 
+  fr.first_login = Première connexion
+  fr.secure_connection = Connexion sécurisée
+  fr.membership_no = N° d'adhésion
+  fr.application_no = N° demande
+  fr.loan_no = N° prêt
+  en.savings = Savings
+  en.all_loans = All Loans
+  en.applications = Loan Applications
+  en.active = Active
+  en.not_secure = Not Secure
+  en.last_login = Last login: 
+  en.first_login = First login
+  en.secure_connection = Secure Connection
+  en.membership_no = Membership No.
+  en.application_no = Application #
+  en.loan_no = Loan #
+
+=== STATUS TRANSLATIONS ===
+  fr.active = Actif
+  fr.inactive = Inactif
+  fr.pending = En attente
+  fr.approved = Approuvé
+  fr.rejected = Rejeté
+  fr.disbursed = Décaissé
+  fr.completed = Terminé
+  fr.overdue = En retard
+  fr.verified = Vérifié
+  en.active = Active
+  en.inactive = Inactive
+  en.pending = Pending
+  en.approved = Approved
+  en.rejected = Rejected
+  en.disbursed = Disbursed
+  en.completed = Completed
+  en.overdue = Overdue
+  en.verified = Verified
+OK: fr.json: Clean UTF-8, 407 keys, no mojibake
+OK: fr.json: No BOM
+OK: fr.json: Valid UTF-8
+OK: en.json: Clean UTF-8, 407 keys, no mojibake
+OK: en.json: No BOM
+OK: en.json: Valid UTF-8
+
+=== KEY TRANSLATIONS ===
+  fr.savings = Épargne
+  fr.all_loans = Tous les prêts
+  fr.applications = Demandes de prêt
+  fr.active = Actif
+  fr.not_secure = Non sécurisé
+  fr.last_login = Dernière connexion : 
+  fr.first_login = Première connexion
+  fr.secure_connection = Connexion sécurisée
+  fr.membership_no = N° d'adhésion
+  fr.application_no = N° demande
+  fr.loan_no = N° prêt
+  en.savings = Savings
+  en.all_loans = All Loans
+  en.applications = Loan Applications
+  en.active = Active
+  en.not_secure = Not Secure
+  en.last_login = Last login: 
+  en.first_login = First login
+  en.secure_connection = Secure Connection
+  en.membership_no = Membership No.
+  en.application_no = Application #
+  en.loan_no = Loan #
+
+=== STATUS TRANSLATIONS ===
+  fr.active = Actif
+  fr.inactive = Inactif
+  fr.pending = En attente
+  fr.approved = Approuvé
+  fr.rejected = Rejeté
+  fr.disbursed = Décaissé
+  fr.completed = Terminé
+  fr.overdue = En retard
+  fr.verified = Vérifié
+  en.active = Active
+  en.inactive = Inactive
+  en.pending = Pending
+  en.approved = Approved
+  en.rejected = Rejected
+  en.disbursed = Disbursed
+  en.completed = Completed
+  en.overdue = Overdue
+  en.verified = Verified

@@ -6,16 +6,19 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="h5 mb-0">Demande de création de SACCO</h3>
+                    <h3 class="h5 mb-0">{{ __('request_sacco_title') }}</h3>
                 </div>
                 <div class="card-body">
                     @if (isset($errors) && $errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>{{ __('please_correct_errors') }}</strong>
+                            <ul class="mb-0 mt-2">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('close') }}"></button>
                         </div>
                     @endif
 
@@ -24,34 +27,34 @@
 
                         <!-- Informations sur le SACCO -->
                         <div class="mb-4">
-                            <h6 class="text-muted">Informations sur le SACCO</h6>
+                            <h6 class="text-muted">{{ __('sacco_information') }}</h6>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nom du SACCO *</label>
-                                    <input type="text" name="name" class="form-control" required value="{{ old('name') }}">
+                                    <label class="form-label">{{ __('sacco_name') }} <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control" required value="{{ old('name') }}" placeholder="{{ __('sacco_name_placeholder') }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">
-                                        Numéro Mobile Money officiel du SACCO *
-                                        <span class="text-muted fw-normal">(Numéro où l'argent des membres sera déposé)</span>
+                                        {{ __('official_mobile_money_number') }} <span class="text-danger">*</span>
+                                        <span class="text-muted fw-normal">({{ __('mobile_money_description') }})</span>
                                     </label>
-                                    <input type="tel" name="phone_number" class="form-control" required value="{{ old('phone_number') }}">
+                                    <input type="tel" name="phone_number" class="form-control" required value="{{ old('phone_number') }}" placeholder="{{ __('mobile_money_placeholder') }}">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Email officiel du SACCO (optionnel)</label>
-                                <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+                                <label class="form-label">{{ __('official_email_optional') }}</label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="{{ __('email_placeholder') }}">
                             </div>
                         </div>
 
                         <!-- Localisation du SACCO -->
                         <div class="mb-4">
-                            <h6 class="text-muted">Localisation du SACCO *</h6>
+                            <h6 class="text-muted">{{ __('sacco_location') }} <span class="text-danger">*</span></h6>
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Province *</label>
+                                    <label class="form-label">{{ __('province') }} <span class="text-danger">*</span></label>
                                     <select name="province" class="form-select" required>
-                                        <option value="">-- Sélectionnez une province --</option>
+                                        <option value="">{{ __('select_province') }}</option>
                                         <option value="Kinshasa" {{ old('province') == 'Kinshasa' ? 'selected' : '' }}>Kinshasa</option>
                                         <option value="Kongo Central" {{ old('province') == 'Kongo Central' ? 'selected' : '' }}>Kongo Central</option>
                                         <option value="Kwango" {{ old('province') == 'Kwango' ? 'selected' : '' }}>Kwango</option>
@@ -80,53 +83,53 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Territoire / Commune *</label>
-                                    <input type="text" name="territory" class="form-control" required value="{{ old('territory') }}">
+                                    <label class="form-label">{{ __('territory_commune') }} <span class="text-danger">*</span></label>
+                                    <input type="text" name="territory" class="form-control" required value="{{ old('territory') }}" placeholder="{{ __('territory_placeholder') }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Ville / Village / Quartier *</label>
-                                    <input type="text" name="city_village" class="form-control" required value="{{ old('city_village') }}">
+                                    <label class="form-label">{{ __('city_village_quarter') }} <span class="text-danger">*</span></label>
+                                    <input type="text" name="city_village" class="form-control" required value="{{ old('city_village') }}" placeholder="{{ __('city_village_placeholder') }}">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Adresse physique détaillée (facultatif)</label>
-                                <textarea name="address" class="form-control" rows="2">{{ old('address') }}</textarea>
+                                <label class="form-label">{{ __('detailed_address_optional') }}</label>
+                                <textarea name="address" class="form-control" rows="2" placeholder="{{ __('address_placeholder') }}">{{ old('address') }}</textarea>
                             </div>
                         </div>
 
                         <!-- Informations du demandeur -->
                         <div class="mb-4">
-                            <h6 class="text-muted">Informations du demandeur *</h6>
+                            <h6 class="text-muted">{{ __('applicant_information') }} <span class="text-danger">*</span></h6>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nom complet du demandeur *</label>
-                                    <input type="text" name="applicant_name" class="form-control" required value="{{ old('applicant_name') }}">
+                                    <label class="form-label">{{ __('applicant_full_name') }} <span class="text-danger">*</span></label>
+                                    <input type="text" name="applicant_name" class="form-control" required value="{{ old('applicant_name') }}" placeholder="{{ __('applicant_name_placeholder') }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Fonction / Rôle dans le SACCO *</label>
-                                    <input type="text" name="applicant_role" class="form-control" required value="{{ old('applicant_role') }}">
+                                    <label class="form-label">{{ __('applicant_role') }} <span class="text-danger">*</span></label>
+                                    <input type="text" name="applicant_role" class="form-control" required value="{{ old('applicant_role') }}" placeholder="{{ __('applicant_role_placeholder') }}">
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email de contact du demandeur (optionnel)</label>
-                                    <input type="email" name="applicant_email" class="form-control" value="{{ old('applicant_email') }}">
+                                    <label class="form-label">{{ __('applicant_email_optional') }}</label>
+                                    <input type="email" name="applicant_email" class="form-control" value="{{ old('applicant_email') }}" placeholder="{{ __('email_placeholder') }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Téléphone de contact du demandeur *</label>
-                                    <input type="tel" name="applicant_phone" class="form-control" required value="{{ old('applicant_phone') }}">
+                                    <label class="form-label">{{ __('applicant_phone') }} <span class="text-danger">*</span></label>
+                                    <input type="tel" name="applicant_phone" class="form-control" required value="{{ old('applicant_phone') }}" placeholder="{{ __('phone_placeholder') }}">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Motif / Description -->
                         <div class="mb-4">
-                            <h6 class="text-muted">Motif / Description</h6>
-                            <textarea name="description" class="form-control" rows="4" placeholder="Décrivez brièvement votre projet de SACCO...">{{ old('description') }}</textarea>
+                            <h6 class="text-muted">{{ __('reason_description') }}</h6>
+                            <textarea name="description" class="form-control" rows="4" placeholder="{{ __('description_placeholder') }}">{{ old('description') }}</textarea>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Soumettre la demande</button>
+                            <button type="submit" class="btn btn-primary btn-lg">{{ __('submit_request') }}</button>
                         </div>
                     </form>
                 </div>

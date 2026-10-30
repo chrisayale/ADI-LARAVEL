@@ -14,14 +14,14 @@
         <small class="text-white-50 d-block mt-1" style="font-size: 11px;">
             @if(auth()->check())
                 @if(auth()->user()->hasRole('admin'))
-                    System Administrator
+                    {{ __('admin') }}
                 @elseif(auth()->user()->hasRole('treasurer'))
-                    Treasurer
+                    {{ __('treasurer') }}
                 @else
-                    Member
+                    {{ __('member') }}
                 @endif
             @else
-                Guest
+                {{ __('guest') }}
             @endif
         </small>
         <!-- SACCO Name for Admin/Treasurer in sidebar header -->
@@ -43,19 +43,19 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                        href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Dashboard</span>
+                        <span style="font-size: 13px;">{{ __('dashboard') }}</span>
                     </a>
                 @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.dashboard') ? 'active' : '' }}"
                        href="{{ route('treasurer.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Dashboard</span>
+                        <span style="font-size: 13px;">{{ __('dashboard') }}</span>
                     </a>
                 @elseif(auth()->check())
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.dashboard') ? 'active' : '' }}"
                        href="{{ route('member.dashboard') }}">
                         <i class="fas fa-chart-pie me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Dashboard</span>
+                        <span style="font-size: 13px;">{{ __('dashboard') }}</span>
                     </a>
                 @else
                     <!-- No dashboard for guests -->
@@ -65,7 +65,7 @@
             @if(auth()->check() && auth()->user()->hasRole('admin'))
                 <!-- ADMIN MENU -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Core Management</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('core_management') }}</small>
                 </li>
 
                 <!-- Users -->
@@ -73,7 +73,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                        href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Users</span>
+                        <span style="font-size: 13px;">{{ __('users') }}</span>
                         @php $pendingUsers = \App\Models\User::where('status', 'pending')->count(); @endphp
                         @if($pendingUsers > 0)
                             <span class="sidebar-badge">{{ $pendingUsers }}</span>
@@ -86,7 +86,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.index') ? 'active' : '' }}"
                        href="{{ route('admin.loans.index') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">All Loans</span>
+                        <span style="font-size: 13px;">{{ __('all_loans') }}</span>
                     </a>
                 </li>
 
@@ -94,7 +94,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.applications') ? 'active' : '' }}"
                        href="{{ route('admin.loans.applications') }}">
                         <i class="fas fa-file-alt me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Applications</span>
+                        <span style="font-size: 13px;">{{ __('applications') }}</span>
                     </a>
                 </li>
 
@@ -102,7 +102,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.pending') ? 'active' : '' }}"
                        href="{{ route('admin.loans.pending') }}">
                         <i class="fas fa-clock me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Pending</span>
+                        <span style="font-size: 13px;">{{ __('pending') }}</span>
                         @php $pendingLoans = \App\Models\LoanApplication::where('status', 'pending')->count(); @endphp
                         @if($pendingLoans > 0)
                             <span class="sidebar-badge">{{ $pendingLoans }}</span>
@@ -114,7 +114,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.under-verification') ? 'active' : '' }}"
                        href="{{ route('admin.loans.under-verification') }}">
                         <i class="fas fa-search me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Under Verification</span>
+                        <span style="font-size: 13px;">{{ __('under_verification') }}</span>
                     </a>
                 </li>
 
@@ -122,7 +122,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.verified') ? 'active' : '' }}"
                        href="{{ route('admin.loans.verified') }}">
                         <i class="fas fa-check-circle me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Verified</span>
+                        <span style="font-size: 13px;">{{ __('verified') }}</span>
                     </a>
                 </li>
 
@@ -130,7 +130,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.approved') ? 'active' : '' }}"
                        href="{{ route('admin.loans.approved') }}">
                         <i class="fas fa-thumbs-up me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Approved</span>
+                        <span style="font-size: 13px;">{{ __('approved') }}</span>
                     </a>
                 </li>
 
@@ -138,7 +138,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.disbursed') ? 'active' : '' }}"
                        href="{{ route('admin.loans.disbursed') }}">
                         <i class="fas fa-money-bill-wave me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Disbursed</span>
+                        <span style="font-size: 13px;">{{ __('disbursed') }}</span>
                     </a>
                 </li>
 
@@ -146,7 +146,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.completed') ? 'active' : '' }}"
                        href="{{ route('admin.loans.completed') }}">
                         <i class="fas fa-check-double me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Completed</span>
+                        <span style="font-size: 13px;">{{ __('completed') }}</span>
                     </a>
                 </li>
 
@@ -154,20 +154,20 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.loans.defaulters') ? 'active' : '' }}"
                        href="{{ route('admin.loans.defaulters') }}">
                         <i class="fas fa-exclamation-triangle me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Defaulters</span>
+                        <span style="font-size: 13px;">{{ __('defaulters') }}</span>
                     </a>
                 </li>
 
                 <!-- Payments - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Payments</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('payments') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.payments.collect') ? 'active' : '' }}"
                        href="{{ route('admin.payments.collect') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Collect Payment</span>
+                        <span style="font-size: 13px;">{{ __('collect_payment') }}</span>
                     </a>
                 </li>
 
@@ -175,20 +175,20 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.payments.history') ? 'active' : '' }}"
                        href="{{ route('admin.payments.history') }}">
                         <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Payment History</span>
+                        <span style="font-size: 13px;">{{ __('payment_history') }}</span>
                     </a>
                 </li>
 
                 <!-- Savings - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Savings</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('savings') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.index') ? 'active' : '' }}"
                        href="{{ route('admin.savings.index') }}">
                         <i class="fas fa-list me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">All Transactions</span>
+                        <span style="font-size: 13px;">{{ __('all_transactions') }}</span>
                     </a>
                 </li>
 
@@ -196,7 +196,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.deposits') ? 'active' : '' }}"
                        href="{{ route('admin.savings.deposits') }}">
                         <i class="fas fa-arrow-down me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Deposits</span>
+                        <span style="font-size: 13px;">{{ __('deposits') }}</span>
                     </a>
                 </li>
 
@@ -204,7 +204,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.withdrawals') ? 'active' : '' }}"
                        href="{{ route('admin.savings.withdrawals') }}">
                         <i class="fas fa-arrow-up me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Withdrawals</span>
+                        <span style="font-size: 13px;">{{ __('withdrawals') }}</span>
                     </a>
                 </li>
 
@@ -212,21 +212,21 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.savings.create') ? 'active' : '' }}"
                        href="{{ route('admin.savings.create') }}">
                         <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Add Transaction</span>
+                        <span style="font-size: 13px;">{{ __('add_transaction') }}</span>
                     </a>
                 </li>
 
                 @if(auth()->check() && auth()->user()->hasRole('super_admin'))
                 <!-- SACCO Requests (Super Admin only) -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">SACCO Requests</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('sacco_requests') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.request-sacco.index') ? 'active' : '' }}"
                        href="{{ route('admin.request-sacco.index') }}">
                         <i class="fas fa-file-alt me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Demandes de SACCO</span>
+                        <span style="font-size: 13px;">{{ __('sacco_requests_management') }}</span>
                         @php $pendingSaccoRequests = \App\Models\RequestSacco::where('status', 'pending')->count(); @endphp
                         @if($pendingSaccoRequests > 0)
                             <span class="sidebar-badge">{{ $pendingSaccoRequests }}</span>
@@ -236,31 +236,31 @@
 
                 <!-- Gestion des SACCOs (Super Admin only) -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Gestion des SACCOs</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('sacco_management') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.sacos.index') ? 'active' : '' }}"
                        href="{{ route('admin.sacos.index') }}">
                         <i class="fas fa-university me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">SACCOs</span>
+                        <span style="font-size: 13px;">{{ __('saccos') }}</span>
                         @php $totalSacos = \App\Models\Sacco::count(); @endphp
                         @php $activeSacos = \App\Models\Sacco::where('status', 'active')->count(); @endphp
-                        <span style="font-size: 11px; opacity: 0.8;">{{ $activeSacos }}/{{ $totalSacos }} actifs</span>
+                        <span style="font-size: 11px; opacity: 0.8;">{{ $activeSacos }}/{{ $totalSacos }} {{ __('active') }}</span>
                     </a>
                 </li>
                 @endif
 
                 <!-- Reports -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Reports & Analytics</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('reports_analytics') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.savings') ? 'active' : '' }}"
                        href="{{ route('admin.reports.savings') }}">
                         <i class="fas fa-chart-line me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Savings Report</span>
+                        <span style="font-size: 13px;">{{ __('savings_report') }}</span>
                     </a>
                 </li>
 
@@ -268,7 +268,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.loans') ? 'active' : '' }}"
                        href="{{ route('admin.reports.loans') }}">
                         <i class="fas fa-chart-bar me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Loans Report</span>
+                        <span style="font-size: 13px;">{{ __('loans_report') }}</span>
                     </a>
                 </li>
 
@@ -276,21 +276,21 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('admin.reports.financial-summary') ? 'active' : '' }}"
                        href="{{ route('admin.reports.financial-summary') }}">
                         <i class="fas fa-file-invoice-dollar me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Financial Summary</span>
+                        <span style="font-size: 13px;">{{ __('financial_summary') }}</span>
                     </a>
                 </li>
 
             @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                 <!-- TREASURER MENU - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Loan Operations</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('loan_operations') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.repayments.collect') ? 'active' : '' }}"
                        href="{{ route('treasurer.repayments.collect') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Collect Payment</span>
+                        <span style="font-size: 13px;">{{ __('collect_payment') }}</span>
                     </a>
                 </li>
 
@@ -298,7 +298,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.repayments.index') ? 'active' : '' }}"
                        href="{{ route('treasurer.repayments.index') }}">
                         <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Payment History</span>
+                        <span style="font-size: 13px;">{{ __('payment_history') }}</span>
                     </a>
                 </li>
 
@@ -306,7 +306,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.loans.assigned') ? 'active' : '' }}"
                        href="{{ route('treasurer.loans.assigned') }}">
                         <i class="fas fa-tasks me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Assigned Loans</span>
+                        <span style="font-size: 13px;">{{ __('assigned_loans') }}</span>
                         @if(auth()->check())
                             @php
                                 $assignedLoans = \App\Models\LoanApplication::where('treasurer_id', auth()->id())
@@ -325,14 +325,14 @@
                 </li>
 
                 <li class="nav-section mt-2 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Verifications</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('verifications') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.verifications.pending') ? 'active' : '' }}"
                        href="{{ route('treasurer.verifications.pending') }}">
                         <i class="fas fa-clock me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Pending</span>
+                        <span style="font-size: 13px;">{{ __('pending') }}</span>
                         @php $pendingVerifications = \App\Models\LoanApplication::where('treasurer_id', auth()->id())->where('status', 'under_verification')->count(); @endphp
                         @if($pendingVerifications > 0)
                             <span class="sidebar-badge">{{ $pendingVerifications }}</span>
@@ -344,20 +344,20 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.verifications.verified') ? 'active' : '' }}"
                        href="{{ route('treasurer.verifications.verified') }}">
                         <i class="fas fa-check me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Verified</span>
+                        <span style="font-size: 13px;">{{ __('verified') }}</span>
                     </a>
                 </li>
 
                 <!-- Savings Section -->
                 <li class="nav-section mt-2 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Savings</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('savings') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.transactions') ? 'active' : '' }}"
                        href="{{ route('treasurer.savings.transactions') }}">
                         <i class="fas fa-list me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">All Transactions</span>
+                        <span style="font-size: 13px;">{{ __('all_transactions') }}</span>
                     </a>
                 </li>
 
@@ -365,7 +365,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.deposits') ? 'active' : '' }}"
                        href="{{ route('treasurer.savings.deposits') }}">
                         <i class="fas fa-arrow-down me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Deposits</span>
+                        <span style="font-size: 13px;">{{ __('deposits') }}</span>
                     </a>
                 </li>
 
@@ -373,7 +373,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.withdrawals') ? 'active' : '' }}"
                        href="{{ route('treasurer.savings.withdrawals') }}">
                         <i class="fas fa-arrow-up me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Withdrawals</span>
+                        <span style="font-size: 13px;">{{ __('withdrawals') }}</span>
                     </a>
                 </li>
 
@@ -381,21 +381,21 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('treasurer.savings.create') ? 'active' : '' }}"
                        href="{{ route('treasurer.savings.create') }}">
                         <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Record Transaction</span>
+                        <span style="font-size: 13px;">{{ __('add_transaction') }}</span>
                     </a>
                 </li>
 
             @else
                 <!-- MEMBER MENU - Flat structure -->
                 <li class="nav-section mt-3 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">My Savings</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('my_savings') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.savings.my-savings') ? 'active' : '' }}"
                        href="{{ route('member.savings.my-savings') }}">
                         <i class="fas fa-piggy-bank me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Savings</span>
+                        <span style="font-size: 13px;">{{ __('my_savings') }}</span>
                     </a>
                 </li>
 
@@ -403,19 +403,19 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.savings.transactions') ? 'active' : '' }}"
                        href="{{ route('member.savings.transactions') }}">
                         <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Transaction History</span>
+                        <span style="font-size: 13px;">{{ __('transaction_history') }}</span>
                     </a>
                 </li>
 
                 <li class="nav-section mt-2 mb-1 px-3">
-                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">My Loans</small>
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('my_loans') }}</small>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.loans.my-loans') ? 'active' : '' }}"
                        href="{{ route('member.loans.my-loans') }}">
                         <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Loans</span>
+                        <span style="font-size: 13px;">{{ __('my_loans') }}</span>
                     </a>
                 </li>
 
@@ -423,7 +423,7 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.loans.apply') ? 'active' : '' }}"
                        href="{{ route('member.loans.apply') }}">
                         <i class="fas fa-file-invoice me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">Apply for Loan</span>
+                        <span style="font-size: 13px;">{{ __('apply_for_loan') }}</span>
                     </a>
                 </li>
 
@@ -431,14 +431,14 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.loans.applications') ? 'active' : '' }}"
                        href="{{ route('member.loans.applications') }}">
                         <i class="fas fa-clipboard-list me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Applications</span>
+                        <span style="font-size: 13px;">{{ __('my_applications') }}</span>
                     </a>
                 </li>
             @endif
 
             <!-- PROFILE - Common for all -->
             <li class="nav-section mt-3 mb-1 px-3">
-                <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">Account</small>
+                <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('account') }}</small>
             </li>
 
             <li class="nav-item">
@@ -446,13 +446,13 @@
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('member.profile.edit') ? 'active' : '' }}"
                        href="{{ route('member.profile.edit') }}">
                         <i class="fas fa-user me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Profile</span>
+                        <span style="font-size: 13px;">{{ __('my_profile') }}</span>
                     </a>
                 @else
                     <a class="nav-link py-2 px-3 {{ request()->routeIs('profile.show') ? 'active' : '' }}"
                        href="{{ route('profile.show') }}">
                         <i class="fas fa-user me-2" style="width: 20px; font-size: 14px;"></i>
-                        <span style="font-size: 13px;">My Profile</span>
+                        <span style="font-size: 13px;">{{ __('my_profile') }}</span>
                     </a>
                 @endif
             </li>
@@ -466,7 +466,7 @@
             <button type="submit" class="btn btn-outline-light w-100 d-flex align-items-center justify-content-center py-2"
                     style="font-size: 13px; border-color: rgba(255, 255, 255, 0.2);">
                 <i class="fas fa-sign-out-alt me-2" style="font-size: 12px;"></i>
-                <span>Logout</span>
+                <span>{{ __('logout') }}</span>
             </button>
         </form>
     </div>

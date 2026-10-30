@@ -29,7 +29,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {{ __('total_deposits') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['total_deposits'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($summary['total_deposits'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-down fa-2x text-gray-300"></i>
@@ -46,7 +46,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('total_withdrawals') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['total_withdrawals'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($summary['total_withdrawals'], 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
@@ -80,7 +80,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('todays_total') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($summary['today_amount'], 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($summary['today_amount'], 2) }}</div>
                             <small>{{ $summary['today_count'] }} {{ __('transactions') }}</small>
                         </div>
                         <div class="col-auto">
@@ -198,10 +198,10 @@
                                 </span>
                             </td>
                             <td class="text-right">
-                                <strong>UGX {{ number_format($transaction->amount, 2) }}</strong>
+                                <strong>CDF {{ number_format($transaction->amount, 2) }}</strong>
                             </td>
                             <td class="text-right">
-                                UGX {{ number_format($transaction->balance_after, 2) }}
+                                CDF {{ number_format($transaction->balance_after, 2) }}
                             </td>
                             <td>
                                 {{ $transaction->transaction_date->format('d M Y') }}

@@ -107,7 +107,7 @@
                                     </td>
                                     <td>
                                         <span class="badge badge-{{ $sacco->status === 'active' ? 'success' : 'secondary' }}">
-                                            {{ ucfirst($sacco->status) }}
+                                            {{ translate_status($sacco->status) }}
                                         </span>
                                     </td>
                                     <td>

@@ -161,11 +161,11 @@
             </div>
             <div class="amount-row">
                 <span class="detail-label">{{ __('amount') }}:</span>
-                <span style="font-size: 20px;">UGX {{ number_format($saving->amount, 2) }}</span>
+                <span style="font-size: 20px;">CDF {{ number_format($saving->amount, 2) }}</span>
             </div>
             <div class="amount-row">
                 <span class="detail-label">{{ __('balance_after') }}:</span>
-                <span>UGX {{ number_format($saving->balance_after, 2) }}</span>
+                <span>CDF {{ number_format($saving->balance_after, 2) }}</span>
             </div>
         </div>
 

@@ -214,10 +214,10 @@
                                 </div>
                             </td>
                             <td>{{ $loan->user->membership_number ?? __('n_a') }}</td>
-                            <td>UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                            <td>CDF {{ number_format($loan->amount_applied, 2) }}</td>
                             <td>
                                 @if($loan->amount_approved)
-                                    UGX {{ number_format($loan->amount_approved, 2) }}
+                                    CDF {{ number_format($loan->amount_approved, 2) }}
                                 @else
                                     <span class="text-muted">{{ __('n_a') }}</span>
                                 @endif

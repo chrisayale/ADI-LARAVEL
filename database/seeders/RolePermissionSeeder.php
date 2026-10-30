@@ -15,7 +15,7 @@ class RolePermissionSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions
+        // Create permissions (idempotent)
         $permissions = [
             'access admin dashboard',
             'access treasurer dashboard',
@@ -34,14 +34,23 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission, 'guard_name' => 'web']);
+            Permission::firstOrCreate(
+                ['name' => $permission, 'guard_name' => 'web'],
+                ['name' => $permission, 'guard_name' => 'web']
+            );
         }
 
-        // Create roles
-        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        // Create roles (idempotent)
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'admin', 'guard_name' => 'web'],
+            ['name' => 'admin', 'guard_name' => 'web']
+        );
         $adminRole->givePermissionTo(Permission::all());
 
-        $treasurerRole = Role::create(['name' => 'treasurer', 'guard_name' => 'web']);
+        $treasurerRole = Role::firstOrCreate(
+            ['name' => 'treasurer', 'guard_name' => 'web'],
+            ['name' => 'treasurer', 'guard_name' => 'web']
+        );
         $treasurerRole->givePermissionTo([
             'access treasurer dashboard',
             'view members',
@@ -52,7 +61,10 @@ class RolePermissionSeeder extends Seeder
             'verify loans',
         ]);
 
-        $memberRole = Role::create(['name' => 'member', 'guard_name' => 'web']);
+        $memberRole = Role::firstOrCreate(
+            ['name' => 'member', 'guard_name' => 'web'],
+            ['name' => 'member', 'guard_name' => 'web']
+        );
         $memberRole->givePermissionTo([
             'access member dashboard',
             'view savings',
@@ -60,46 +72,55 @@ class RolePermissionSeeder extends Seeder
             'view loans',
         ]);
 
-        // Create users
-        $admin = User::create([
-            'name' => 'System Administrator',
-            'email' => 'admin@sacco.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+256700000001',
-            'address' => 'Kampala',
-            'national_id' => 'ADMIN001',
-            'membership_number' => 'ADMIN-2024-001',
-            'membership_date' => now(),
-            'status' => 'active',
-        ]);
+        // Create users (idempotent)
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@sacco.com'],
+            [
+                'name' => 'System Administrator',
+                'password' => Hash::make('password'),
+                'phone_number' => '+256700000001',
+                'address' => 'Kampala',
+                'national_id' => 'ADMIN001',
+                'membership_number' => 'ADMIN-2024-001',
+                'membership_date' => now(),
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
         $admin->assignRole('admin');
 
-        $treasurer = User::create([
-            'name' => 'John Treasurer',
-            'email' => 'treasurer@sacco.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+256700000002',
-            'address' => 'Kampala',
-            'national_id' => 'TREAS001',
-            'membership_number' => 'TREAS-2024-001',
-            'membership_date' => now(),
-            'status' => 'active',
-        ]);
+        $treasurer = User::firstOrCreate(
+            ['email' => 'treasurer@sacco.com'],
+            [
+                'name' => 'John Treasurer',
+                'password' => Hash::make('password'),
+                'phone_number' => '+256700000002',
+                'address' => 'Kampala',
+                'national_id' => 'TREAS001',
+                'membership_number' => 'TREAS-2024-001',
+                'membership_date' => now(),
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
         $treasurer->assignRole('treasurer');
 
-        $member = User::create([
-            'name' => 'Alice Member',
-            'email' => 'alice@ssacco.com',
-            'password' => Hash::make('password'),
-            'phone_number' => '+256700000003',
-            'address' => 'Kampala',
-            'national_id' => 'MEM001',
-            'membership_number' => 'MEM-2024-001',
-            'membership_date' => now(),
-            'status' => 'active',
-        ]);
+        $member = User::firstOrCreate(
+            ['email' => 'alice@ssacco.com'],
+            [
+                'name' => 'Alice Member',
+                'password' => Hash::make('password'),
+                'phone_number' => '+256700000003',
+                'address' => 'Kampala',
+                'national_id' => 'MEM001',
+                'membership_number' => 'MEM-2024-001',
+                'membership_date' => now(),
+                'status' => 'active',
+                'email_verified_at' => now(),
+            ]
+        );
         $member->assignRole('member');
 
-        $this->command->info('Roles and users created successfully!');
+        $this->command->info('Roles and users created/updated successfully!');
     }
 }

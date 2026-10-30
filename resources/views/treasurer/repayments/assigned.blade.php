@@ -85,11 +85,11 @@
                                 </div>
                             </td>
                             <td class="text-right">
-                                <strong>UGX {{ number_format($loan->amount_approved, 2) }}</strong>
+                                <strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong>
                             </td>
-                            <td class="text-right">UGX {{ number_format($loan->monthly_repayment, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
                             <td class="text-right {{ $loan->balance > 0 ? 'text-danger' : 'text-success' }}">
-                                <strong>UGX {{ number_format($loan->balance, 2) }}</strong>
+                                <strong>CDF {{ number_format($loan->balance, 2) }}</strong>
                             </td>
                             <td style="min-width: 150px;">
                                 <div class="progress" style="height: 8px;">
@@ -100,7 +100,7 @@
                             </td>
                             <td>
                                 <span class="badge badge-{{ $loan->status == 'disbursed' ? 'primary' : 'warning' }} p-2">
-                                    {{ ucfirst($loan->status) }}
+                                    {{ translate_status($loan->status) }}
                                 </span>
                             </td>
                             <td>

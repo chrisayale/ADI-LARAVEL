@@ -21,12 +21,20 @@ return new class extends Migration
             $table->string('position')->nullable()->after('employment_date');
         });
 
-        // For PostgreSQL compatibility: change status column to text and add check constraint
-        // instead of using enum which is not easily alterable in PostgreSQL
-        DB::statement("ALTER TABLE users ALTER COLUMN status TYPE VARCHAR(255)");
-        DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'pending'");
-        DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
-        DB::statement("ALTER TABLE users ADD CONSTRAINT users_status_check CHECK (status IN ('active', 'inactive', 'suspended', 'pending'))");
+        // For SQLite compatibility: change status column using Laravel's change() method
+        // SQLite doesn't support ALTER COLUMN TYPE directly, so we check the driver
+        if (DB::getDriverName() !== 'sqlite') {
+            // PostgreSQL/MySQL: can use raw SQL for type changes
+            DB::statement("ALTER TABLE users ALTER COLUMN status TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'pending'");
+            DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
+            DB::statement("ALTER TABLE users ADD CONSTRAINT users_status_check CHECK (status IN ('active', 'inactive', 'suspended', 'pending'))");
+        } else {
+            // SQLite: use Blueprint->change() which handles the table recreation internally
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('status', 255)->default('pending')->change();
+            });
+        }
     }
 
     /**
@@ -39,7 +47,13 @@ return new class extends Migration
         });
 
         // Revert status column
-        DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
-        DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'active'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check");
+            DB::statement("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'active'");
+        } else {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('status', 255)->default('active')->change();
+            });
+        }
     }
 };

@@ -40,6 +40,9 @@ class LoginController extends Controller
             // Check if account is active
             if ($user->status !== 'active') {
                 Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
                 return back()->withErrors([
                     'email' => 'Your account is not active. Please contact administrator.',
                 ])->onlyInput('email');

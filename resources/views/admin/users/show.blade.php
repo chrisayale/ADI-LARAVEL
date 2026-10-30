@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'User Details - ' . $user->name)
+@section('title', __('user_details', ['name' => $user->name]))
 
 @section('content')
 <div class="container-fluid">
@@ -9,14 +9,14 @@
 
         <div>
             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to List
+                <i class="fas fa-arrow-left"></i> {{ __('back_to_list') }}
             </a>
             <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Edit User
+                <i class="fas fa-edit"></i> {{ __('edit_user') }}
             </a>
             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteUserModal"
                     {{ ($activeLoans > 0) ? 'disabled' : '' }}>
-                <i class="fas fa-trash"></i> Delete User
+                <i class="fas fa-trash"></i> {{ __('delete_user') }}
             </button>
         </div>
     </div>
@@ -35,11 +35,11 @@
             @endphp
             <div class="alert alert-{{ $color }} mb-0 d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>Account Status:</strong> {{ ucfirst($user->status) }}
+                    <strong>{{ __('account_status') }}:</strong> {{ translate_status($user->status) }}
                     @if($user->email_verified_at)
-                        <span class="ml-3 badge badge-success">Email Verified</span>
+                        <span class="ml-3 badge badge-success">{{ __('email_verified') }}</span>
                     @else
-                        <span class="ml-3 badge badge-warning">Email Not Verified</span>
+                        <span class="ml-3 badge badge-warning">{{ __('email_not_verified') }}</span>
                     @endif
                 </div>
                 <div>
@@ -47,7 +47,7 @@
                         @csrf
                         <button type="submit" class="btn btn-sm btn-{{ $user->status === 'active' ? 'warning' : 'success' }}">
                             <i class="fas fa-{{ $user->status === 'active' ? 'pause' : 'play' }}"></i>
-                            {{ $user->status === 'active' ? 'Deactivate' : 'Activate' }}
+                            {{ $user->status === 'active' ? __('deactivate') : __('activate') }}
                         </button>
                     </form>
                 </div>
@@ -63,8 +63,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Savings</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalSavings, 2) }}</div>
+                                {{ __('total_savings') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalSavings, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-piggy-bank fa-2x text-gray-300"></i>
@@ -80,7 +80,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Active Loans</div>
+                                {{ __('active_loans') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeLoans }}</div>
                         </div>
                         <div class="col-auto">
@@ -97,7 +97,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Loans</div>
+                                {{ __('total_loans') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalLoans }}</div>
                         </div>
                         <div class="col-auto">
@@ -114,7 +114,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Member Since</div>
+                                {{ __('member_since') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 {{ $user->membership_date ? $user->membership_date->format('d M Y') : $user->created_at->format('d M Y') }}
                             </div>
@@ -134,50 +134,50 @@
             <!-- Personal Information Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Personal Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('personal_information') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Full Name:</th>
+                                    <th width="40%">{{ __('full_name') }}:</th>
                                     <td><strong>{{ $user->name }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Email Address:</th>
+                                    <th>{{ __('email_address') }}:</th>
                                     <td>{{ $user->email }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Phone Number:</th>
-                                    <td>{{ $user->phone_number ?? 'N/A' }}</td>
+                                    <th>{{ __('phone_number') }}:</th>
+                                    <td>{{ $user->phone_number ?? __('n_a') }}</td>
                                 </tr>
                                 <tr>
-                                    <th>National ID:</th>
-                                    <td>{{ $user->national_id ?? 'N/A' }}</td>
+                                    <th>{{ __('national_id_passport') }}:</th>
+                                    <td>{{ $user->national_id ?? __('n_a') }}</td>
                                 </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Address:</th>
-                                    <td>{{ $user->address ?? 'N/A' }}</td>
+                                    <th width="40%">{{ __('address') }}:</th>
+                                    <td>{{ $user->address ?? __('n_a') }}</td>
                                 </tr>
                                 <tr>
-                                    <th>User Type:</th>
+                                    <th>{{ __('user_type') }}:</th>
                                     <td>
                                         @foreach($user->roles as $role)
-                                            <span class="badge badge-info">{{ ucfirst($role->name) }}</span>
+                                            <span class="badge badge-info">{{ translate_status($role->name) }}</span>
                                         @endforeach
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Last Login:</th>
-                                    <td>{{ $user->last_login_at ? $user->last_login_at->format('d M Y H:i') : 'Never' }}</td>
+                                    <th>{{ __('last_login') }}:</th>
+                                    <td>{{ $user->last_login_at ? $user->last_login_at->format('d M Y H:i') : __('never') }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Registered On:</th>
+                                    <th>{{ __('registered_on') }}:</th>
                                     <td>{{ $user->created_at->format('d M Y H:i') }}</td>
                                 </tr>
                             </table>
@@ -190,30 +190,30 @@
             @if($user->hasRole('member'))
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Membership Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('membership_information') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Membership Number:</th>
-                                    <td><strong>{{ $user->membership_number ?? 'N/A' }}</strong></td>
+                                    <th width="40%">{{ __('membership_number') }}:</th>
+                                    <td><strong>{{ $user->membership_number ?? __('n_a') }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Membership Date:</th>
-                                    <td>{{ $user->membership_date ? $user->membership_date->format('d M Y') : 'N/A' }}</td>
+                                    <th>{{ __('membership_date') }}:</th>
+                                    <td>{{ $user->membership_date ? $user->membership_date->format('d M Y') : __('n_a') }}</td>
                                 </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Total Savings:</th>
-                                    <td><strong>UGX {{ number_format($totalSavings, 2) }}</strong></td>
+                                    <th width="40%">{{ __('total_savings') }}:</th>
+                                    <td><strong>CDF {{ number_format($totalSavings, 2) }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Active Loans:</th>
+                                    <th>{{ __('active_loans') }}:</th>
                                     <td>{{ $activeLoans }}</td>
                                 </tr>
                             </table>
@@ -227,27 +227,27 @@
             @if($user->hasRole('treasurer'))
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Employment Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('employment_information') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Employee ID:</th>
-                                    <td><strong>{{ $user->employee_id ?? 'N/A' }}</strong></td>
+                                    <th width="40%">{{ __('employee_id') }}:</th>
+                                    <td><strong>{{ $user->employee_id ?? __('n_a') }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Position:</th>
-                                    <td>{{ $user->position ?? 'N/A' }}</td>
+                                    <th>{{ __('position') }}:</th>
+                                    <td>{{ $user->position ?? __('n_a') }}</td>
                                 </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Employment Date:</th>
-                                    <td>{{ $user->employment_date ? $user->employment_date->format('d M Y') : 'N/A' }}</td>
+                                    <th width="40%">{{ __('employment_date') }}:</th>
+                                    <td>{{ $user->employment_date ? $user->employment_date->format('d M Y') : __('n_a') }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -259,21 +259,21 @@
             <!-- Next of Kin Information (for all users) -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Next of Kin Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('next_of_kin_information') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <strong>Name:</strong><br>
-                            {{ $user->next_of_kin_name ?? 'N/A' }}
+                            <strong>{{ __('next_of_kin_name') }}:</strong><br>
+                            {{ $user->next_of_kin_name ?? __('n_a') }}
                         </div>
                         <div class="col-md-4">
-                            <strong>Phone:</strong><br>
-                            {{ $user->next_of_kin_phone ?? 'N/A' }}
+                            <strong>{{ __('next_of_kin_phone') }}:</strong><br>
+                            {{ $user->next_of_kin_phone ?? __('n_a') }}
                         </div>
                         <div class="col-md-4">
-                            <strong>Relationship:</strong><br>
-                            {{ $user->next_of_kin_relationship ?? 'N/A' }}
+                            <strong>{{ __('relationship') }}:</strong><br>
+                            {{ $user->next_of_kin_relationship ?? __('n_a') }}
                         </div>
                     </div>
                 </div>
@@ -283,25 +283,25 @@
             @if($user->loanApplications && $user->loanApplications->count() > 0)
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Loan Applications</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('recent_loan_applications') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Application #</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Applied Date</th>
-                                    <th>Action</th>
+                                    <th>{{ __('application_number') }}</th>
+                                    <th>{{ __('amount') }}</th>
+                                    <th>{{ __('status') }}</th>
+                                    <th>{{ __('applied_date') }}</th>
+                                    <th>{{ __('action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($user->loanApplications->take(5) as $loan)
                                 <tr>
                                     <td>{{ $loan->application_number }}</td>
-                                    <td>UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                                    <td>CDF {{ number_format($loan->amount_applied, 2) }}</td>
                                     <td>
                                         @php
                                             $statusColors = [
@@ -316,7 +316,7 @@
                                             ];
                                             $color = $statusColors[$loan->status] ?? 'secondary';
                                         @endphp
-                                        <span class="badge badge-{{ $color }}">{{ ucfirst($loan->status) }}</span>
+                                        <span class="badge badge-{{ $color }}">{{ translate_status($loan->status) }}</span>
                                     </td>
                                     <td>{{ $loan->created_at->format('d M Y') }}</td>
                                     <td>
@@ -331,7 +331,7 @@
                     </div>
                     @if($user->loanApplications->count() > 5)
                     <div class="text-center mt-3">
-                        <a href="#" class="btn btn-link">View All Loans</a>
+                        <a href="#" class="btn btn-link">{{ __('view_all_loans') }}</a>
                     </div>
                     @endif
                 </div>
@@ -342,17 +342,17 @@
             @if($user->savingsTransactions && $user->savingsTransactions->count() > 0)
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Savings Transactions</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('recent_savings_transactions') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Amount</th>
-                                    <th>Reference</th>
+                                    <th>{{ __('date') }}</th>
+                                    <th>{{ __('type') }}</th>
+                                    <th>{{ __('amount') }}</th>
+                                    <th>{{ __('reference') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -361,11 +361,11 @@
                                     <td>{{ $transaction->created_at->format('d M Y') }}</td>
                                     <td>
                                         <span class="badge badge-{{ $transaction->type == 'deposit' ? 'success' : 'info' }}">
-                                            {{ ucfirst($transaction->type) }}
+                                            {{ translate_status($transaction->type) }}
                                         </span>
                                     </td>
-                                    <td>UGX {{ number_format($transaction->amount, 2) }}</td>
-                                    <td>{{ $transaction->reference_number ?? 'N/A' }}</td>
+                                    <td>CDF {{ number_format($transaction->amount, 2) }}</td>
+                                    <td>{{ $transaction->reference_number ?? __('n_a') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -381,7 +381,7 @@
             <!-- Profile Photo Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Profile Photo</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('profile_photo') }}</h6>
                 </div>
                 <div class="card-body text-center">
                     @if($user->profile_photo)
@@ -397,9 +397,9 @@
                     @endif
 
                     @if($user->membership_number)
-                        <p class="mb-0"><strong>ID:</strong> {{ $user->membership_number }}</p>
+                        <p class="mb-0"><strong>{{ __('id') }}:</strong> {{ $user->membership_number }}</p>
                     @elseif($user->employee_id)
-                        <p class="mb-0"><strong>ID:</strong> {{ $user->employee_id }}</p>
+                        <p class="mb-0"><strong>{{ __('id') }}:</strong> {{ $user->employee_id }}</p>
                     @endif
                 </div>
             </div>
@@ -407,26 +407,26 @@
             <!-- Account Statistics Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Account Statistics</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('account_statistics') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <div class="small text-gray-500">Total Savings</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalSavings, 2) }}</div>
+                        <div class="small text-gray-500">{{ __('total_savings') }}</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalSavings, 2) }}</div>
                     </div>
                     <hr>
                     <div class="mb-3">
-                        <div class="small text-gray-500">Loan Applications</div>
+                        <div class="small text-gray-500">{{ __('loan_applications') }}</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalLoans }}</div>
                     </div>
                     <hr>
                     <div class="mb-3">
-                        <div class="small text-gray-500">Active Loans</div>
+                        <div class="small text-gray-500">{{ __('active_loans') }}</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeLoans }}</div>
                     </div>
                     <hr>
                     <div>
-                        <div class="small text-gray-500">Member Since</div>
+                        <div class="small text-gray-500">{{ __('member_since') }}</div>
                         <div class="h6 mb-0 text-gray-800">
                             {{ $user->membership_date ? $user->membership_date->format('F d, Y') : $user->created_at->format('F d, Y') }}
                         </div>
@@ -437,21 +437,21 @@
             <!-- Quick Actions Card -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('quick_actions') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="list-group">
                         <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-piggy-bank mr-2"></i> View Savings History
+                            <i class="fas fa-piggy-bank mr-2"></i> {{ __('view_savings_history') }}
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-file-invoice mr-2"></i> View Loan History
+                            <i class="fas fa-file-invoice mr-2"></i> {{ __('view_loan_history') }}
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-chart-line mr-2"></i> Generate Statement
+                            <i class="fas fa-chart-line mr-2"></i> {{ __('generate_statement') }}
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-envelope mr-2"></i> Send Message
+                            <i class="fas fa-envelope mr-2"></i> {{ __('send_message') }}
                         </a>
                     </div>
                 </div>
@@ -468,7 +468,7 @@
                 @csrf
                 @method('DELETE')
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete User</h5>
+                    <h5 class="modal-title">{{ __('delete_user') }}</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
@@ -477,24 +477,24 @@
                     @if($activeLoans > 0)
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-triangle"></i>
-                            This user has {{ $activeLoans }} active loan(s) and cannot be deleted.
+                            {{ __('user_has_active_loans_cannot_delete', ['count' => $activeLoans]) }}
                         </div>
                     @else
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
-                            Are you sure you want to delete this user? This action cannot be undone.
+                            {{ __('confirm_delete_user_warning') }}
                         </div>
-                        <p><strong>Name:</strong> {{ $user->name }}</p>
-                        <p><strong>Email:</strong> {{ $user->email }}</p>
+                        <p><strong>{{ __('full_name') }}:</strong> {{ $user->name }}</p>
+                        <p><strong>{{ __('email_address') }}:</strong> {{ $user->email }}</p>
                         @if($user->membership_number)
-                            <p><strong>Membership #:</strong> {{ $user->membership_number }}</p>
+                            <p><strong>{{ __('membership_number') }}:</strong> {{ $user->membership_number }}</p>
                         @endif
                     @endif
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('cancel') }}</button>
                     @if($activeLoans == 0)
-                        <button type="submit" class="btn btn-danger">Delete User</button>
+                        <button type="submit" class="btn btn-danger">{{ __('delete_user') }}</button>
                     @endif
                 </div>
             </form>

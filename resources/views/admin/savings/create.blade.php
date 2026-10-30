@@ -61,7 +61,7 @@
                                     <p class="mb-1"><strong>{{ __('email') }}:</strong> {{ $selectedMember->email }}</p>
                                     <p class="mb-1"><strong>{{ __('phone') }}:</strong> {{ $selectedMember->phone_number ?? __('n_a') }}</p>
                                     <hr>
-                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">UGX {{ number_format($currentBalance, 2) }}</span></p>
+                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">CDF {{ number_format($currentBalance, 2) }}</span></p>
                                     @endif
                                 </div>
                             </div>
@@ -96,8 +96,8 @@
                                                 {{ $transaction->transaction_type == 'deposit' ? __('deposit') : __('withdrawal') }}
                                             </span>
                                         </td>
-                                        <td class="text-right">UGX {{ number_format($transaction->amount, 2) }}</td>
-                                        <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($transaction->amount, 2) }}</td>
+                                        <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 @else
@@ -194,11 +194,11 @@
                             <hr class="mt-0">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span id="summary-current">UGX 0</span></p>
-                                    <p class="mb-1"><strong>{{ __('transaction_amount') }}:</strong> <span id="summary-amount">UGX 0</span></p>
+                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span id="summary-current">CDF 0</span></p>
+                                    <p class="mb-1"><strong>{{ __('transaction_amount') }}:</strong> <span id="summary-amount">CDF 0</span></p>
                                 </div>
                                 <div class="col-sm-6">
-                                    <p class="mb-1"><strong>{{ __('new_balance') }}:</strong> <span id="summary-new">UGX 0</span></p>
+                                    <p class="mb-1"><strong>{{ __('new_balance') }}:</strong> <span id="summary-new">CDF 0</span></p>
                                     <p class="mb-1"><strong>{{ __('status') }}:</strong> <span id="summary-status">{{ translate_status('approved') }}</span></p>
                                 </div>
                             </div>
@@ -332,7 +332,7 @@
         <p class="mb-1"><strong>{{ __('email') }}:</strong> ${data.email}</p>
         <p class="mb-1"><strong>{{ __('phone') }}:</strong> ${data.phone || '{{ __('n_a') }}'}</p>
         <hr>
-        <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">UGX ${formattedBalance}</span></p>
+        <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">CDF ${formattedBalance}</span></p>
     `;
     $('#member-details').html(html);
 }
@@ -355,8 +355,8 @@ function updateRecentTransactions(transactions) {
                 <tr>
                     <td>${t.date}</td>
                     <td><span class="badge badge-${badgeClass}">${t.type}</span></td>
-                    <td class="text-right">UGX ${amount}</td>
-                    <td class="text-right">UGX ${t.balance || '{{ __('n_a') }}'}</td>
+                    <td class="text-right">CDF ${amount}</td>
+                    <td class="text-right">CDF ${t.balance || '{{ __('n_a') }}'}</td>
                 </tr>
             `;
         });
@@ -372,10 +372,10 @@ function updateTransactionSummary() {
 
     // Get current balance from the displayed text
     const currentBalanceText = $('#current-balance').text();
-    // Extract number from "UGX 880,000.00" format
+    // Extract number from "CDF 880,000.00" format
     const currentBalance = parseFloat(currentBalanceText.replace(/[^0-9.-]+/g, '')) || 0;
 
-    if (amount > 0 && type && currentBalanceText !== 'UGX undefined') {
+    if (amount > 0 && type && currentBalanceText !== 'CDF undefined') {
         let newBalance = type === 'deposit' ? currentBalance + amount : currentBalance - amount;
 
         // Format numbers with commas
@@ -386,9 +386,9 @@ function updateTransactionSummary() {
             }).format(num);
         };
 
-        $('#summary-current').text('UGX ' + formatNumber(currentBalance));
-        $('#summary-amount').text('UGX ' + formatNumber(amount));
-        $('#summary-new').text('UGX ' + formatNumber(newBalance));
+        $('#summary-current').text('CDF ' + formatNumber(currentBalance));
+        $('#summary-amount').text('CDF ' + formatNumber(amount));
+        $('#summary-new').text('CDF ' + formatNumber(newBalance));
 
         // Generate receipt preview
         let receiptPreview = 'RCT-' + new Date().toISOString().slice(0,10).replace(/-/g, '') + '-xxxxxx';
@@ -414,7 +414,7 @@ function updateTransactionSummary() {
     const amount = parseFloat($('#amount').val()) || 0;
     const currentBalanceText = $('#current-balance').text();
 
-    if (currentBalanceText === 'UGX undefined' || currentBalanceText === 'UGX NaN') {
+    if (currentBalanceText === 'CDF undefined' || currentBalanceText === 'CDF NaN') {
         e.preventDefault();
         alert('{{ __('please_select_valid_member') }}');
         return false;
@@ -424,7 +424,7 @@ function updateTransactionSummary() {
 
     if (type === 'withdrawal' && amount > currentBalance) {
         e.preventDefault();
-        alert('{{ __('insufficient_balance') }}! {{ __('current_balance') }}: UGX ' +
+        alert('{{ __('insufficient_balance') }}! {{ __('current_balance') }}: CDF ' +
               new Intl.NumberFormat(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2

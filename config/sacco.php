@@ -18,7 +18,7 @@ return [
         'phone' => env('SACCO_DEFAULT_PHONE', null),
         'email' => env('SACCO_DEFAULT_EMAIL', null),
         'address' => env('SACCO_DEFAULT_ADDRESS', null),
-        'primary_currency' => env('SACCO_DEFAULT_PRIMARY_CURRENCY', 'USD'),
+        'primary_currency' => env('SACCO_DEFAULT_PRIMARY_CURRENCY', 'CDF'),
         'secondary_currency' => env('SACCO_DEFAULT_SECONDARY_CURRENCY', 'CDF'),
         'status' => 'active',
         'settings' => [

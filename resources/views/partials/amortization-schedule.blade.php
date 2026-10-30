@@ -3,9 +3,9 @@
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Loan Amortization Schedule</h6>
         <div>
-            <span class="badge badge-info mr-2">Total: UGX {{ number_format($loan->total_repayable, 2) }}</span>
-            <span class="badge badge-success">Paid: UGX {{ number_format($loan->repayments->sum('amount_paid'), 2) }}</span>
-            <span class="badge badge-warning">Balance: UGX {{ number_format($loan->balance, 2) }}</span>
+            <span class="badge badge-info mr-2">Total: CDF {{ number_format($loan->total_repayable, 2) }}</span>
+            <span class="badge badge-success">Paid: CDF {{ number_format($loan->repayments->sum('amount_paid'), 2) }}</span>
+            <span class="badge badge-warning">Balance: CDF {{ number_format($loan->balance, 2) }}</span>
         </div>
     </div>
     <div class="card-body">
@@ -64,11 +64,11 @@
                                     <span class="badge badge-danger ml-1">Overdue</span>
                                 @endif
                             </td>
-                            <td><strong>UGX {{ number_format($repayment->amount_due, 0) }}</strong></td>
-                            <td>UGX {{ number_format($principalPortion, 0) }}</td>
-                            <td>UGX {{ number_format($interestPortion, 0) }}</td>
-                            <td>UGX {{ number_format($repayment->amount_paid ?? 0, 0) }}</td>
-                            <td>UGX {{ number_format($repayment->balance, 0) }}</td>
+                            <td><strong>CDF {{ number_format($repayment->amount_due, 0) }}</strong></td>
+                            <td>CDF {{ number_format($principalPortion, 0) }}</td>
+                            <td>CDF {{ number_format($interestPortion, 0) }}</td>
+                            <td>CDF {{ number_format($repayment->amount_paid ?? 0, 0) }}</td>
+                            <td>CDF {{ number_format($repayment->balance, 0) }}</td>
                             <td>
                                 <span class="badge badge-{{ $statusColor }} px-3 py-2">
                                     {{ ucfirst($repayment->status) }}
@@ -90,11 +90,11 @@
                 <tfoot class="thead-light">
                     <tr>
                         <th colspan="2" class="text-right">Totals:</th>
-                        <th>UGX {{ number_format($loan->repayments->sum('amount_due'), 0) }}</th>
-                        <th>UGX {{ number_format($loan->amount_approved, 0) }}</th>
-                        <th>UGX {{ number_format($loan->repayments->sum('amount_due') - $loan->amount_approved, 0) }}</th>
-                        <th>UGX {{ number_format($loan->repayments->sum('amount_paid'), 0) }}</th>
-                        <th>UGX {{ number_format($loan->repayments->sum('balance'), 0) }}</th>
+                        <th>CDF {{ number_format($loan->repayments->sum('amount_due'), 0) }}</th>
+                        <th>CDF {{ number_format($loan->amount_approved, 0) }}</th>
+                        <th>CDF {{ number_format($loan->repayments->sum('amount_due') - $loan->amount_approved, 0) }}</th>
+                        <th>CDF {{ number_format($loan->repayments->sum('amount_paid'), 0) }}</th>
+                        <th>CDF {{ number_format($loan->repayments->sum('balance'), 0) }}</th>
                         <th colspan="3"></th>
                     </tr>
                 </tfoot>

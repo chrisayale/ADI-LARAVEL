@@ -86,7 +86,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('amount_applied') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['total_amount_applied'], 2) }}
+                                CDF {{ number_format($summary['total_amount_applied'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -105,7 +105,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('amount_approved') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['total_amount_approved'], 2) }}
+                                CDF {{ number_format($summary['total_amount_approved'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -124,7 +124,7 @@
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('amount_repaid') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($summary['total_repaid'], 2) }}
+                                CDF {{ number_format($summary['total_repaid'], 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -196,10 +196,10 @@
                                     <br><small class="text-muted">{{ $loan->user->membership_number }}</small>
                                 @endif
                             </td>
-                            <td class="text-right">UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($loan->amount_applied, 2) }}</td>
                             <td class="text-right">
                                 @if($loan->amount_approved)
-                                    UGX {{ number_format($loan->amount_approved, 2) }}
+                                    CDF {{ number_format($loan->amount_approved, 2) }}
                                 @else
                                     -
                                 @endif

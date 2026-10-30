@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -737,8 +737,8 @@
         <!-- Left Panel - Welcome Content -->
         <div class="auth-left">
             <div class="auth-content">
-                <h3>Empowering Financial Growth Through Digital Innovation</h3>
-                <p>Join thousands of satisfied members who trust our platform</p>
+                <h3>{{ __('empowering_financial_growth_through') }}</h3>
+                <p>{{ __('join_thousands_satisfied') }}</p>
 
                 <ul class="features-list">
                     <li style="--delay: 0.5s">
@@ -746,8 +746,8 @@
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <div>
-                            <strong>Bank-Level Security</strong>
-                            <div class="small opacity-75">256-bit encryption for all transactions</div>
+                            <strong>{{ __('bank_level_security') }}</strong>
+                            <div class="small opacity-75">{{ __('256_bit_encryption_desc') }}</div>
                         </div>
                     </li>
                     <li style="--delay: 0.7s">
@@ -755,8 +755,8 @@
                             <i class="fas fa-bolt"></i>
                         </div>
                         <div>
-                            <strong>Real-time Updates</strong>
-                            <div class="small opacity-75">Instant notifications & dashboard updates</div>
+                            <strong>{{ __('real_time_updates_desc') }}</strong>
+                            <div class="small opacity-75">{{ __('instant_notifications_dashboard') }}</div>
                         </div>
                     </li>
                     <li style="--delay: 0.9s">
@@ -764,8 +764,8 @@
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <div>
-                            <strong>Smart Analytics</strong>
-                            <div class="small opacity-75">Track contributions & growth insights</div>
+                            <strong>{{ __('smart_analytics') }}</strong>
+                            <div class="small opacity-75">{{ __('track_contributions_growth') }}</div>
                         </div>
                     </li>
                     <li style="--delay: 1.1s">
@@ -773,8 +773,8 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div>
-                            <strong>Community Driven</strong>
-                            <div class="small opacity-75">250+ active members growing together</div>
+                            <strong>{{ __('community_driven') }}</strong>
+                            <div class="small opacity-75">{{ __('active_members_growing') }}</div>
                         </div>
                     </li>
                 </ul>
@@ -787,7 +787,7 @@
             <div class="back-home">
                 <a href="{{ url('/') }}">
                     <i class="fas fa-arrow-left"></i>
-                    <span> Home</span>
+                    <span> {{ __('home') }}</span>
                 </a>
             </div>
 
@@ -796,8 +796,8 @@
                 <!-- Logo & Header -->
                 <div class="auth-header mt-4">
 
-                    <h2>Capital Investment Club</h2>
-                    <p>@yield('subtitle', 'Member Management System')</p>
+                    <h2>{{ __('capital_investment_club') }}</h2>
+                    <p>@yield('subtitle', __('member_management_system'))</p>
                 </div>
 
                 <!-- Messages -->
@@ -825,12 +825,12 @@
                 <!-- Footer Links -->
                 <div class="auth-footer mt-3">
                     <small>
-                        &copy; {{ date('Y') }} Capital Investment Club
+                        {{ __('copyright_year') }} {{ date('Y') }}
                         @if(Route::has('register') && Route::currentRouteName() === 'login')
-                            · <a href="{{ route('register') }}">Create Account</a>
+                            · <a href="{{ route('register') }}">{{ __('create_account') }}</a>
                         @endif
                         @if(Route::has('login') && Route::currentRouteName() === 'register')
-                            · <a href="{{ route('login') }}">Already have an account?</a>
+                            · <a href="{{ route('login') }}">{{ __('already_have_account') }}</a>
                         @endif
                     </small>
                 </div>

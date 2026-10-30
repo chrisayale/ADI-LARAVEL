@@ -18,8 +18,8 @@
                             <i class="fas fa-handshake text-success" style="font-size: 1.5rem;"></i>
                         </div>
                         <div class="brand-text d-none d-md-block">
-                            <span class="fw-bold fs-6 lh-1">Capital Investment</span>
-                            <small class="d-block text-white-50 opacity-75" style="font-size: 0.7rem;">Club</small>
+                            <span class="fw-bold fs-6 lh-1">{{ __('capital_investment') }}</span>
+                            <small class="d-block text-white-50 opacity-75" style="font-size: 0.7rem;">{{ __('club') }}</small>
                         </div>
                         <!-- SACCO Name for Admin/Treasurer -->
                         @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
@@ -35,8 +35,8 @@
                 <!-- Mobile Stats -->
                 <div class="d-flex d-md-none align-items-center ms-auto me-2">
                     <div class="text-white text-end me-2">
-                        <small class="d-block opacity-75" style="font-size: 0.7rem;">Total Sav.</small>
-                        <strong class="d-block fw-semibold" style="font-size: 0.85rem;">UGX {{ number_format(auth()->check() ? auth()->user()->total_savings ?? 0 : 0, 0) }}</strong>
+                        <small class="d-block opacity-75" style="font-size: 0.7rem;">{{ __('total_savings_short') }}</small>
+                        <strong class="d-block fw-semibold" style="font-size: 0.85rem;">CDF {{ number_format(auth()->check() ? auth()->user()->total_savings ?? 0 : 0, 0) }}</strong>
                     </div>
                 </div>
             </div>
@@ -45,23 +45,23 @@
             <div class="d-none d-md-flex align-items-center ms-auto me-3 me-lg-4">
                 @if(auth()->check() && auth()->user()->hasRole('admin'))
                 <div class="text-white text-center me-3 me-xl-4">
-                    <small class="d-block opacity-75" style="font-size: 0.75rem;">Total Members</small>
+                    <small class="d-block opacity-75" style="font-size: 0.75rem;">{{ __('total_members') }}</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\User::count() }}</strong>
                 </div>
                 <div class="vr text-white opacity-25 mx-2 d-none d-xl-block" style="height: 1.5rem;"></div>
                 <div class="text-white text-center">
-                    <small class="d-block opacity-75" style="font-size: 0.75rem;">Pending Loans</small>
+                    <small class="d-block opacity-75" style="font-size: 0.75rem;">{{ __('pending_loans') }}</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\LoanApplication::where('status', 'pending')->count() }}</strong>
                 </div>
                 @elseif(auth()->check() && auth()->user()->hasRole('treasurer'))
                 <div class="text-white text-center me-3 me-xl-4">
-                    <small class="d-block opacity-75" style="font-size: 0.75rem;">Assigned Loans</small>
+                    <small class="d-block opacity-75" style="font-size: 0.75rem;">{{ __('assigned_loans') }}</small>
                     <strong class="d-block fs-6 fw-semibold lh-1">{{ \App\Models\LoanApplication::where('treasurer_id', auth()->id())->whereIn('status', ['pending', 'under_verification'])->count() }}</strong>
                 </div>
                 <div class="vr text-white opacity-25 mx-2 d-none d-xl-block" style="height: 1.5rem;"></div>
                 <div class="text-white text-center">
-                    <small class="d-block opacity-75" style="font-size: 0.75rem;">Today's Trans.</small>
-                    <strong class="d-block fs-6 fw-semibold lh-1">UGX {{ number_format(\App\Models\SavingsTransaction::whereDate('created_at', today())->sum('amount'), 0) }}</strong>
+                    <small class="d-block opacity-75" style="font-size: 0.75rem;">{{ __('todays_transactions_short') }}</small>
+                    <strong class="d-block fs-6 fw-semibold lh-1">CDF {{ number_format(\App\Models\SavingsTransaction::whereDate('created_at', today())->sum('amount'), 0) }}</strong>
                 </div>
                 @endif
             </div>
@@ -77,19 +77,55 @@
                     </a>
                     <div class="dropdown-list dropdown-menu dropdown-menu-end shadow animated--grow-in"
                          aria-labelledby="notificationsDropdown">
-                        <h6 class="dropdown-header bg-primary text-white">Notifications</h6>
+                        <h6 class="dropdown-header bg-primary text-white">{{ __('notifications') }}</h6>
                         <div id="notificationList">
                             <!-- Notifications will be loaded here via AJAX -->
                             <div class="text-center p-3">
                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                                    <span class="visually-hidden">{{ __('loading') }}</span>
                                 </div>
                             </div>
                         </div>
                         <a class="dropdown-item text-center small text-gray-500" href="{{ route('notifications.index') }}">
-                            View All Notifications
+                            {{ __('view_all_notifications') }}
                         </a>
                     </div>
+                </li>
+
+                <!-- Language Selector Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white d-flex align-items-center p-1 p-md-2" href="#"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-globe me-1 me-md-2" style="font-size: 1rem;"></i>
+                        <span class="d-none d-sm-inline fw-medium" style="font-size: 0.875rem;">{{ strtoupper(app()->getLocale()) }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 160px;">
+                        <li>
+                            <h6 class="dropdown-header px-3 py-2">
+                                <i class="fas fa-globe me-2"></i>{{ __('language') }}
+                            </h6>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center {{ app()->getLocale() === 'fr' ? 'active' : '' }}"
+                               href="{{ route('lang.switch', 'fr') }}">
+                                <i class="fas fa-flag me-2" style="color: #002395;"></i>
+                                <span class="fw-medium">{{ __('french') }}</span>
+                                @if(app()->getLocale() === 'fr')
+                                <i class="fas fa-check ms-auto text-success"></i>
+                                @endif
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center {{ app()->getLocale() === 'en' ? 'active' : '' }}"
+                               href="{{ route('lang.switch', 'en') }}">
+                                <i class="fas fa-flag me-2" style="color: #00247d;"></i>
+                                <span class="fw-medium">{{ __('english') }}</span>
+                                @if(app()->getLocale() === 'en')
+                                <i class="fas fa-check ms-auto text-success"></i>
+                                @endif
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <!-- User Menu - Fixed with Bootstrap 5 syntax -->
@@ -133,7 +169,7 @@
                         <li><hr class="dropdown-divider m-0"></li>
                         <li>
                             <a class="dropdown-item py-2" href="{{ route('profile.show') }}">
-    <i class="fas fa-user me-2 text-muted"></i>My Profile
+    <i class="fas fa-user me-2 text-muted"></i>{{ __('my_profile') }}
 </a>
                         </li>
                         <li><hr class="dropdown-divider m-0"></li>
@@ -141,7 +177,7 @@
                             <form method="POST" action="{{ route('logout') }}" class="dropdown-item p-0">
                                 @csrf
                                 <button type="submit" class="btn btn-link text-danger w-100 text-start px-3 py-2">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    <i class="fas fa-sign-out-alt me-2"></i>{{ __('logout') }}
                                 </button>
                             </form>
                         </li>

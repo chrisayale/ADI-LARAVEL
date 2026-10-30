@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Demandes de SACCO')
+@section('title', __('sacco_requests'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Demandes de SACCO</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('sacco_requests') }}</h1>
     </div>
 
     <!-- Status Filters -->
@@ -14,25 +14,25 @@
         <div class="col-md-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Filtrer par statut</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_by_status') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="btn-group" role="group" aria-label="Status filter">
                         <a href="{{ route('admin.request-sacco.index', ['status' => 'all']) }}"
                            class="btn btn-outline-secondary {{ request()->input('status') == 'all' ? 'active' : '' }}">
-                            Toutes
+                            {{ __('all') }}
                         </a>
                         <a href="{{ route('admin.request-sacco.index', ['status' => 'pending']) }}"
-                           class="btn btn-outline-warning {{ request()->input('status') == 'pending' ? 'active' : '' }}>
-                            En attente
+                           class="btn btn-outline-warning {{ request()->input('status') == 'pending' ? 'active' : '' }}">
+                            {{ __('pending') }}
                         </a>
                         <a href="{{ route('admin.request-sacco.index', ['status' => 'approved']) }}"
                            class="btn btn-outline-success {{ request()->input('status') == 'approved' ? 'active' : '' }}">
-                            Approuvées
+                            {{ __('approved') }}
                         </a>
                         <a href="{{ route('admin.request-sacco.index', ['status' => 'rejected']) }}"
                            class="btn btn-outline-danger {{ request()->input('status') == 'rejected' ? 'active' : '' }}">
-                            Rejetées
+                            {{ __('rejected') }}
                         </a>
                     </div>
                 </div>
@@ -45,26 +45,26 @@
         <div class="col-md-12">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Liste des demandes de SACCO</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('sacco_requests_list') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Nom du SACCO</th>
-                                    <th>Demandeur</th>
-                                    <th>Localisation</th>
-                                    <th>Téléphone Mobile Money</th>
-                                    <th>Statut</th>
-                                    <th>Date de soumission</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('sacco_name') }}</th>
+                                    <th>{{ __('applicant') }}</th>
+                                    <th>{{ __('location') }}</th>
+                                    <th>{{ __('mobile_money_phone') }}</th>
+                                    <th>{{ __('status') }}</th>
+                                    <th>{{ __('submission_date') }}</th>
+                                    <th>{{ __('actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if($requests->isEmpty())
                                     <tr>
-                                        <td colspan="7" class="text-center">Aucune demande de SACCO trouvée.</td>
+                                        <td colspan="7" class="text-center">{{ __('no_sacco_requests_found') }}</td>
                                     </tr>
                                 @else
                                     @foreach($requests as $request)
@@ -84,13 +84,13 @@
                                             <td>
                                                 @switch($request->status)
                                                     @case('pending')
-                                                        <span class="badge badge-warning">En attente</span>
+                                                        <span class="badge badge-warning">{{ translate_status('pending') }}</span>
                                                     @break
                                                     @case('approved')
-                                                        <span class="badge badge-success">Approuvée</span>
+                                                        <span class="badge badge-success">{{ translate_status('approved') }}</span>
                                                     @break
                                                     @case('rejected')
-                                                        <span class="badge badge-danger">Rejetée</span>
+                                                        <span class="badge badge-danger">{{ translate_status('rejected') }}</span>
                                                     @break
                                                     @default
                                                         <span class="badge badge-info">{{ ucfirst($request->status) }}</span>
@@ -101,16 +101,16 @@
                                                 <div class="d-flex justify-content-center">
                                                     <a href="{{ route('admin.request-sacco.show', $request->id) }}"
                                                        class="btn btn-sm btn-info me-1">
-                                                        <i class="fas fa-eye"></i> Voir
+                                                        <i class="fas fa-eye"></i> {{ __('view') }}
                                                     </a>
                                                     @if($request->status == 'pending')
                                                         <a href="{{ route('admin.request-sacco.approve', $request->id) }}"
                                                            class="btn btn-sm btn-success me-1">
-                                                            <i class="fas fa-check"></i> Approuver
+                                                            <i class="fas fa-check"></i> {{ __('approve') }}
                                                         </a>
                                                         <a href="{{ route('admin.request-sacco.reject', $request->id) }}"
                                                            class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-times"></i> Rejeter
+                                                            <i class="fas fa-times"></i> {{ __('reject') }}
                                                         </a>
                                                     @elseif($request->status == 'approved')
                                                         @php
@@ -119,13 +119,13 @@
                                                         @if($sacco)
                                                             @php
                                                                 $isActive = $sacco->status === 'active';
-                                                                $statusText = $isActive ? 'Désactiver' : 'Activer';
-                                                                $statusConfirmText = $isActive ? 'Désactiver' : 'Activer';
+                                                                $statusText = $isActive ? __('deactivate') : __('activate');
+                                                                $statusConfirmText = $isActive ? __('deactivate') : __('activate');
                                                             @endphp
                                                             <form action="{{ route('super-admin.sacos.toggle-status', $sacco->id) }}" method="POST" class="d-inline">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-sm me-1 {{ $isActive ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                                                        onclick="return confirm('Êtes-vous sûr de vouloir {{ strtolower($statusText) }} ce SACCO ?');">
+                                                                        onclick="return confirm('{{ __('confirm_toggle_status', ['action' => strtolower($statusText)] ) }}');">
                                                                     <i class="fas {{ $isActive ? 'fa-times' : 'fa-check' }}"></i>
                                                                     {{ $statusConfirmText }}
                                                                 </button>
@@ -151,7 +151,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <p class="text-muted small mb-0">
-                        Affichage {{ $requests->firstItem() }} à {{ $requests->lastItem() }} sur {{ $requests->total() }} entrées
+                        {{ __('showing_entries', ['first' => $requests->firstItem(), 'last' => $requests->lastItem(), 'total' => $requests->total()]) }}
                     </p>
                 </div>
                 <div>

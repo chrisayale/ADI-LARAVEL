@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RequestSacco;
 use App\Models\Sacco;
 use App\Models\User;
+use App\Services\SaccoCodeGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -79,7 +80,7 @@ class RequestSaccoController extends Controller
      * @param  \App\Models\RequestSacco  $requestSacco
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function storeApproval(Request $request, RequestSacco $requestSacco)
+    public function storeApproval(Request $request, RequestSacco $requestSacco, SaccoCodeGenerator $codeGenerator)
     {
         // Only Super Admin can access
         if (!Auth::user()->hasRole('super_admin')) {
@@ -95,8 +96,8 @@ class RequestSaccoController extends Controller
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        // Generate unique SACCO code
-        $code = $this->generateUniqueSaccoCode();
+        // Generate unique SACCO code using service
+        $code = $codeGenerator->generate();
 
         // Generate official email for the SACCO
         $officialEmail = $this->generateOfficialEmail($requestSacco->name);
@@ -106,9 +107,9 @@ class RequestSaccoController extends Controller
             'name' => $requestSacco->name,
             'code' => $code,
             'registration_number' => $requestSacco->registration_number,
-            'address' => $requestSacco->address,
-            'phone' => $requestSacco->phone_number, // Note: request uses phone_number, db uses phone
-            'email' => $officialEmail,
+            'physical_address' => $requestSacco->address,
+            'mobile_money' => $requestSacco->phone_number,
+            'official_email' => $officialEmail,
             'primary_currency' => 'USD', // Default values
             'secondary_currency' => 'CDF', // Default values
             'status' => 'active',
@@ -188,20 +189,6 @@ class RequestSaccoController extends Controller
 
         return Redirect::route('super-admin.request-sacco.index')
             ->with('success', "La demande de SACCO {$requestSacco->name} a été rejetée.");
-    }
-
-    /**
-     * Generate a unique SACCO code.
-     *
-     * @return string
-     */
-    private function generateUniqueSaccoCode()
-    {
-        do {
-            $code = '09' . str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        } while (Sacco::where('code', $code)->exists());
-
-        return $code;
     }
 
     /**

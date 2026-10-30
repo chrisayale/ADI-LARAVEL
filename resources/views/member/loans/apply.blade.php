@@ -35,10 +35,10 @@
                 <h5 class="border-bottom pb-2 mb-4">Loan Details</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="amount_applied">Loan Amount (UGX) <span class="text-danger">*</span></label>
+                        <label for="amount_applied">Loan Amount (CDF) <span class="text-danger">*</span></label>
                         <input type="number" step="1000" class="form-control" id="amount_applied"
                                name="amount_applied" value="{{ old('amount_applied') }}" required min="10000">
-                        <small class="text-muted">Minimum: UGX 10,000 | Maximum: UGX 10,000,000</small>
+                        <small class="text-muted">Minimum: CDF 10,000 | Maximum: CDF 10,000,000</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="purpose">Loan Purpose <span class="text-danger">*</span></label>
@@ -82,7 +82,7 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label for="collateral_value">Estimated Value (UGX)</label>
+                            <label for="collateral_value">Estimated Value (CDF)</label>
                             <input type="number" step="0.01" class="form-control" id="collateral_value" name="collateral_value">
                         </div>
                         <div class="col-md-12 mb-3">
@@ -198,7 +198,7 @@
                     <div class="card bg-success text-white">
                         <div class="card-body py-2">
                             <small>Monthly Payment</small>
-                            <h6 id="calcMonthly">UGX 0</h6>
+                            <h6 id="calcMonthly">CDF 0</h6>
                         </div>
                     </div>
                 </div>
@@ -206,7 +206,7 @@
                     <div class="card bg-info text-white">
                         <div class="card-body py-2">
                             <small>Total Interest</small>
-                            <h6 id="calcInterest">UGX 0</h6>
+                            <h6 id="calcInterest">CDF 0</h6>
                         </div>
                     </div>
                 </div>
@@ -214,7 +214,7 @@
                     <div class="card bg-primary text-white">
                         <div class="card-body py-2">
                             <small>Total Payment</small>
-                            <h6 id="calcTotal">UGX 0</h6>
+                            <h6 id="calcTotal">CDF 0</h6>
                         </div>
                     </div>
                 </div>
@@ -302,9 +302,9 @@
         const totalPayment = monthlyPayment * months;
         const totalInterest = totalPayment - amount;
 
-        document.getElementById('calcMonthly').textContent = 'UGX ' + Math.round(monthlyPayment).toLocaleString();
-        document.getElementById('calcInterest').textContent = 'UGX ' + Math.round(totalInterest).toLocaleString();
-        document.getElementById('calcTotal').textContent = 'UGX ' + Math.round(totalPayment).toLocaleString();
+        document.getElementById('calcMonthly').textContent = 'CDF ' + Math.round(monthlyPayment).toLocaleString();
+        document.getElementById('calcInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
+        document.getElementById('calcTotal').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
 
         document.getElementById('calcResults').style.display = 'flex';
     });

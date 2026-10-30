@@ -81,7 +81,7 @@
                         </tr>
                         <tr>
                             <th>{{ __('amount') }}:</th>
-                            <td><h4 class="text-{{ $saving->transaction_type == 'deposit' ? 'success' : 'info' }}">UGX {{ number_format($saving->amount, 2) }}</h4></td>
+                            <td><h4 class="text-{{ $saving->transaction_type == 'deposit' ? 'success' : 'info' }}">CDF {{ number_format($saving->amount, 2) }}</h4></td>
                         </tr>
                         <tr>
                             <th>{{ __('transaction_date') }}:</th>
@@ -140,7 +140,7 @@
                             <div class="card bg-light mb-3">
                                 <div class="card-body text-center py-3">
                                     <small class="text-muted">{{ __('balance_before') }}</small>
-                                    <h5 class="mb-0">UGX {{ number_format($balanceBefore, 2) }}</h5>
+                                    <h5 class="mb-0">CDF {{ number_format($balanceBefore, 2) }}</h5>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +148,7 @@
                             <div class="card bg-{{ $saving->transaction_type == 'deposit' ? 'success' : 'info' }} text-white mb-3">
                                 <div class="card-body text-center py-3">
                                     <small>{{ __('balance_after') }}</small>
-                                    <h5 class="mb-0">UGX {{ number_format($saving->balance_after, 2) }}</h5>
+                                    <h5 class="mb-0">CDF {{ number_format($saving->balance_after, 2) }}</h5>
                                 </div>
                             </div>
                         </div>
@@ -201,8 +201,8 @@
                                             {{ $transaction->transaction_type == 'deposit' ? __('deposit') : __('withdrawal') }}
                                         </span>
                                     </td>
-                                    <td class="text-right">UGX {{ number_format($transaction->amount, 2) }}</td>
-                                    <td class="text-right">UGX {{ number_format($transaction->balance_after, 2) }}</td>
+                                    <td class="text-right">CDF {{ number_format($transaction->amount, 2) }}</td>
+                                    <td class="text-right">CDF {{ number_format($transaction->balance_after, 2) }}</td>
                                 </tr>
                                 @empty
                                 <tr>
@@ -238,8 +238,8 @@
                     <div class="alert alert-info">
                         <p class="mb-1"><strong>{{ __('member') }}:</strong> {{ $saving->user->name }}</p>
                         <p class="mb-1"><strong>{{ __('transaction_type') }}:</strong> {{ $saving->transaction_type == 'deposit' ? __('deposit') : __('withdrawal') }}</p>
-                        <p class="mb-1"><strong>{{ __('amount') }}:</strong> UGX {{ number_format($saving->amount, 2) }}</p>
-                        <p class="mb-0"><strong>{{ __('balance_after') }}:</strong> UGX {{ number_format($saving->balance_after, 2) }}</p>
+                        <p class="mb-1"><strong>{{ __('amount') }}:</strong> CDF {{ number_format($saving->amount, 2) }}</p>
+                        <p class="mb-0"><strong>{{ __('balance_after') }}:</strong> CDF {{ number_format($saving->balance_after, 2) }}</p>
                     </div>
                 </div>
                 <div class="modal-footer">

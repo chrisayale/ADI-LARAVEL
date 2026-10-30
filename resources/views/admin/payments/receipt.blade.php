@@ -127,7 +127,7 @@
         <div class="line"></div>
 
         <div class="amount">
-            {{ __('amount_paid') }}: UGX {{ number_format($transaction->amount, 2) }}
+            {{ __('amount_paid') }}: CDF {{ number_format($transaction->amount, 2) }}
         </div>
 
         <div class="line"></div>

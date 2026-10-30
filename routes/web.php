@@ -39,6 +39,18 @@ Route::view('/services', 'services')->name('services');
 Route::view('/testimonials', 'testimonials')->name('testimonials');
 Route::view('/team', 'team')->name('team');
 
+// Language switching route
+Route::get('/lang/{locale}', function ($locale) {
+    $supportedLocales = ['fr', 'en'];
+
+    if (in_array($locale, $supportedLocales)) {
+        session(['locale' => $locale]);
+        app()->setLocale($locale);
+    }
+
+    return redirect()->back();
+})->name('lang.switch');
+
 // Test route to verify routing is working
 Route::get('/test-route', function () {
     return 'Test route working';

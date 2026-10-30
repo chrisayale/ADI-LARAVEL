@@ -1,0 +1,7 @@
+savings: fr=Ãpargne | en=Savings
+all_loans: fr=MISSING | en=MISSING
+applications: fr=MISSING | en=MISSING
+active: fr=Actif | en=Active
+not_secure: fr=MISSING | en=MISSING
+last_login: fr=MISSING | en=MISSING
+first_login: fr=MISSING | en=MISSING

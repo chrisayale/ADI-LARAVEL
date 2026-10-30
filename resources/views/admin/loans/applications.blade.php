@@ -78,7 +78,7 @@
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 {{ __('total_amount') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalAmount ?? 0, 2) }}
+                                CDF {{ number_format($totalAmount ?? 0, 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -187,10 +187,10 @@
                                 </div>
                             </td>
                             <td>{{ $application->user->membership_number ?? __('n_a') }}</td>
-                            <td>UGX {{ number_format($application->amount_applied, 2) }}</td>
+                            <td>CDF {{ number_format($application->amount_applied, 2) }}</td>
                             <td>
                                 @if($application->amount_approved)
-                                    UGX {{ number_format($application->amount_approved, 2) }}
+                                    CDF {{ number_format($application->amount_approved, 2) }}
                                 @else
                                     <span class="text-muted">{{ __('n_a') }}</span>
                                 @endif

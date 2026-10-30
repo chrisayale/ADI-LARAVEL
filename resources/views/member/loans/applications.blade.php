@@ -147,7 +147,7 @@
                                 <strong>{{ $application->application_number }}</strong>
                             </td>
                             <td class="text-right">
-                                <strong>UGX {{ number_format($application->amount_applied, 2) }}</strong>
+                                <strong>CDF {{ number_format($application->amount_applied, 2) }}</strong>
                             </td>
                             <td>{{ Str::limit($application->purpose, 30) }}</td>
                             <td>{{ $application->created_at->format('d M Y') }}</td>

@@ -85,10 +85,10 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-right">UGX {{ number_format($loan->amount_applied, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($loan->amount_applied, 2) }}</td>
                             <td class="text-right">
                                 @if($loan->amount_approved)
-                                    UGX {{ number_format($loan->amount_approved, 2) }}
+                                    CDF {{ number_format($loan->amount_approved, 2) }}
                                 @else
                                     <span class="text-muted">Pending</span>
                                 @endif
@@ -105,7 +105,7 @@
                                     ];
                                 @endphp
                                 <span class="badge badge-{{ $statusColors[$loan->status] ?? 'secondary' }} p-2">
-                                    {{ ucfirst($loan->status) }}
+                                    {{ translate_status($loan->status) }}
                                 </span>
                             </td>
                         </tr>

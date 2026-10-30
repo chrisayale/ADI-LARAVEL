@@ -12,13 +12,21 @@ class Sacco extends Model
         'name',
         'code',
         'registration_number',
-        'address',
-        'phone',
-        'email',
+        'mobile_money',
+        'official_email',
+        'physical_address',
         'primary_currency',
         'secondary_currency',
         'status',
-        'settings'
+        'settings',
+        'province',
+        'territory',
+        'city_quartier',
+        'applicant_name',
+        'applicant_role',
+        'applicant_email',
+        'applicant_phone',
+        'description'
     ];
 
     protected $casts = [
@@ -47,6 +55,6 @@ class Sacco extends Model
      */
     public function getOfficialEmailAttribute()
     {
-        return $this->email;
+        return $this->attributes['official_email'] ?? null;
     }
 }

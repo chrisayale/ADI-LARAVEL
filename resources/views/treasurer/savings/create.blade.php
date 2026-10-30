@@ -126,7 +126,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="amount">Amount (UGX) <span class="text-danger">*</span></label>
+                                <label for="amount">Amount (CDF) <span class="text-danger">*</span></label>
                                 <input type="number" step="0.01" class="form-control @error('amount') is-invalid @enderror"
                                        id="amount" name="amount" value="{{ old('amount') }}" required min="1">
                                 @error('amount')
@@ -162,11 +162,11 @@
                             <hr class="mt-0">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <p class="mb-1"><strong>Current Balance:</strong> <span id="summary-current">UGX 0</span></p>
-                                    <p class="mb-1"><strong>Transaction Amount:</strong> <span id="summary-amount">UGX 0</span></p>
+                                    <p class="mb-1"><strong>Current Balance:</strong> <span id="summary-current">CDF 0</span></p>
+                                    <p class="mb-1"><strong>Transaction Amount:</strong> <span id="summary-amount">CDF 0</span></p>
                                 </div>
                                 <div class="col-sm-6">
-                                    <p class="mb-1"><strong>New Balance:</strong> <span id="summary-new">UGX 0</span></p>
+                                    <p class="mb-1"><strong>New Balance:</strong> <span id="summary-new">CDF 0</span></p>
                                     <p class="mb-1"><strong>Receipt #:</strong> <span id="summary-receipt">Will be generated</span></p>
                                 </div>
                             </div>
@@ -291,7 +291,7 @@
         <p class="mb-1"><strong>Email:</strong> ${data.email}</p>
         <p class="mb-1"><strong>Phone:</strong> ${data.phone || 'N/A'}</p>
         <hr>
-        <p class="mb-1"><strong>Current Balance:</strong> <span class="h5 text-success" id="current-balance">UGX ${formattedBalance}</span></p>
+        <p class="mb-1"><strong>Current Balance:</strong> <span class="h5 text-success" id="current-balance">CDF ${formattedBalance}</span></p>
     `;
     $('#member-details').html(html);
 }
@@ -303,8 +303,8 @@
                         <tr>
                             <td>${t.date}</td>
                             <td><span class="badge badge-${t.type === 'deposit' ? 'success' : 'info'}">${t.type}</span></td>
-                            <td class="text-right">UGX ${t.amount}</td>
-                            <td class="text-right">UGX ${t.balance}</td>
+                            <td class="text-right">CDF ${t.amount}</td>
+                            <td class="text-right">CDF ${t.balance}</td>
                         </tr>
                     `;
                 });
@@ -320,12 +320,12 @@
             const currentBalanceText = $('#current-balance').text();
             const currentBalance = parseFloat(currentBalanceText.replace(/[^0-9.-]+/g, '')) || 0;
 
-            if (amount > 0 && type && currentBalanceText !== 'UGX undefined') {
+            if (amount > 0 && type && currentBalanceText !== 'CDF undefined') {
                 let newBalance = type === 'deposit' ? currentBalance + amount : currentBalance - amount;
 
-                $('#summary-current').text('UGX ' + currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-                $('#summary-amount').text('UGX ' + amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-                $('#summary-new').text('UGX ' + newBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#summary-current').text('CDF ' + currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#summary-amount').text('CDF ' + amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#summary-new').text('CDF ' + newBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 
                 let receiptPreview = 'RCT-' + new Date().toISOString().slice(0,10).replace(/-/g, '') + '-xxxxxx';
                 $('#summary-receipt').text(receiptPreview);
@@ -344,7 +344,7 @@
             const amount = parseFloat($('#amount').val()) || 0;
             const currentBalanceText = $('#current-balance').text();
 
-            if (currentBalanceText === 'UGX undefined') {
+            if (currentBalanceText === 'CDF undefined') {
                 e.preventDefault();
                 alert('Please select a member first.');
                 return false;
@@ -354,7 +354,7 @@
 
             if (type === 'withdrawal' && amount > currentBalance) {
                 e.preventDefault();
-                alert('Insufficient balance! Current balance: UGX ' + currentBalance.toLocaleString());
+                alert('Insufficient balance! Current balance: CDF ' + currentBalance.toLocaleString());
                 return false;
             }
         });

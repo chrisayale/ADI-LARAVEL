@@ -60,7 +60,7 @@
                                     'EUR' => 'Euro (EUR)',
                                     'CDF' => 'Franc congolais (CDF)',
                                     'KES' => 'Shilling kényan (KES)',
-                                    'UGX' => 'Shilling ougandais (UGX)',
+                                    'CDF' => 'Shilling ougandais (CDF)',
                                     'TZS' => 'Shilling tanzanien (TZS)',
                                 ];
                                 echo $currencies[$sacco->primary_currency] ?? $sacco->primary_currency;
@@ -75,7 +75,7 @@
                                     'EUR' => 'Euro (EUR)',
                                     'CDF' => 'Franc congolais (CDF)',
                                     'KES' => 'Shilling kényan (KES)',
-                                    'UGX' => 'Shilling ougandais (UGX)',
+                                    'CDF' => 'Shilling ougandais (CDF)',
                                     'TZS' => 'Shilling tanzanien (TZS)',
                                 ];
                                 echo $currencies[$sacco->secondary_currency] ?? $sacco->secondary_currency;
@@ -85,7 +85,7 @@
                         <dt class="col-sm-3">Statut</dt>
                         <dd class="col-sm-9">
                             <span class="badge bg-{{ $sacco->status === 'active' ? 'success' : ($sacco->status === 'inactive' ? 'secondary' : 'warning') }}">
-                                {{ ucfirst($sacco->status) }}
+                                {{ translate_status($sacco->status) }}
                             </span>
                         </dd>
 

@@ -88,7 +88,7 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th>Amount Applied:</th>
-                                    <td><strong>UGX {{ number_format($loan->amount_applied, 2) }}</strong></td>
+                                    <td><strong>CDF {{ number_format($loan->amount_applied, 2) }}</strong></td>
                                 </tr>
                                 <tr>
                                     <th>Purpose:</th>
@@ -119,7 +119,7 @@
                                 </tr>
                                 <tr>
                                     <th>Collateral Value:</th>
-                                    <td>UGX {{ number_format($loan->collateral_value, 2) }}</td>
+                                    <td>CDF {{ number_format($loan->collateral_value, 2) }}</td>
                                 </tr>
                                 @endif
                             </table>
@@ -162,7 +162,7 @@
                                     <div class="mb-2">
                                         <span class="badge badge-{{ $guarantor->status == 'approved' ? 'success' : ($guarantor->status == 'rejected' ? 'danger' : 'warning') }} p-2"
                                               id="guarantor-status-{{ $guarantor->id }}">
-                                            {{ ucfirst($guarantor->status ?? 'pending') }}
+                                            {{ translate_status($guarantor->status ?? 'pending') }}
                                         </span>
                                     </div>
                                     <div class="btn-group">
@@ -227,7 +227,7 @@
                                         <td>
                                             <span class="badge badge-{{ $document->verification_status == 'verified' ? 'success' : ($document->verification_status == 'rejected' ? 'danger' : 'warning') }}"
                                                   id="document-status-{{ $document->id }}">
-                                                {{ ucfirst($document->verification_status) }}
+                                                {{ translate_status($document->verification_status) }}
                                             </span>
                                         </td>
                                         <td>

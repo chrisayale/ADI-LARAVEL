@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
-@section('title', 'Login - Capital Investment Club')
-@section('subtitle', 'Welcome back to your investment dashboard')
+@section('title', __('login') . ' - Capital Investment Club')
+@section('subtitle', __('welcome_back', ['name' => '']))
 
 @section('content')
     <form method="POST" action="{{ route('login') }}" novalidate>
@@ -15,7 +15,7 @@
                        name="email"
                        id="email"
                        value="{{ old('email') }}"
-                       placeholder="Email Address"
+                       placeholder="{{ __('email_address') }}"
                        required
                        autofocus>
             </div>
@@ -31,7 +31,7 @@
                        class="form-control-auth @error('password') is-invalid @enderror"
                        name="password"
                        id="password"
-                       placeholder="Password"
+                       placeholder="{{ __('password') }}"
                        required>
                 <button type="button" class="password-toggle" id="togglePassword">
                     <i class="fas fa-eye"></i>
@@ -50,36 +50,36 @@
                        id="remember"
                        {{ old('remember') ? 'checked' : '' }}>
                 <label class="form-check-label" for="remember">
-                    Remember me
+                    {{ __('remember_me') }}
                 </label>
             </div>
             @if (Route::has('password.request'))
                 <a href="{{ route('password.request') }}" class="auth-link small">
-                    Forgot Password?
+                    {{ __('forgot_password') }}
                 </a>
             @endif
         </div>
 
         <button type="submit" class="btn-auth mb-3">
             <i class="fas fa-sign-in-alt"></i>
-            <span>Login to Dashboard</span>
+            <span>{{ __('login_to_dashboard') }}</span>
         </button>
 
         @if(Route::has('register'))
             <div class="divider">
-                <span>or</span>
+                <span>{{ __('or') }}</span>
             </div>
 
             <a href="{{ route('register') }}" class="btn-outline-auth">
                 <i class="fas fa-user-plus"></i>
-                <span>Create New Account</span>
+                <span>{{ __('create_new_account') }}</span>
             </a>
         @endif
     </form>
         <form method="GET" action="{{ route('request-sacco.create') }}" class="mt-3">
             <button type="submit" class="btn-auth mb-3">
                 <i class="fas fa-plus"></i>
-                <span>Demander la création d'un SACCO</span>
+                <span>{{ __('request_sacco_creation') }}</span>
             </button>
         </form>
 @endsection

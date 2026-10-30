@@ -29,7 +29,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 {{ __('total_withdrawals') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($totalWithdrawals, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalWithdrawals, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
@@ -46,7 +46,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 {{ __('todays_withdrawals') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">UGX {{ number_format($todayWithdrawals, 2) }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($todayWithdrawals, 2) }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
@@ -64,7 +64,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 {{ __('average_withdrawal') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                UGX {{ number_format($totalWithdrawals / max($withdrawals->total(), 1), 2) }}
+                                CDF {{ number_format($totalWithdrawals / max($withdrawals->total(), 1), 2) }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -164,9 +164,9 @@
                                 </div>
                             </td>
                             <td class="text-right">
-                                <strong class="text-info">UGX {{ number_format($withdrawal->amount, 2) }}</strong>
+                                <strong class="text-info">CDF {{ number_format($withdrawal->amount, 2) }}</strong>
                             </td>
-                            <td class="text-right">UGX {{ number_format($withdrawal->balance_after, 2) }}</td>
+                            <td class="text-right">CDF {{ number_format($withdrawal->balance_after, 2) }}</td>
                             <td>{{ $withdrawal->transaction_date->format('d M Y') }}</td>
                             <td>
                                 <span class="badge badge-{{ $withdrawal->status_color }} p-2">

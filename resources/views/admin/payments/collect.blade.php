@@ -158,7 +158,7 @@
                                                     <label for="amount">{{ __('payment_amount') }} *</label>
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
-                                                            <span class="input-group-text">UGX</span>
+                                                            <span class="input-group-text">CDF</span>
                                                         </div>
                                                         <input type="number"
                                                                name="amount"
