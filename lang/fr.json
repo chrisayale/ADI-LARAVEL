@@ -622,5 +622,16 @@
     "search_member_to_collect": "Rechercher un membre pour encaisser un paiement",
     "enter_membership_number_above": "Entrez le numéro d'adhésion, le téléphone ou le nom ci-dessus",
     "no_member_found_with_search": "Aucun membre trouvé avec",
-    "please_try_again": "Veuillez réessayer"
+    "please_try_again": "Veuillez réessayer",
+    "new_payment": "Nouveau paiement",
+    "todays_collections": "Encaissements du jour",
+    "total_transactions": "Total transactions",
+    "showing": "Affichés",
+    "filter_payments": "Filtrer les paiements",
+    "all_members": "Tous les membres",
+    "all_methods": "Toutes les méthodes",
+    "receipt_number": "N° reçu",
+    "collected_by": "Encaissé par",
+    "print_receipt": "Imprimer le reçu",
+    "no_payment_transactions_found": "Aucune transaction de paiement trouvée"
 }

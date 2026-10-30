@@ -622,5 +622,16 @@
     "search_member_to_collect": "Search for a member to collect payment",
     "enter_membership_number_above": "Enter membership number, phone number, or name above",
     "no_member_found_with_search": "No member found with",
-    "please_try_again": "Please try again."
+    "please_try_again": "Please try again.",
+    "new_payment": "New Payment",
+    "todays_collections": "Today's Collections",
+    "total_transactions": "Total Transactions",
+    "showing": "Showing",
+    "filter_payments": "Filter Payments",
+    "all_members": "All Members",
+    "all_methods": "All Methods",
+    "receipt_number": "Receipt #",
+    "collected_by": "Collected By",
+    "print_receipt": "Print Receipt",
+    "no_payment_transactions_found": "No payment transactions found"
 }
