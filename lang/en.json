@@ -654,5 +654,10 @@
     "average_deposit": "Average Deposit",
     "filter_deposits": "Filter Deposits",
     "deposit_transactions": "Deposit Transactions",
-    "no_deposits_found": "No deposits found"
+    "no_deposits_found": "No deposits found",
+    "new_withdrawal": "New Withdrawal",
+    "average_withdrawal": "Average Withdrawal",
+    "filter_withdrawals": "Filter Withdrawals",
+    "withdrawal_transactions": "Withdrawal Transactions",
+    "no_withdrawals_found": "No withdrawals found"
 }

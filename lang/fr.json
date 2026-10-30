@@ -654,5 +654,10 @@
     "average_deposit": "Dépôt moyen",
     "filter_deposits": "Filtrer les dépôts",
     "deposit_transactions": "Transactions de dépôt",
-    "no_deposits_found": "Aucun dépôt trouvé"
+    "no_deposits_found": "Aucun dépôt trouvé",
+    "new_withdrawal": "Nouveau retrait",
+    "average_withdrawal": "Retrait moyen",
+    "filter_withdrawals": "Filtrer les retraits",
+    "withdrawal_transactions": "Transactions de retrait",
+    "no_withdrawals_found": "Aucun retrait trouvé"
 }
