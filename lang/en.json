@@ -597,5 +597,10 @@
     "rejection_reason": "Rejection Reason",
     "rejection_reason_placeholder": "Explain the reason for rejection...",
     "reject_loan": "Reject Loan",
-    "view_documents": "View Documents"
+    "view_documents": "View Documents",
+    "completed_loans": "Completed Loans",
+    "total_completed_loans": "Total Completed Loans",
+    "total_amount_repaid": "Total Amount Repaid",
+    "completion_date": "Completion Date",
+    "no_completed_loans_found": "No completed loans found."
 }

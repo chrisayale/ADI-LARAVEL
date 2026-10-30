@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Completed Loans')
+@section('title', __('completed_loans'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Completed Loans</h3>
+                    <h3 class="card-title">{{ __('completed_loans') }}</h3>
                 </div>
                 <div class="card-body">
                     <!-- Summary Stats -->
@@ -17,7 +17,7 @@
                             <div class="small-box bg-success">
                                 <div class="inner">
                                     <h3>{{ $totalCompleted }}</h3>
-                                    <p>Total Completed Loans</p>
+                                    <p>{{ __('total_completed_loans') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-check-circle"></i>
@@ -28,7 +28,7 @@
                             <div class="small-box bg-primary">
                                 <div class="inner">
                                     <h3>{{ number_format($totalRepaid, 2) }}</h3>
-                                    <p>Total Amount Repaid</p>
+                                    <p>{{ __('total_amount_repaid') }}</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-hand-holding-usd"></i>
@@ -41,12 +41,12 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th>Application #</th>
-                                    <th>Member</th>
-                                    <th>Amount Approved</th>
-                                    <th>Total Repaid</th>
-                                    <th>Completion Date</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('application_number') }}</th>
+                                    <th>{{ __('member') }}</th>
+                                    <th>{{ __('amount_approved') }}</th>
+                                    <th>{{ __('total_repaid') }}</th>
+                                    <th>{{ __('completion_date') }}</th>
+                                    <th>{{ __('actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,13 +60,13 @@
                                     <td>
                                         <a href="{{ route('admin.loans.show', $loan) }}"
                                            class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {{ __('view') }}
                                         </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No completed loans found.</td>
+                                    <td colspan="6" class="text-center">{{ __('no_completed_loans_found') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>

@@ -597,5 +597,10 @@
     "rejection_reason": "Motif du rejet",
     "rejection_reason_placeholder": "Expliquez le motif du rejet...",
     "reject_loan": "Rejeter le prêt",
-    "view_documents": "Voir les documents"
+    "view_documents": "Voir les documents",
+    "completed_loans": "Prêts terminés",
+    "total_completed_loans": "Total prêts terminés",
+    "total_amount_repaid": "Montant total remboursé",
+    "completion_date": "Date de fin",
+    "no_completed_loans_found": "Aucun prêt terminé trouvé."
 }
