@@ -649,5 +649,10 @@
     "balance_after": "Solde après",
     "recorded_by": "Enregistré par",
     "receipt": "Reçu",
-    "no_transactions_found": "Aucune transaction trouvée"
+    "no_transactions_found": "Aucune transaction trouvée",
+    "new_deposit": "Nouveau dépôt",
+    "average_deposit": "Dépôt moyen",
+    "filter_deposits": "Filtrer les dépôts",
+    "deposit_transactions": "Transactions de dépôt",
+    "no_deposits_found": "Aucun dépôt trouvé"
 }

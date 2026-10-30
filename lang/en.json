@@ -649,5 +649,10 @@
     "balance_after": "Balance After",
     "recorded_by": "Recorded By",
     "receipt": "Receipt",
-    "no_transactions_found": "No transactions found"
+    "no_transactions_found": "No transactions found",
+    "new_deposit": "New Deposit",
+    "average_deposit": "Average Deposit",
+    "filter_deposits": "Filter Deposits",
+    "deposit_transactions": "Deposit Transactions",
+    "no_deposits_found": "No deposits found"
 }
