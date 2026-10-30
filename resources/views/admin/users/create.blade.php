@@ -2,6 +2,10 @@
 
 @section('title', __('add_new_user'))
 
+@php
+    $year = date('Y');
+@endphp
+
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
