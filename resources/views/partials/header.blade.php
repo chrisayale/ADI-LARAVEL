@@ -21,6 +21,14 @@
                             <span class="fw-bold fs-6 lh-1">Capital Investment</span>
                             <small class="d-block text-white-50 opacity-75" style="font-size: 0.7rem;">Club</small>
                         </div>
+                        <!-- SACCO Name for Admin/Treasurer -->
+                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+                        <div class="ms-3 d-none d-lg-block">
+                            <span class="badge bg-light text-success fw-medium px-2 py-1" style="font-size: 0.7rem;">
+                                <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </a>
 
@@ -111,6 +119,12 @@
                                         <small class="text-muted d-block text-truncate">{{ auth()->check() ? auth()->user()->email : '' }}</small>
                                         @if(auth()->check() && auth()->user()->membership_number)
                                         <small class="text-success fw-medium">{{ auth()->user()->membership_number }}</small>
+                                        @endif
+                                        <!-- SACCO Name for Admin/Treasurer in dropdown -->
+                                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+                                        <small class="text-primary fw-medium d-block mt-1">
+                                            <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+                                        </small>
                                         @endif
                                     </div>
                                 </div>

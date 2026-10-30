@@ -24,6 +24,14 @@
                 Guest
             @endif
         </small>
+        <!-- SACCO Name for Admin/Treasurer in sidebar header -->
+        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+        <div class="mt-2">
+            <span class="badge bg-light text-success fw-medium px-2 py-1" style="font-size: 0.65rem;">
+                <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+            </span>
+        </div>
+        @endif
     </div>
 
     <!-- Scrollable Navigation Menu -->
