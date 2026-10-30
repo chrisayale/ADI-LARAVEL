@@ -953,5 +953,21 @@
     "loan_details": "Loan Details",
     "no_loans_found_period": "No loans found for the selected period",
     "amount_applied_ugx": "Amount Applied (UGX)",
-    "amount_approved_ugx": "Amount Approved (UGX)"
+    "amount_approved_ugx": "Amount Approved (UGX)",
+    "select_year": "Select Year",
+    "export_report": "Export Report",
+    "net_savings": "Net Savings",
+    "loans_approved": "Loans Approved",
+    "active_loans": "Active Loans",
+    "currently_disbursed_approved": "Currently disbursed/approved",
+    "average_loan": "Average Loan",
+    "monthly_savings_overview": "Monthly Savings Overview",
+    "monthly_loans_approved": "Monthly Loans Approved",
+    "monthly_summary": "Monthly Summary",
+    "month": "Month",
+    "deposits_ugx": "Deposits (UGX)",
+    "withdrawals_ugx": "Withdrawals (UGX)",
+    "net_savings_ugx": "Net Savings (UGX)",
+    "loans_approved_ugx": "Loans Approved (UGX)",
+    "total": "Total"
 }

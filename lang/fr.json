@@ -953,5 +953,21 @@
     "loan_details": "Détails du prêt",
     "no_loans_found_period": "Aucun prêt trouvé pour la période sélectionnée",
     "amount_applied_ugx": "Montant demandé (UGX)",
-    "amount_approved_ugx": "Montant approuvé (UGX)"
+    "amount_approved_ugx": "Montant approuvé (UGX)",
+    "select_year": "Sélectionner l'année",
+    "export_report": "Exporter le rapport",
+    "net_savings": "Épargne nette",
+    "loans_approved": "Prêts approuvés",
+    "active_loans": "Prêts actifs",
+    "currently_disbursed_approved": "Actuellement décaissés/approuvés",
+    "average_loan": "Prêt moyen",
+    "monthly_savings_overview": "Aperçu mensuel de l'épargne",
+    "monthly_loans_approved": "Prêts approuvés mensuels",
+    "monthly_summary": "Résumé mensuel",
+    "month": "Mois",
+    "deposits_ugx": "Dépôts (UGX)",
+    "withdrawals_ugx": "Retraits (UGX)",
+    "net_savings_ugx": "Épargne nette (UGX)",
+    "loans_approved_ugx": "Prêts approuvés (UGX)",
+    "total": "Total"
 }

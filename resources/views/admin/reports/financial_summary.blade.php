@@ -1,19 +1,19 @@
-{{-- resources/views/admin/reports/financial-summary.blade.php --}}
+{{-- resources/views/admin/reports/financial_summary.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Financial Summary')
+@section('title', __('financial_summary'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Financial Summary - {{ $year }}</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('financial_summary') }} - {{ $year }}</h1>
         <div>
             <a href="{{ route('admin.reports.savings') }}" class="btn btn-info">
-                <i class="fas fa-piggy-bank"></i> Savings Report
+                <i class="fas fa-piggy-bank"></i> {{ __('savings_report') }}
             </a>
             <a href="{{ route('admin.reports.loans') }}" class="btn btn-primary">
-                <i class="fas fa-hand-holding-usd"></i> Loans Report
+                <i class="fas fa-hand-holding-usd"></i> {{ __('loans_report') }}
             </a>
         </div>
     </div>
@@ -23,7 +23,7 @@
         <div class="card-body">
             <form method="GET" action="{{ route('admin.reports.financial-summary') }}" class="row align-items-center">
                 <div class="col-md-3">
-                    <label for="year">Select Year</label>
+                    <label for="year">{{ __('select_year') }}</label>
                     <select class="form-control" id="year" name="year" onchange="this.form.submit()">
                         @for($y = now()->year; $y >= 2020; $y--)
                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="col-md-9 text-right">
                     <a href="{{ route('admin.reports.export') }}?type=financial&year={{ $year }}" class="btn btn-success">
-                        <i class="fas fa-download"></i> Export Report
+                        <i class="fas fa-download"></i> {{ __('export_report') }}
                     </a>
                 </div>
             </form>
@@ -47,9 +47,9 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Members</div>
+                                {{ __('total_members') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totals['total_members'] }}</div>
-                            <small class="text-success">{{ $totals['active_members'] }} active</small>
+                            <small class="text-success">{{ $totals['active_members'] }} {{ __('active') }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -65,7 +65,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Deposits</div>
+                                {{ __('total_deposits') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totals['total_deposits'], 2) }}
                             </div>
@@ -84,7 +84,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Withdrawals</div>
+                                {{ __('total_withdrawals') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totals['total_withdrawals'], 2) }}
                             </div>
@@ -103,7 +103,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Net Savings</div>
+                                {{ __('net_savings') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totals['net_savings'], 2) }}
                             </div>
@@ -125,11 +125,11 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Loans Approved</div>
+                                {{ __('loans_approved') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totals['total_loans_approved'], 2) }}
                             </div>
-                            <small>{{ $totals['total_loans_count'] }} loans</small>
+                            <small>{{ $totals['total_loans_count'] }} {{ __('loans') }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -145,9 +145,9 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Active Loans</div>
+                                {{ __('active_loans') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totals['active_loans_count'] }}</div>
-                            <small>Currently disbursed/approved</small>
+                            <small>{{ __('currently_disbursed_approved') }}</small>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-hand-holding-usd fa-2x text-gray-300"></i>
@@ -163,7 +163,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Average Loan</div>
+                                {{ __('average_loan') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 UGX {{ number_format($totals['total_loans_count'] > 0 ? $totals['total_loans_approved'] / $totals['total_loans_count'] : 0, 2) }}
                             </div>
@@ -182,7 +182,7 @@
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Monthly Savings Overview</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('monthly_savings_overview') }}</h6>
                 </div>
                 <div class="card-body">
                     <canvas id="savingsChart" height="300"></canvas>
@@ -193,7 +193,7 @@
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Monthly Loans Approved</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('monthly_loans_approved') }}</h6>
                 </div>
                 <div class="card-body">
                     <canvas id="loansChart" height="300"></canvas>
@@ -205,18 +205,18 @@
     <!-- Summary Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Monthly Summary - {{ $year }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('monthly_summary') }} - {{ $year }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Month</th>
-                            <th class="text-right">Deposits (UGX)</th>
-                            <th class="text-right">Withdrawals (UGX)</th>
-                            <th class="text-right">Net Savings (UGX)</th>
-                            <th class="text-right">Loans Approved (UGX)</th>
+                            <th>{{ __('month') }}</th>
+                            <th class="text-right">{{ __('deposits_ugx') }}</th>
+                            <th class="text-right">{{ __('withdrawals_ugx') }}</th>
+                            <th class="text-right">{{ __('net_savings_ugx') }}</th>
+                            <th class="text-right">{{ __('loans_approved_ugx') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -240,7 +240,7 @@
                     </tbody>
                     <tfoot class="bg-light">
                         <tr>
-                            <th><strong>Total</strong></th>
+                            <th><strong>{{ __('total') }}</strong></th>
                             <th class="text-right text-success">
                                 <strong>{{ number_format(array_sum($savingsData['deposits']), 2) }}</strong>
                             </th>
@@ -266,6 +266,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Get translations for chart labels
+        const depositsLabel = '{{ __('deposits') }}';
+        const withdrawalsLabel = '{{ __('withdrawals') }}';
+        const loansApprovedLabel = '{{ __('loans_approved') }}';
+        const ugxLabel = '{{ __('ugx') }}';
+
         // Savings Chart
         const savingsCtx = document.getElementById('savingsChart').getContext('2d');
         const months = @json($months);
@@ -276,12 +282,12 @@
             data: {
                 labels: months,
                 datasets: [{
-                    label: 'Deposits',
+                    label: depositsLabel,
                     data: savingsData.deposits,
                     backgroundColor: '#1cc88a',
                     borderRadius: 4
                 }, {
-                    label: 'Withdrawals',
+                    label: withdrawalsLabel,
                     data: savingsData.withdrawals,
                     backgroundColor: '#36b9cc',
                     borderRadius: 4
@@ -295,7 +301,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'UGX ' + (value / 1000000).toFixed(1) + 'M';
+                                return ugxLabel + ' ' + (value / 1000000).toFixed(1) + 'M';
                             }
                         }
                     }
@@ -307,7 +313,7 @@
                                 let label = context.dataset.label || '';
                                 if (label) label += ': ';
                                 if (context.parsed.y !== null) {
-                                    label += 'UGX ' + context.parsed.y.toLocaleString();
+                                    label += ugxLabel + ' ' + context.parsed.y.toLocaleString();
                                 }
                                 return label;
                             }
@@ -325,7 +331,7 @@
             data: {
                 labels: months,
                 datasets: [{
-                    label: 'Loans Approved',
+                    label: loansApprovedLabel,
                     data: @json($loansData['approved']),
                     borderColor: '#4e73df',
                     backgroundColor: 'rgba(78, 115, 223, 0.1)',
@@ -345,7 +351,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'UGX ' + (value / 1000000).toFixed(1) + 'M';
+                                return ugxLabel + ' ' + (value / 1000000).toFixed(1) + 'M';
                             }
                         }
                     }
