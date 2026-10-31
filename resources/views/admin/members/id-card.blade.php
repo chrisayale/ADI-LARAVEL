@@ -1,6 +1,6 @@
 {{-- resources/views/admin/members/id-card.blade.php --}}
 {{-- PVC Membership ID Card (CR80 Portrait: 53.98mm x 85.6mm) --}}
-{{-- Design with background image, centered QR in yellow frame, name in blue band, code/expiry in white bubbles --}}
+{{-- Background as <img> tag for reliable DomPDF rendering --}}
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -20,13 +20,7 @@
             box-sizing: border-box;
         }
 
-        html {
-            width: 53.98mm;
-            height: 85.6mm;
-            overflow: hidden;
-        }
-
-        body {
+        html, body {
             width: 53.98mm;
             height: 85.6mm;
             margin: 0;
@@ -44,18 +38,11 @@
         }
 
         .card {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 53.98mm;
             height: 85.6mm;
-            border-radius: 2.5mm;
             overflow: hidden;
-            /* Background image from public folder */
-            background-image: url('{{ public_path("card-background.png") }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            border-radius: 2.5mm;
             page-break-inside: avoid;
             page-break-after: avoid;
             page-break-before: avoid;
@@ -75,12 +62,6 @@
                 padding: 0;
                 overflow: hidden;
             }
-            .card {
-                border: none;
-            }
-            .no-print {
-                display: none !important;
-            }
             * {
                 page-break-inside: avoid !important;
                 page-break-after: avoid !important;
@@ -88,33 +69,35 @@
             }
         }
 
-        /* ========================================
-           VERTICAL PORTRAIT LAYOUT - ABSOLUTE POSITIONING OVER BACKGROUND
-           ======================================== */
-        .card-front {
+        /* Background image as <img> tag - z-index 1 */
+        .card-bg {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 53.98mm;
+            height: 85.6mm;
+            object-fit: cover;
+            z-index: 1;
         }
 
-        /* QR Code Section - Centered in yellow frame area */
-        .qr-section {
+        /* All content elements - z-index 2 */
+        .qr-frame,
+        .member-name,
+        .member-code-box,
+        .member-expiry-box {
             position: absolute;
+            z-index: 2;
+        }
+
+        /* QR Frame - Centered, yellow border */
+        .qr-frame {
             top: 18mm;
             left: 50%;
             transform: translateX(-50%);
             width: 35mm;
             height: 35mm;
-            z-index: 10;
-        }
-
-        .qr-frame {
-            width: 100%;
-            height: 100%;
             background: #ffffff;
-            border: 3px solid #f59e0b; /* Yellow frame */
+            border: 3px solid #f59e0b;
             border-radius: 3mm;
             display: flex;
             align-items: center;
@@ -132,96 +115,64 @@
             display: block;
         }
 
-        /* Member Name - In blue central band */
-        .member-name-band {
-            position: absolute;
+        /* Member Name - White text, centered */
+        .member-name {
             top: 56mm;
             left: 3mm;
             right: 3mm;
             text-align: center;
-            z-index: 10;
-        }
-
-        .member-name {
             font-size: 4.5mm;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 0.03mm;
             line-height: 1.2;
             text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
             word-break: break-word;
         }
 
-        /* Member Code & Expiry - In white bubbles */
-        .info-bubbles {
-            position: absolute;
+        /* Member Code Box - White semi-transparent bubble */
+        .member-code-box {
             top: 66mm;
             left: 3mm;
             right: 3mm;
-            display: flex;
-            flex-direction: column;
-            gap: 3mm;
-            z-index: 10;
-        }
-
-        .info-bubble {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 2mm;
             padding: 2mm 3mm;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             backdrop-filter: blur(4px);
-        }
-
-        .member-code-bubble {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5mm;
-        }
-
-        .member-code-label {
-            font-size: 1.6mm;
-            font-weight: 500;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05mm;
-        }
-
-        .member-code-value {
-            font-size: 2.6mm;
+            font-size: 2.4mm;
             font-weight: 700;
             color: #111827;
-            letter-spacing: 0.08mm;
-            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-        }
-
-        .expiry-bubble {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5mm;
-        }
-
-        .expiry-label {
-            font-size: 1.6mm;
-            font-weight: 500;
-            color: #6b7280;
-            text-transform: uppercase;
             letter-spacing: 0.05mm;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            text-align: center;
         }
 
-        .expiry-value {
-            font-size: 2.4mm;
+        /* Expiry Box - White semi-transparent bubble */
+        .member-expiry-box {
+            top: 73mm;
+            left: 3mm;
+            right: 3mm;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 2mm;
+            padding: 2mm 3mm;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            font-size: 2.2mm;
             font-weight: 700;
             color: #b91c1c;
             letter-spacing: 0.05mm;
             font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            text-align: center;
         }
 
-        /* Side indicators */
+        /* Side indicator */
         .side-indicator {
             position: absolute;
             bottom: 1mm;
             right: 1.5mm;
+            z-index: 2;
             font-size: 1.1mm;
             color: rgba(255,255,255,0.7);
             font-weight: 600;
@@ -289,30 +240,27 @@
 </head>
 <body>
     <div class="card">
-        <!-- FRONT SIDE - Vertical Portrait with Background -->
+        <!-- Background Image as <img> for DomPDF compatibility -->
+        <img src="{{ public_path('card-background.png') }}" class="card-bg" alt="Background">
+
+        <!-- FRONT SIDE - Vertical Portrait -->
         <div class="card-front">
             <!-- QR Code - Centered in Yellow Frame -->
-            <div class="qr-section">
-                <div class="qr-frame">
-                    <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
-                </div>
+            <div class="qr-frame">
+                <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
             </div>
 
-            <!-- Member Name - In Blue Central Band -->
-            <div class="member-name-band">
-                <div class="member-name">{{ strtoupper($user->name) }}</div>
+            <!-- Member Name -->
+            <div class="member-name">{{ strtoupper($user->name) }}</div>
+
+            <!-- Member Code Box -->
+            <div class="member-code-box">
+                {{ __('member_code') }}: {{ $user->membership_number }}
             </div>
 
-            <!-- Member Code & Expiry - In White Bubbles -->
-            <div class="info-bubbles">
-                <div class="info-bubble member-code-bubble">
-                    <div class="member-code-label">{{ __('member_code') }}</div>
-                    <div class="member-code-value">{{ $user->membership_number }}</div>
-                </div>
-                <div class="info-bubble expiry-bubble">
-                    <div class="expiry-label">{{ __('expires_on') }}</div>
-                    <div class="expiry-value">{{ $expiryDate }}</div>
-                </div>
+            <!-- Expiry Box -->
+            <div class="member-expiry-box">
+                {{ __('expires_on') }}: {{ $expiryDate }}
             </div>
 
             <div class="side-indicator">{{ __('front') }}</div>
