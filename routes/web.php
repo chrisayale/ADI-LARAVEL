@@ -125,6 +125,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::get('/users/{user}/pvc-card', [AdminUserController::class, 'showPvcCard'])->name('users.pvc-card');
     Route::get('/users/{user}/pvc-card/download', [AdminUserController::class, 'downloadPvcCard'])->name('users.pvc-card.download');
+    Route::post('/users/{user}/pvc-card/download', [AdminUserController::class, 'downloadPvcCard'])->name('users.download-pvc-card');
 
 
     // ========== ADMIN PAYMENT MANAGEMENT ==========
