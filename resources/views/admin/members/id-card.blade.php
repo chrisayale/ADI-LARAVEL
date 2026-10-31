@@ -133,7 +133,7 @@
             top: 55.5mm; /* Aligned with "Code membre :" label in white oval slot */
             left: 65%;
             transform: translateX(-50%);
-            font-size: 2.8mm;
+            font-size: 2.2mm;
             font-weight: 700;
             color: #000000;
             letter-spacing: 0.08mm;
