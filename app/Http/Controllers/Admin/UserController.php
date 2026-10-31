@@ -352,7 +352,11 @@ public function showPvcCard(User $user)
     // Generate QR Code SVG directly from matrix (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
-    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'));
+    // Load background image as base64 data URI for universal rendering
+    $bgPath = public_path('card-background.png');
+    $bgBase64 = file_exists($bgPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgPath)) : '';
+
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'));
 }
 
 /**
@@ -379,8 +383,12 @@ public function downloadPvcCard(User $user)
     // Generate QR Code SVG directly from matrix (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
+    // Load background image as base64 data URI for universal rendering
+    $bgPath = public_path('card-background.png');
+    $bgBase64 = file_exists($bgPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgPath)) : '';
+
     // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'))
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'))
         ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',

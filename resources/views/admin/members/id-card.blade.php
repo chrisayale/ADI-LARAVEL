@@ -240,8 +240,8 @@
 </head>
 <body>
     <div class="card">
-        <!-- Background Image as <img> for DomPDF compatibility -->
-        <img src="{{ public_path('card-background.png') }}" class="card-bg" alt="Background">
+        <!-- Background Image as <img> with Base64 data URI for universal rendering -->
+        <img src="{!! $bgBase64 ?? '' !!}" class="card-bg" alt="Background">
 
         <!-- FRONT SIDE - Vertical Portrait -->
         <div class="card-front">
