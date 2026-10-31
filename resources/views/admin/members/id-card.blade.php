@@ -144,7 +144,7 @@
 
         /* Expiry Value - Centered in YELLOW/WHITE SLOT (line "Expire le :") in BLACK */
         .member-expiry-value {
-            top: 66.5mm; /* Aligned with "Expire le :" label in white oval slot */
+            top: 63.5mm; /* Aligned with "Expire le :" label in white oval slot */
             left: 75%;
             transform: translateX(-50%);
             font-size: 1.8mm;
