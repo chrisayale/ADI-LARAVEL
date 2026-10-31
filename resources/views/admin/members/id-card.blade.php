@@ -133,7 +133,7 @@
             top: 56.5mm; /* Centered vertically in white oval slot */
             left: 75%;
             transform: translateX(-50%);
-            font-size: 2mm;
+            font-size: 1.8mm;
             font-weight: 700;
             color: #000000;
             letter-spacing: 0.08mm;
