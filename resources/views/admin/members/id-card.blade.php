@@ -413,7 +413,7 @@
                     </div>
 
                     <!-- Member Name - Centered in Blue Band -->
-                    <div class="member-name">{{ strtoupper($user->name) }}</div>
+                    <div class="member-name">{{ strtoupper($displayName ?? $user->name) }}</div>
 
                     <!-- Member Code Value Only - Centered in Yellow/White Slot -->
                     <div class="member-code-value">{{ $user->membership_number }}</div>

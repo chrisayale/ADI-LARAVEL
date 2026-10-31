@@ -349,6 +349,9 @@ public function showPvcCard(User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
+    // Generate display name limited to 15 characters
+    $displayName = Str::limit($user->name, 15);
+
     // Generate QR Code SVG as base64 data URI (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
@@ -356,7 +359,7 @@ public function showPvcCard(User $user)
     $bgPath = public_path('card-background.jpeg');
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
-    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'));
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'displayName'));
 }
 
 /**
@@ -433,6 +436,9 @@ public function downloadPvcCard(Request $request, User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
+    // Generate display name limited to 15 characters
+    $displayName = Str::limit($user->name, 15);
+
     // Fallback: Generate QR Code SVG as base64 data URI (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
@@ -441,7 +447,7 @@ public function downloadPvcCard(Request $request, User $user)
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
     // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'))
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'displayName'))
         ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',
