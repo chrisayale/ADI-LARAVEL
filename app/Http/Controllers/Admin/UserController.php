@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class UserController extends Controller
 {
@@ -321,5 +324,90 @@ private function generateEmployeeId()
     }
 
     return 'EMP-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Display PVC Membership ID Card for a member
+ */
+public function showPvcCard(User $user)
+{
+    // Only members can have PVC cards
+    if (!$user->hasRole('member')) {
+        return redirect()->route('admin.users.show', $user)
+            ->with('error', __('card_generation_failed') . ': ' . __('only_members_can_have_pvc_card'));
+    }
+
+    // Ensure membership number exists
+    if (!$user->membership_number) {
+        return redirect()->route('admin.users.show', $user)
+            ->with('error', __('card_generation_failed') . ': ' . __('no_membership_number'));
+    }
+
+    // Calculate expiry date (1 year from membership date)
+    $membershipDate = $user->membership_date ?? $user->created_at;
+    $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
+
+    // Generate QR Code with membership number
+    $qrOptions = new QROptions([
+        'version' => 5,
+        'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+        'eccLevel' => QRCode::ECC_H,
+        'scale' => 4,
+        'imageBase64' => false,
+        'moduleSize' => 3,
+        'quietZone' => 2,
+    ]);
+
+    $qrCode = new QRCode($qrOptions);
+    $qrCodeSvg = $qrCode->render($user->membership_number);
+
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'));
+}
+
+/**
+ * Download PVC Membership ID Card as PDF
+ */
+public function downloadPvcCard(User $user)
+{
+    // Only members can have PVC cards
+    if (!$user->hasRole('member')) {
+        return redirect()->route('admin.users.show', $user)
+            ->with('error', __('card_generation_failed') . ': ' . __('only_members_can_have_pvc_card'));
+    }
+
+    // Ensure membership number exists
+    if (!$user->membership_number) {
+        return redirect()->route('admin.users.show', $user)
+            ->with('error', __('card_generation_failed') . ': ' . __('no_membership_number'));
+    }
+
+    // Calculate expiry date (1 year from membership date)
+    $membershipDate = $user->membership_date ?? $user->created_at;
+    $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
+
+    // Generate QR Code with membership number
+    $qrOptions = new QROptions([
+        'version' => 5,
+        'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+        'eccLevel' => QRCode::ECC_H,
+        'scale' => 4,
+        'imageBase64' => false,
+        'moduleSize' => 3,
+        'quietZone' => 2,
+    ]);
+
+    $qrCode = new QRCode($qrOptions);
+    $qrCodeSvg = $qrCode->render($user->membership_number);
+
+    // Generate PDF using DomPDF
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'))
+        ->setPaper([0, 0, 242.6, 153.1], 'portrait') // CR80 in points (85.6mm x 53.98mm)
+        ->setOptions([
+            'defaultFont' => 'Helvetica',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+
+    return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
 }
 }

@@ -453,6 +453,14 @@
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-envelope mr-2"></i> {{ __('send_message') }}
                         </a>
+                        @if($user->hasRole('member') && $user->membership_number)
+                        <a href="{{ route('admin.users.pvc-card', $user) }}" class="list-group-item list-group-item-action" target="_blank">
+                            <i class="fas fa-id-card mr-2"></i> {{ __('view_pvc_card') }}
+                        </a>
+                        <a href="{{ route('admin.users.pvc-card.download', $user) }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-download mr-2"></i> {{ __('download_pvc_card') }}
+                        </a>
+                        @endif
                     </div>
                 </div>
             </div>

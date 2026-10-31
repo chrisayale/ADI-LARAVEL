@@ -122,6 +122,14 @@
                                 <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary btn-sm" title="{{ __('edit') }}">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @if($user->hasRole('member') && $user->membership_number)
+                                <a href="{{ route('admin.users.pvc-card', $user) }}" class="btn btn-success btn-sm" title="{{ __('view_pvc_card') }}" target="_blank">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+                                <a href="{{ route('admin.users.pvc-card.download', $user) }}" class="btn btn-outline-success btn-sm" title="{{ __('download_pvc_card') }}">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                @endif
                                 <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-{{ $user->status === 'active' ? 'warning' : 'success' }} btn-sm"
