@@ -114,11 +114,11 @@
 
         /* Member Name - Centered in BLUE CENTRAL BAND */
         .member-name {
-            top: 51.5mm; /* Adjusted to center vertically in blue band */
-            left: 3mm;
-            right: 3mm;
+            top: 49mm; /* Adjusted to center vertically in yellow badge */
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
-            font-size: 5.2mm;
+            font-size: 3.2mm;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 0.04mm;
