@@ -24,12 +24,26 @@
                 {{ __('guest') }}
             @endif
         </small>
-        <!-- SACCO Name for Admin/Treasurer in sidebar header -->
-        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+        <!-- SACCO Indicator for Admin/Treasurer in sidebar header -->
+        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')))
         <div class="mt-2">
-            <span class="badge bg-light text-success fw-medium px-2 py-1" style="font-size: 0.65rem;">
-                <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+            @if(auth()->user()->sacco)
+            <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap">
+                <span class="badge bg-success bg-opacity-10 text-success fw-medium px-2 py-1" style="font-size: 0.65rem;">
+                    <i class="fas fa-building me-1"></i>{{ __('active_sacco') }}
+                </span>
+                <span class="badge bg-light text-dark fw-medium px-2 py-1" style="font-size: 0.65rem;">
+                    {{ auth()->user()->sacco->name }}
+                    @if(auth()->user()->sacco->code)
+                    <span class="ms-1 badge bg-success" style="font-size: 0.55rem;">{{ auth()->user()->sacco->code }}</span>
+                    @endif
+                </span>
+            </div>
+            @else
+            <span class="badge bg-warning text-dark fw-medium px-2 py-1" style="font-size: 0.65rem;">
+                <i class="fas fa-building me-1"></i>{{ __('no_sacco_assigned') }}
             </span>
+            @endif
         </div>
         @endif
     </div>

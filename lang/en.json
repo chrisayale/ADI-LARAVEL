@@ -969,5 +969,11 @@
     "withdrawals_ugx": "Withdrawals (CDF)",
     "net_savings_ugx": "Net Savings (CDF)",
     "loans_approved_ugx": "Loans Approved (CDF)",
-    "total": "Total"
+    "total": "Total",
+    "active_sacco": "Active SACCO",
+    "current_sacco": "Current SACCO",
+    "sacco_code": "SACCO Code",
+    "sacco_name": "SACCO Name",
+    "switch_sacco": "Switch SACCO",
+    "no_sacco_assigned": "No SACCO Assigned"
 }

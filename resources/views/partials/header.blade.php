@@ -21,12 +21,52 @@
                             <span class="fw-bold fs-6 lh-1">{{ __('capital_investment') }}</span>
                             <small class="d-block text-white-50 opacity-75" style="font-size: 0.7rem;">{{ __('club') }}</small>
                         </div>
-                        <!-- SACCO Name for Admin/Treasurer -->
-                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+                        <!-- SACCO Indicator for Admin/Treasurer -->
+                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')))
                         <div class="ms-3 d-none d-lg-block">
-                            <span class="badge bg-light text-success fw-medium px-2 py-1" style="font-size: 0.7rem;">
-                                <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+                            @if(auth()->user()->sacco)
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-building text-success me-1"></i>
+                                    <span class="fw-medium">{{ __('active_sacco') }}: {{ auth()->user()->sacco->name }}</span>
+                                    @if(auth()->user()->sacco->code)
+                                    <span class="badge bg-success ms-1" style="font-size: 0.6rem;">{{ auth()->user()->sacco->code }}</span>
+                                    @endif
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <h6 class="dropdown-header">
+                                            <i class="fas fa-building me-2"></i>{{ __('current_sacco') }}
+                                        </h6>
+                                    </li>
+                                    <li>
+                                        <div class="dropdown-item py-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-building text-success me-2"></i>
+                                                <div>
+                                                    <strong>{{ auth()->user()->sacco->name }}</strong>
+                                                    @if(auth()->user()->sacco->code)
+                                                    <br><small class="text-muted">{{ __('sacco_code') }}: {{ auth()->user()->sacco->code }}</small>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    @if(auth()->user()->hasRole('super_admin'))
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.sacos.index') }}">
+                                            <i class="fas fa-exchange-alt me-2"></i>{{ __('switch_sacco') }}
+                                        </a>
+                                    </li>
+                                    @endif
+                                </ul>
+                            </div>
+                            @else
+                            <span class="badge bg-warning text-dark fw-medium px-2 py-1" style="font-size: 0.7rem;">
+                                <i class="fas fa-building me-1"></i>{{ __('no_sacco_assigned') }}
                             </span>
+                            @endif
                         </div>
                         @endif
                     </div>
@@ -157,10 +197,19 @@
                                         <small class="text-success fw-medium">{{ auth()->user()->membership_number }}</small>
                                         @endif
                                         <!-- SACCO Name for Admin/Treasurer in dropdown -->
-                                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')) && auth()->user()->sacco)
+                                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('treasurer')))
+                                        @if(auth()->user()->sacco)
                                         <small class="text-primary fw-medium d-block mt-1">
-                                            <i class="fas fa-building me-1"></i>{{ auth()->user()->sacco->name }}
+                                            <i class="fas fa-building me-1"></i>{{ __('current_sacco') }}: {{ auth()->user()->sacco->name }}
+                                            @if(auth()->user()->sacco->code)
+                                            <span class="ms-1 badge bg-success" style="font-size: 0.6rem;">{{ auth()->user()->sacco->code }}</span>
+                                            @endif
                                         </small>
+                                        @else
+                                        <small class="text-warning fw-medium d-block mt-1">
+                                            <i class="fas fa-building me-1"></i>{{ __('no_sacco_assigned') }}
+                                        </small>
+                                        @endif
                                         @endif
                                     </div>
                                 </div>
