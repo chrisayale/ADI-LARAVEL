@@ -331,7 +331,7 @@
                 <!-- QR Code Section -->
                 <div class="qr-section">
                     <div class="qr-code">
-                        {{ $qrCodeSvg ?? '' }}
+                        {!! $qrCodeSvg ?? '' !!}
                     </div>
                     <div class="qr-label">{{ __('member_code') }}</div>
                 </div>
