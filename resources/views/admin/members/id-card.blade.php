@@ -116,8 +116,7 @@
         /* QR Frame - Centered at top: 23mm, size 22mm */
         .qr-frame {
             top: 23mm;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 29.8%;
             width: 22mm;
             height: 22mm;
             background: #ffffff;
@@ -143,7 +142,6 @@
         .member-name {
             top: 50mm; /* Adjusted to center vertically in yellow badge */
             left: 50%;
-            transform: translateX(-50%);
             text-align: center;
             font-size: 3.2mm;
             font-weight: 700;
@@ -159,7 +157,6 @@
         .member-code-value {
             top: 56.5mm; /* Centered vertically in white oval slot */
             left: 75%;
-            transform: translateX(-50%);
             font-size: 1.8mm;
             font-weight: 700;
             color: #000000;
@@ -173,7 +170,6 @@
         .member-expiry-value {
             top: 62.5mm; /* Aligned with "Expire le :" label in white oval slot */
             left: 71%;
-            transform: translateX(-50%);
             font-size: 2.2mm;
             font-weight: 700;
             color: #000000; /* Black as requested */
@@ -265,7 +261,7 @@
                 <div class="card-front">
                     <!-- QR Code - Centered at top 23mm -->
                     <div class="qr-frame">
-                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                        <img src="{!! $qrCodePath ?? $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
                     </div>
 
                     <!-- Member Name - Centered in Blue Band -->
@@ -283,7 +279,7 @@
                 <!-- BACK SIDE - Minimal with QR -->
                 <div class="card-back hidden">
                     <div class="back-qr-frame">
-                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                        <img src="{!! $qrCodePath ?? $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
                     </div>
                     <div class="back-caption">{{ __('member_code') }}</div>
                     <div class="back-legal">{{ __('card_back_text') }}</div>
