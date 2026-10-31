@@ -7,6 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('membership_card') }} - {{ $user->membership_number }}</title>
+    <!-- html2canvas for PNG/JPG download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibjyteARQMzA+m9QE7N7zS0CuXrD5Bqw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         @page {
             size: 53.98mm 85.6mm;
@@ -182,6 +184,23 @@
             background: #d1d5db;
         }
 
+        .zoom-controls .download-btn {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .zoom-controls .download-btn:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .zoom-controls .download-btn:active {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
         /* Background image as <img> tag - z-index 1 */
         .card-bg {
             position: absolute;
@@ -352,6 +371,7 @@
         <button type="button" id="zoomIn" aria-label="{{ __('zoom_in') }}">+</button>
         <button type="button" id="zoomOut" aria-label="{{ __('zoom_out') }}">-</button>
         <button type="button" id="zoomReset" aria-label="{{ __('zoom_reset') }}">{{ __('reset') }}</button>
+        <button type="button" id="downloadPng" aria-label="{{ __('download_png') }}" class="download-btn">{{ __('download_png') }}</button>
     </div>
 
     <!-- Card Container with Zoom -->
@@ -462,6 +482,61 @@
                     updateZoom(1);
                 }
             });
+        })();
+
+        // Download PNG functionality using html2canvas
+        (function() {
+            const downloadBtn = document.getElementById('downloadPng');
+            const cardWrapper = document.getElementById('cardWrapper');
+            const cardContainer = document.getElementById('cardContainer');
+
+            if (downloadBtn && cardWrapper) {
+                downloadBtn.addEventListener('click', async function() {
+                    // Disable button during capture
+                    downloadBtn.disabled = true;
+                    downloadBtn.textContent = '{{ __('downloading') }}...';
+
+                    try {
+                        // Store current transform
+                        const currentTransform = cardWrapper.style.transform;
+
+                        // Temporarily reset transform for accurate capture
+                        cardWrapper.style.transform = 'none';
+
+                        // Capture the card wrapper at high resolution
+                        const canvas = await html2canvas(cardWrapper, {
+                            scale: 4, // High resolution for crisp output
+                            useCORS: true,
+                            logging: false,
+                            backgroundColor: null, // Transparent background
+                            width: cardWrapper.offsetWidth,
+                            height: cardWrapper.offsetHeight,
+                            windowWidth: cardWrapper.offsetWidth,
+                            windowHeight: cardWrapper.offsetHeight,
+                        });
+
+                        // Restore transform
+                        cardWrapper.style.transform = currentTransform;
+
+                        // Generate filename
+                        const filename = 'carte-membre-{{ $user->membership_number }}.png';
+
+                        // Trigger download
+                        const link = document.createElement('a');
+                        link.download = filename;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+
+                    } catch (error) {
+                        console.error('Error generating PNG:', error);
+                        alert('{{ __('download_error') }}');
+                    } finally {
+                        // Re-enable button
+                        downloadBtn.disabled = false;
+                        downloadBtn.textContent = '{{ __('download_png') }}';
+                    }
+                });
+            }
         })();
     </script>
 </body>
