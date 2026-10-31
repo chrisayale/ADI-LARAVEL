@@ -86,20 +86,20 @@
             z-index: 2;
         }
 
-        /* QR Frame - Centered at top: 18mm */
+        /* QR Frame - Centered at top: 23.5mm, size 25.5mm */
         .qr-frame {
-            top: 18mm;
+            top: 23.5mm;
             left: 50%;
             transform: translateX(-50%);
-            width: 35mm;
-            height: 35mm;
+            width: 25.5mm;
+            height: 25.5mm;
             background: #ffffff;
             border: 3px solid #f59e0b;
-            border-radius: 3mm;
+            border-radius: 2.5mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2mm;
+            padding: 1.5mm;
             box-shadow:
                 0 4px 16px rgba(0,0,0,0.15),
                 0 0 0 1px rgba(245,158,11,0.3),
