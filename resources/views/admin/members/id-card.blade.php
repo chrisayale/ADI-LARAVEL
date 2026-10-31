@@ -147,7 +147,7 @@
             top: 63.5mm; /* Aligned with "Expire le :" label in white oval slot */
             left: 75%;
             transform: translateX(-50%);
-            font-size: 1.8mm;
+            font-size: 2.2mm;
             font-weight: 700;
             color: #000000; /* Black as requested */
             letter-spacing: 0.08mm;
