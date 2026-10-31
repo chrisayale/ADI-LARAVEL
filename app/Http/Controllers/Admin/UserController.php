@@ -350,7 +350,7 @@ public function showPvcCard(User $user)
     // Generate QR Code with membership number
     $qrOptions = new QROptions([
         'version' => 5,
-        'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+        'outputType' => 'svg',
         'eccLevel' => QRCode::ECC_H,
         'scale' => 4,
         'imageBase64' => false,
@@ -388,7 +388,7 @@ public function downloadPvcCard(User $user)
     // Generate QR Code with membership number
     $qrOptions = new QROptions([
         'version' => 5,
-        'outputType' => QRCode::OUTPUT_MARKUP_SVG,
+        'outputType' => 'svg',
         'eccLevel' => QRCode::ECC_H,
         'scale' => 4,
         'imageBase64' => false,
