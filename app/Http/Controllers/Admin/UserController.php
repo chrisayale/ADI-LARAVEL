@@ -351,12 +351,13 @@ public function showPvcCard(User $user)
     // Generate QR Code with membership number
     $qrOptions = new QROptions([
         'version' => 5,
-        'outputType' => 'svg',
         'eccLevel' => EccLevel::H,
         'scale' => 4,
         'imageBase64' => false,
+        'outputBase64' => false,
         'moduleSize' => 3,
         'quietZone' => 2,
+        // Uses default QRMarkupSVG output interface (pure SVG, no GD required)
     ]);
 
     $qrCode = new QRCode($qrOptions);
@@ -389,12 +390,13 @@ public function downloadPvcCard(User $user)
     // Generate QR Code with membership number
     $qrOptions = new QROptions([
         'version' => 5,
-        'outputType' => 'svg',
         'eccLevel' => EccLevel::H,
         'scale' => 4,
         'imageBase64' => false,
+        'outputBase64' => false,
         'moduleSize' => 3,
         'quietZone' => 2,
+        // Uses default QRMarkupSVG output interface (pure SVG, no GD required)
     ]);
 
     $qrCode = new QRCode($qrOptions);
