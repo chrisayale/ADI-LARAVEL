@@ -429,6 +429,10 @@ public function downloadPvcCard(Request $request, User $user)
         return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
     }
 
+    // Calculate expiry date (1 year from membership date) - needed for fallback
+    $membershipDate = $user->membership_date ?? $user->created_at;
+    $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
+
     // Fallback: Generate QR Code SVG as base64 data URI (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
