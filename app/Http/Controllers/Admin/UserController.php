@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use chillerlan\QRCode\Common\EccLevel;
+use chillerlan\QRCode\Data\QRMatrix;
 
 class UserController extends Controller
 {
@@ -348,20 +349,8 @@ public function showPvcCard(User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
-    // Generate QR Code with membership number
-    $qrOptions = new QROptions([
-        'version' => 5,
-        'eccLevel' => EccLevel::H,
-        'scale' => 4,
-        'imageBase64' => false,
-        'outputBase64' => false,
-        'moduleSize' => 3,
-        'quietZone' => 2,
-        // Uses default QRMarkupSVG output interface (pure SVG, no GD required)
-    ]);
-
-    $qrCode = new QRCode($qrOptions);
-    $qrCodeSvg = $qrCode->render($user->membership_number);
+    // Generate QR Code SVG directly from matrix (no GD required)
+    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
     return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'));
 }
@@ -387,20 +376,8 @@ public function downloadPvcCard(User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
-    // Generate QR Code with membership number
-    $qrOptions = new QROptions([
-        'version' => 5,
-        'eccLevel' => EccLevel::H,
-        'scale' => 4,
-        'imageBase64' => false,
-        'outputBase64' => false,
-        'moduleSize' => 3,
-        'quietZone' => 2,
-        // Uses default QRMarkupSVG output interface (pure SVG, no GD required)
-    ]);
-
-    $qrCode = new QRCode($qrOptions);
-    $qrCodeSvg = $qrCode->render($user->membership_number);
+    // Generate QR Code SVG directly from matrix (no GD required)
+    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
     // Generate PDF using DomPDF
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'))
@@ -412,5 +389,68 @@ public function downloadPvcCard(User $user)
         ]);
 
     return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
+}
+
+/**
+ * Generate QR Code SVG markup directly from matrix
+ * Bypasses all GD/Imagick dependencies by using chillerlan/php-qrcode's matrix
+ * and generating pure SVG markup manually.
+ *
+ * @param string $data The data to encode in the QR code (membership number)
+ * @return string Raw SVG XML markup
+ */
+private function generateQrCodeSvg(string $data): string
+{
+    $qrOptions = new QROptions([
+        'version' => 5,
+        'eccLevel' => EccLevel::H,
+        'scale' => 4,
+        'moduleSize' => 3,
+        'quietZone' => 2,
+    ]);
+
+    $qrCode = new QRCode($qrOptions);
+    $matrix = $qrCode->getQRMatrix();
+    $modules = $matrix->getMatrix();
+    $size = $matrix->getSize();
+
+    // QR Matrix constants for dark modules
+    $M_DARKMODULE = 2048;
+    $M_DATA_DARK = 2050;
+
+    // Calculate SVG dimensions
+    $moduleSize = 3; // pixels per module
+    $quietZone = 2;  // modules
+    $svgSize = ($size + 2 * $quietZone) * $moduleSize;
+
+    $svg = [];
+    $svg[] = '<?xml version="1.0" encoding="UTF-8"?>';
+    $svg[] = '<svg xmlns="http://www.w3.org/2000/svg" class="qr-svg qrcode" ';
+    $svg[] = 'viewBox="0 0 ' . ($size + 2 * $quietZone) . ' ' . ($size + 2 * $quietZone) . '" ';
+    $svg[] = 'preserveAspectRatio="xMidYMid" width="' . $svgSize . '" height="' . $svgSize . '">';
+    $svg[] = '<rect width="100%" height="100%" fill="#ffffff"/>';
+    $svg[] = '<path fill="#000000" d="';
+
+    // Build path data for dark modules
+    $pathData = [];
+    for ($y = 0; $y < $size; $y++) {
+        for ($x = 0; $x < $size; $x++) {
+            $val = $modules[$y][$x];
+            $isDark = ($val & $M_DARKMODULE) || ($val === $M_DATA_DARK);
+
+            if ($isDark) {
+                // Add rectangle for this module (with quiet zone offset)
+                $px = $x + $quietZone;
+                $py = $y + $quietZone;
+                $pathData[] = "M{$px},{$py}h1v1h-1z";
+            }
+        }
+    }
+
+    $svg[] = implode(' ', $pathData);
+    $svg[] = '"/>';
+    $svg[] = '</svg>';
+
+    return implode('', $svg);
 }
 }
