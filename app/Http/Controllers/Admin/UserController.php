@@ -465,3 +465,5 @@ private function generateQrCodeBase64(string $data): string
     // Return as base64 data URI for reliable DomPDF rendering
     return 'data:image/svg+xml;base64,' . base64_encode($svgMarkup);
 }
+
+}
