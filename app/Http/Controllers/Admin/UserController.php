@@ -350,13 +350,13 @@ public function showPvcCard(User $user)
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
     // Generate QR Code SVG as base64 data URI (no GD required)
-    $qrBase64 = $this->generateQrCodeBase64($user->membership_number);
+    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
     // Load background image as base64 data URI for universal rendering
     $bgPath = public_path('card-background.jpeg');
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
-    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrBase64', 'bgBase64'));
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'));
 }
 
 /**
@@ -381,26 +381,26 @@ public function downloadPvcCard(User $user)
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
     // Generate QR Code SVG as base64 data URI (no GD required)
-    $qrBase64 = $this->generateQrCodeBase64($user->membership_number);
+    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
     // Load background image as base64 data URI for universal rendering
     $bgPath = public_path('card-background.jpeg');
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
     // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrBase64', 'bgBase64'))
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64'))
         ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => false,
+            'isRemoteEnabled' => true,
         ]);
 
     return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
 }
 
 /**
- * Generate QR Code SVG as base64 data URI directly from matrix
+ * Generate QR Code SVG markup directly from matrix
  * Bypasses all GD/Imagick dependencies by using chillerlan/php-qrcode's matrix
  * and generating pure SVG markup manually.
  * Returns a base64 data URI for reliable rendering in both browser and DomPDF.
@@ -408,7 +408,7 @@ public function downloadPvcCard(User $user)
  * @param string $data The data to encode in the QR code (membership number)
  * @return string Base64 encoded SVG data URI
  */
-private function generateQrCodeBase64(string $data): string
+private function generateQrCodeSvg(string $data): string
 {
     $qrOptions = new QROptions([
         'version' => 5,
