@@ -379,9 +379,9 @@ public function downloadPvcCard(User $user)
     // Generate QR Code SVG directly from matrix (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
-    // Generate PDF using DomPDF
+    // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg'))
-        ->setPaper([0, 0, 242.6, 153.1], 'portrait') // CR80 in points (85.6mm x 53.98mm)
+        ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',
             'isHtml5ParserEnabled' => true,

@@ -20,42 +20,65 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 85.6mm;
+            width: 53.98mm;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 10pt;
             line-height: 1.3;
             color: #1a1a1a;
             background: #ffffff;
-            width: 53.98mm;
-            height: 85.6mm;
-            overflow: hidden;
             position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            /* Prevent extra page in DomPDF */
+            page-break-after: avoid;
+            page-break-inside: avoid;
         }
 
         .card {
-            width: 100%;
-            height: 100%;
+            width: 53.98mm;
+            height: 85.6mm;
             border-radius: 2.5mm;
             overflow: hidden;
             position: relative;
             background: #ffffff;
             border: 1px solid #e8e8e8;
+            /* Ensure card stays on single page */
+            page-break-inside: avoid;
+            page-break-after: avoid;
         }
 
-        /* Print styles */
+        /* Print styles - strict single page */
         @media print {
             @page {
                 size: 53.98mm 85.6mm;
                 margin: 0;
+                padding: 0;
             }
-            body {
+            html, body {
+                height: 85.6mm;
+                width: 53.98mm;
+                overflow: hidden;
+            }
+            .card {
                 width: 53.98mm;
                 height: 85.6mm;
+                border: none;
+                border-radius: 2.5mm;
             }
             .no-print {
                 display: none !important;
+            }
+            /* Prevent any page breaks */
+            * {
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
             }
         }
 
@@ -67,34 +90,37 @@
             flex-direction: column;
             height: 100%;
             background: #ffffff;
-            padding: 6mm 5mm;
+            padding: 5mm 4mm;
             justify-content: center;
             align-items: center;
-            gap: 5mm;
+            gap: 4mm;
         }
 
-        /* QR Code Section - Central focal point */
+        /* QR Code Section - Central focal point, enlarged */
         .qr-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .qr-frame {
-            width: 38mm;
-            height: 38mm;
+            width: 35mm;
+            height: 35mm;
             background: #ffffff;
             border: 2px solid #2d3748;
             border-radius: 3mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3mm;
+            padding: 2mm;
             box-shadow:
                 0 2px 8px rgba(0,0,0,0.06),
                 0 0 0 1px rgba(45,55,72,0.1),
                 inset 0 0 0 1px rgba(255,255,255,0.5);
+            /* Ensure QR code stays centered */
+            margin: 0 auto;
         }
 
         .qr-frame img,
@@ -113,6 +139,7 @@
             text-align: center;
             width: 100%;
             max-width: 44mm;
+            flex-shrink: 0;
         }
 
         .member-name {
@@ -148,7 +175,7 @@
 
         .expiry-date {
             font-size: 2.2mm;
-            font-weight: 600;
+            font-weight: 600,
             color: #b91c1c;
             letter-spacing: 0.02mm;
             padding-top: 1mm;
@@ -187,22 +214,17 @@
         }
 
         .back-qr-frame {
-            width: 34mm;
-            height: 34mm;
+            width: 35mm;
+            height: 35mm;
             background: #ffffff;
             border: 1.5px solid #d1d5db;
             border-radius: 2.5mm;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2.5mm;
+            padding: 2mm;
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-
-        .back-qr-frame img {
-            width: 100%;
-            height: 100%;
-            display: block;
+            margin: 0 auto;
         }
 
         .back-caption {
@@ -230,7 +252,7 @@
     <div class="card">
         <!-- FRONT SIDE - Vertical Portrait -->
         <div class="card-front">
-            <!-- QR Code - Central Element -->
+            <!-- QR Code - Central Element, Enlarged & Centered -->
             <div class="qr-section">
                 <div class="qr-frame">
                     <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
