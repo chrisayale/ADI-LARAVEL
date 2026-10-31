@@ -20,18 +20,20 @@
             box-sizing: border-box;
         }
 
+        /* Screen styles - center the card on the preview page */
         html, body {
-            width: 53.98mm;
-            height: 85.6mm;
+            width: 100%;
+            height: 100vh;
             margin: 0;
             padding: 0;
-            overflow: hidden;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            page-break-after: avoid;
-            page-break-inside: avoid;
-            page-break-before: avoid;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
         .card {
@@ -43,6 +45,29 @@
             page-break-inside: avoid;
             page-break-after: avoid;
             page-break-before: avoid;
+        }
+
+        /* Print styles - strict single page, no centering for PDF */
+        @media print {
+            @page {
+                size: 53.98mm 85.6mm;
+                margin: 0;
+                padding: 0;
+            }
+            html, body {
+                width: 53.98mm;
+                height: 85.6mm;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background-color: transparent;
+                display: block;
+            }
+            * {
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+            }
         }
 
         /* Print styles - strict single page */
