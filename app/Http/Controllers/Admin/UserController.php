@@ -403,33 +403,32 @@ public function downloadPvcCard(User $user)
         ]);
 
     return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
+}
 
-    /**
-     * Save QR Code SVG as file for DomPDF compatibility
-     * Returns the public path to the saved file
-     */
-    private function saveQrCodeAsFile(string $membershipNumber): string
-    {
-        $qrCodeSvg = $this->generateQrCodeSvg($membershipNumber);
-        
-        // Extract the base64 SVG from the data URI
-        $base64Svg = str_replace('data:image/svg+xml;base64,', '', $qrCodeSvg);
-        $svgContent = base64_decode($base64Svg);
-        
-        // Save to storage/app/public/qrcodes/
-        $dir = storage_path('app/public/qrcodes');
-        if (!file_exists($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        
-        $filename = 'qrcode-' . $membershipNumber . '.svg';
-        $filepath = $dir . '/' . $filename;
-        file_put_contents($filepath, $svgContent);
-        
-        // Return the public URL path
-        return asset('storage/qrcodes/' . $filename);
+/**
+ * Save QR Code SVG as file for DomPDF compatibility
+ * Returns the public path to the saved file
+ */
+private function saveQrCodeAsFile(string $membershipNumber): string
+{
+    $qrCodeSvg = $this->generateQrCodeSvg($membershipNumber);
+
+    // Extract the base64 SVG from the data URI
+    $base64Svg = str_replace('data:image/svg+xml;base64,', '', $qrCodeSvg);
+    $svgContent = base64_decode($base64Svg);
+
+    // Save to storage/app/public/qrcodes/
+    $dir = storage_path('app/public/qrcodes');
+    if (!file_exists($dir)) {
+        mkdir($dir, 0755, true);
     }
 
+    $filename = 'qrcode-' . $membershipNumber . '.svg';
+    $filepath = $dir . '/' . $filename;
+    file_put_contents($filepath, $svgContent);
+
+    // Return the public URL path
+    return asset('storage/qrcodes/' . $filename);
 }
 
 /**
