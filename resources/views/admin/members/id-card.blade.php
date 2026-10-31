@@ -20,37 +20,43 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            height: 85.6mm;
+        html {
             width: 53.98mm;
+            height: 85.6mm;
             overflow: hidden;
         }
 
         body {
+            width: 53.98mm;
+            height: 85.6mm;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 10pt;
             line-height: 1.3;
             color: #1a1a1a;
             background: #ffffff;
-            position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            /* Prevent extra page in DomPDF */
             page-break-after: avoid;
             page-break-inside: avoid;
+            page-break-before: avoid;
         }
 
         .card {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 53.98mm;
             height: 85.6mm;
             border-radius: 2.5mm;
             overflow: hidden;
-            position: relative;
             background: #ffffff;
             border: 1px solid #e8e8e8;
-            /* Ensure card stays on single page */
             page-break-inside: avoid;
             page-break-after: avoid;
+            page-break-before: avoid;
         }
 
         /* Print styles - strict single page */
@@ -61,20 +67,18 @@
                 padding: 0;
             }
             html, body {
-                height: 85.6mm;
                 width: 53.98mm;
+                height: 85.6mm;
+                margin: 0;
+                padding: 0;
                 overflow: hidden;
             }
             .card {
-                width: 53.98mm;
-                height: 85.6mm;
                 border: none;
-                border-radius: 2.5mm;
             }
             .no-print {
                 display: none !important;
             }
-            /* Prevent any page breaks */
             * {
                 page-break-inside: avoid !important;
                 page-break-after: avoid !important;
@@ -83,31 +87,31 @@
         }
 
         /* ========================================
-           VERTICAL PORTRAIT LAYOUT
+           VERTICAL PORTRAIT LAYOUT - EXPLICIT POSITIONING
            ======================================== */
         .card-front {
-            display: flex;
-            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
             background: #ffffff;
-            padding: 5mm 4mm;
-            justify-content: center;
-            align-items: center;
-            gap: 4mm;
+            padding: 3.5mm 3mm;
         }
 
-        /* QR Code Section - Central focal point, enlarged */
+        /* QR Code Section - Fixed position */
         .qr-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            position: absolute;
+            top: 3.5mm;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35mm;
+            height: 35mm;
         }
 
         .qr-frame {
-            width: 35mm;
-            height: 35mm;
+            width: 100%;
+            height: 100%;
             background: #ffffff;
             border: 2px solid #2d3748;
             border-radius: 3mm;
@@ -119,8 +123,6 @@
                 0 2px 8px rgba(0,0,0,0.06),
                 0 0 0 1px rgba(45,55,72,0.1),
                 inset 0 0 0 1px rgba(255,255,255,0.5);
-            /* Ensure QR code stays centered */
-            margin: 0 auto;
         }
 
         .qr-frame img,
@@ -130,16 +132,13 @@
             display: block;
         }
 
-        /* Member Details Section */
+        /* Member Details Section - Fixed position below QR */
         .details-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3mm;
+            position: absolute;
+            top: 42mm;
+            left: 3mm;
+            right: 3mm;
             text-align: center;
-            width: 100%;
-            max-width: 44mm;
-            flex-shrink: 0;
         }
 
         .member-name {
@@ -147,23 +146,25 @@
             font-weight: 700;
             color: #111827;
             letter-spacing: 0.02mm;
-            line-height: 1.2;
+            line-height: 1.15;
             text-transform: uppercase;
             word-break: break-word;
+            margin-bottom: 1.5mm;
         }
 
         .divider {
             width: 60%;
             height: 1px;
             background: linear-gradient(90deg, transparent, #d1d5db, transparent);
-            margin: 1mm 0;
+            margin: 0 auto 1.5mm;
         }
 
         .member-code {
-            font-size: 2.4mm;
+            font-size: 2.3mm;
             font-weight: 500;
             color: #374151;
             letter-spacing: 0.01mm;
+            margin-bottom: 1.5mm;
         }
 
         .member-code strong {
@@ -174,13 +175,12 @@
         }
 
         .expiry-date {
-            font-size: 2.2mm;
-            font-weight: 600,
+            font-size: 2.1mm;
+            font-weight: 600;
             color: #b91c1c;
             letter-spacing: 0.02mm;
             padding-top: 1mm;
             border-top: 1px solid #e5e7eb;
-            width: 100%;
         }
 
         .expiry-date span {
@@ -192,9 +192,9 @@
         /* Side indicators */
         .side-indicator {
             position: absolute;
-            bottom: 2mm;
-            right: 2.5mm;
-            font-size: 1.3mm;
+            bottom: 1mm;
+            right: 1.5mm;
+            font-size: 1.1mm;
             color: #9ca3af;
             font-weight: 600;
             text-transform: uppercase;
@@ -203,14 +203,19 @@
 
         /* Back side (minimal) */
         .card-back {
-            display: flex;
-            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
             background: #ffffff;
-            padding: 5mm;
+            padding: 3.5mm;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 4mm;
+            gap: 3mm;
         }
 
         .back-qr-frame {
@@ -236,10 +241,9 @@
         }
 
         .back-legal {
-            font-size: 1.6mm;
+            font-size: 1.5mm;
             color: #9ca3af;
-            line-height: 1.5;
-            text-align: center;
+            line-height: 1.4;
             max-width: 42mm;
         }
 
