@@ -130,7 +130,7 @@
 
         /* Member Code Value - Centered in YELLOW/WHITE SLOT (line "Code membre :") */
         .member-code-value {
-            top: 60.5mm; /* Aligned with "Code membre :" label in white oval slot */
+            top: 55.5mm; /* Aligned with "Code membre :" label in white oval slot */
             left: 65%;
             transform: translateX(-50%);
             font-size: 2.8mm;
