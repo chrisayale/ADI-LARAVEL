@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Common\EccLevel;
 
 class UserController extends Controller
 {
@@ -351,7 +352,7 @@ public function showPvcCard(User $user)
     $qrOptions = new QROptions([
         'version' => 5,
         'outputType' => 'svg',
-        'eccLevel' => QRCode::ECC_H,
+        'eccLevel' => EccLevel::H,
         'scale' => 4,
         'imageBase64' => false,
         'moduleSize' => 3,
@@ -389,7 +390,7 @@ public function downloadPvcCard(User $user)
     $qrOptions = new QROptions([
         'version' => 5,
         'outputType' => 'svg',
-        'eccLevel' => QRCode::ECC_H,
+        'eccLevel' => EccLevel::H,
         'scale' => 4,
         'imageBase64' => false,
         'moduleSize' => 3,
