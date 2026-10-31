@@ -361,8 +361,9 @@ public function showPvcCard(User $user)
 
 /**
  * Download PVC Membership ID Card as PDF
+ * Uses client-side html2canvas capture injected into minimal PDF template
  */
-public function downloadPvcCard(User $user)
+public function downloadPvcCard(Request $request, User $user)
 {
     // Only members can have PVC cards
     if (!$user->hasRole('member')) {
@@ -376,11 +377,59 @@ public function downloadPvcCard(User $user)
             ->with('error', __('card_generation_failed') . ': ' . __('no_membership_number'));
     }
 
-    // Calculate expiry date (1 year from membership date)
-    $membershipDate = $user->membership_date ?? $user->created_at;
-    $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
+    // Check if client-side captured image is provided
+    $cardImage = $request->input('card_image');
 
-    // Generate QR Code SVG as base64 data URI (no GD required)
+    if ($cardImage) {
+        // Use the captured image directly in a minimal PDF template
+        $html = '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page {
+                    size: 53.98mm 85.6mm;
+                    margin: 0;
+                    padding: 0;
+                }
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                html, body {
+                    width: 53.98mm;
+                    height: 85.6mm;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                }
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+            </style>
+        </head>
+        <body>
+            <img src="' . $cardImage . '" alt="Member Card">
+        </body>
+        </html>';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)
+            ->setPaper([0, 0, 153.1, 242.6], 'portrait')
+            ->setOptions([
+                'defaultFont' => 'Helvetica',
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+            ]);
+
+        return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
+    }
+
+    // Fallback: Generate QR Code SVG as base64 data URI (no GD required)
     $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
 
     // Load background image as base64 data URI for universal rendering

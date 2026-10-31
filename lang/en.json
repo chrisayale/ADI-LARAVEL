@@ -355,7 +355,9 @@
     "download_png": "Download PNG",
     "downloading": "Downloading",
     "download_error": "Error downloading image. Please try again.",
-    "reset": "Reset"
+    "reset": "Reset",
+    "download_pdf": "Download PDF",
+    "generating_pdf": "Generating PDF",
     "please_correct_errors": "Please correct the following errors",
     "sacco_information": "SACCO Information",
     "sacco_name_placeholder": "Enter SACCO name",

@@ -201,6 +201,23 @@
             border-color: #1d4ed8;
         }
 
+        .zoom-controls .pdf-btn {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+
+        .zoom-controls .pdf-btn:hover {
+            background: #047857;
+            border-color: #047857;
+            color: white;
+        }
+
+        .zoom-controls .pdf-btn:active {
+            background: #065f46;
+            border-color: #065f46;
+        }
+
         /* Background image as <img> tag - z-index 1 */
         .card-bg {
             position: absolute;
@@ -372,7 +389,14 @@
         <button type="button" id="zoomOut" aria-label="{{ __('zoom_out') }}">-</button>
         <button type="button" id="zoomReset" aria-label="{{ __('zoom_reset') }}">{{ __('reset') }}</button>
         <button type="button" id="downloadPng" aria-label="{{ __('download_png') }}" class="download-btn">{{ __('download_png') }}</button>
+        <button type="button" id="downloadPdf" aria-label="{{ __('download_pdf') }}" class="download-btn pdf-btn">{{ __('download_pdf') }}</button>
     </div>
+
+    <!-- Hidden form for PDF download via html2canvas -->
+    <form id="pdfDownloadForm" method="POST" action="{{ route('admin.users.download-pvc-card', $user) }}" style="display: none;">
+        @csrf
+        <input type="hidden" name="card_image" id="cardImageInput">
+    </form>
 
     <!-- Card Container with Zoom -->
     <div class="card-container" id="cardContainer">
@@ -534,6 +558,58 @@
                         // Re-enable button
                         downloadBtn.disabled = false;
                         downloadBtn.textContent = '{{ __('download_png') }}';
+                    }
+                });
+            }
+        })();
+
+        // Download PDF functionality using html2canvas + server-side PDF generation
+        (function() {
+            const downloadPdfBtn = document.getElementById('downloadPdf');
+            const cardWrapper = document.getElementById('cardWrapper');
+            const pdfForm = document.getElementById('pdfDownloadForm');
+            const cardImageInput = document.getElementById('cardImageInput');
+
+            if (downloadPdfBtn && cardWrapper && pdfForm && cardImageInput) {
+                downloadPdfBtn.addEventListener('click', async function() {
+                    // Disable button during capture
+                    downloadPdfBtn.disabled = true;
+                    downloadPdfBtn.textContent = '{{ __('generating_pdf') }}...';
+
+                    try {
+                        // Store current transform
+                        const currentTransform = cardWrapper.style.transform;
+
+                        // Temporarily reset transform for accurate capture
+                        cardWrapper.style.transform = 'none';
+
+                        // Capture the card wrapper at high resolution
+                        const canvas = await html2canvas(cardWrapper, {
+                            scale: 4, // High resolution for crisp output
+                            useCORS: true,
+                            logging: false,
+                            backgroundColor: null,
+                            width: cardWrapper.offsetWidth,
+                            height: cardWrapper.offsetHeight,
+                            windowWidth: cardWrapper.offsetWidth,
+                            windowHeight: cardWrapper.offsetHeight,
+                        });
+
+                        // Restore transform
+                        cardWrapper.style.transform = currentTransform;
+
+                        // Convert to base64 and submit form
+                        const base64Image = canvas.toDataURL('image/png');
+                        cardImageInput.value = base64Image;
+                        pdfForm.submit();
+
+                    } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        alert('{{ __('download_error') }}');
+                    } finally {
+                        // Re-enable button
+                        downloadPdfBtn.disabled = false;
+                        downloadPdfBtn.textContent = '{{ __('download_pdf') }}';
                     }
                 });
             }
