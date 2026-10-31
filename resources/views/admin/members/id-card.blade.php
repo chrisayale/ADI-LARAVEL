@@ -86,9 +86,9 @@
             z-index: 2;
         }
 
-        /* QR Frame - Centered at top: 25mm, size 22mm */
+        /* QR Frame - Centered at top: 24mm, size 22mm */
         .qr-frame {
-            top: 25mm;
+            top: 24mm;
             left: 50%;
             transform: translateX(-50%);
             width: 22mm;
