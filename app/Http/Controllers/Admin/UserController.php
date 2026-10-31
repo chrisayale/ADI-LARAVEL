@@ -349,17 +349,14 @@ public function showPvcCard(User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
-    // Generate QR Code SVG directly from matrix (no GD required)
-    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
-
-    // Also save QR code as file for DomPDF compatibility
-    $qrCodePath = $this->saveQrCodeAsFile($user->membership_number);
+    // Generate QR Code SVG as base64 data URI (no GD required)
+    $qrBase64 = $this->generateQrCodeBase64($user->membership_number);
 
     // Load background image as base64 data URI for universal rendering
     $bgPath = public_path('card-background.jpeg');
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
-    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'qrCodePath', 'bgBase64'));
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrBase64', 'bgBase64'));
 }
 
 /**
@@ -383,56 +380,27 @@ public function downloadPvcCard(User $user)
     $membershipDate = $user->membership_date ?? $user->created_at;
     $expiryDate = $membershipDate->copy()->addYear()->format('d/m/Y');
 
-    // Generate QR Code SVG directly from matrix (no GD required)
-    $qrCodeSvg = $this->generateQrCodeSvg($user->membership_number);
-
-    // Also save QR code as file for DomPDF compatibility
-    $qrCodePath = $this->saveQrCodeAsFile($user->membership_number);
+    // Generate QR Code SVG as base64 data URI (no GD required)
+    $qrBase64 = $this->generateQrCodeBase64($user->membership_number);
 
     // Load background image as base64 data URI for universal rendering
     $bgPath = public_path('card-background.jpeg');
     $bgBase64 = file_exists($bgPath) ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
     // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'qrCodePath', 'bgBase64'))
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrBase64', 'bgBase64'))
         ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
+            'isRemoteEnabled' => false,
         ]);
 
     return $pdf->download('carte-membre-' . $user->membership_number . '.pdf');
 }
 
 /**
- * Save QR Code SVG as file for DomPDF compatibility
- * Returns the public path to the saved file
- */
-private function saveQrCodeAsFile(string $membershipNumber): string
-{
-    $qrCodeSvg = $this->generateQrCodeSvg($membershipNumber);
-
-    // Extract the base64 SVG from the data URI
-    $base64Svg = str_replace('data:image/svg+xml;base64,', '', $qrCodeSvg);
-    $svgContent = base64_decode($base64Svg);
-
-    // Save to storage/app/public/qrcodes/
-    $dir = storage_path('app/public/qrcodes');
-    if (!file_exists($dir)) {
-        mkdir($dir, 0755, true);
-    }
-
-    $filename = 'qrcode-' . $membershipNumber . '.svg';
-    $filepath = $dir . '/' . $filename;
-    file_put_contents($filepath, $svgContent);
-
-    // Return the public URL path
-    return asset('storage/qrcodes/' . $filename);
-}
-
-/**
- * Generate QR Code SVG markup directly from matrix
+ * Generate QR Code SVG as base64 data URI directly from matrix
  * Bypasses all GD/Imagick dependencies by using chillerlan/php-qrcode's matrix
  * and generating pure SVG markup manually.
  * Returns a base64 data URI for reliable rendering in both browser and DomPDF.
@@ -440,7 +408,7 @@ private function saveQrCodeAsFile(string $membershipNumber): string
  * @param string $data The data to encode in the QR code (membership number)
  * @return string Base64 encoded SVG data URI
  */
-private function generateQrCodeSvg(string $data): string
+private function generateQrCodeBase64(string $data): string
 {
     $qrOptions = new QROptions([
         'version' => 5,
@@ -496,5 +464,4 @@ private function generateQrCodeSvg(string $data): string
 
     // Return as base64 data URI for reliable DomPDF rendering
     return 'data:image/svg+xml;base64,' . base64_encode($svgMarkup);
-}
 }

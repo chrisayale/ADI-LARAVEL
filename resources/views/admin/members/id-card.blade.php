@@ -261,7 +261,7 @@
                 <div class="card-front">
                     <!-- QR Code - Centered at top 23mm -->
                     <div class="qr-frame">
-                        <img src="{!! $qrCodePath ?? $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                        <img src="{!! $qrBase64 ?? '' !!}" alt="{{ __('member_code') }}" />
                     </div>
 
                     <!-- Member Name - Centered in Blue Band -->
@@ -279,7 +279,7 @@
                 <!-- BACK SIDE - Minimal with QR -->
                 <div class="card-back hidden">
                     <div class="back-qr-frame">
-                        <img src="{!! $qrCodePath ?? $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                        <img src="{!! $qrBase64 ?? '' !!}" alt="{{ __('member_code') }}" />
                     </div>
                     <div class="back-caption">{{ __('member_code') }}</div>
                     <div class="back-legal">{{ __('card_back_text') }}</div>
