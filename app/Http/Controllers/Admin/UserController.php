@@ -395,9 +395,10 @@ public function downloadPvcCard(User $user)
  * Generate QR Code SVG markup directly from matrix
  * Bypasses all GD/Imagick dependencies by using chillerlan/php-qrcode's matrix
  * and generating pure SVG markup manually.
+ * Returns a base64 data URI for reliable rendering in both browser and DomPDF.
  *
  * @param string $data The data to encode in the QR code (membership number)
- * @return string Raw SVG XML markup
+ * @return string Base64 encoded SVG data URI
  */
 private function generateQrCodeSvg(string $data): string
 {
@@ -451,6 +452,9 @@ private function generateQrCodeSvg(string $data): string
     $svg[] = '"/>';
     $svg[] = '</svg>';
 
-    return implode('', $svg);
+    $svgMarkup = implode('', $svg);
+
+    // Return as base64 data URI for reliable DomPDF rendering
+    return 'data:image/svg+xml;base64,' . base64_encode($svgMarkup);
 }
 }

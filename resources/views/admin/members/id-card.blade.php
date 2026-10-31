@@ -97,7 +97,8 @@
                 inset 0 0 0 1px rgba(255,255,255,0.5);
         }
 
-        .qr-frame svg {
+        .qr-frame img,
+        .back-qr-frame img {
             width: 100%;
             height: 100%;
             display: block;
@@ -198,7 +199,7 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
 
-        .back-qr-frame svg {
+        .back-qr-frame img {
             width: 100%;
             height: 100%;
             display: block;
@@ -232,7 +233,7 @@
             <!-- QR Code - Central Element -->
             <div class="qr-section">
                 <div class="qr-frame">
-                    {!! $qrCodeSvg ?? '' !!}
+                    <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
                 </div>
             </div>
 
@@ -257,7 +258,7 @@
         <!-- BACK SIDE - Minimal with QR -->
         <div class="card-back hidden">
             <div class="back-qr-frame">
-                {!! $qrCodeSvg ?? '' !!}
+                <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
             </div>
             <div class="back-caption">{{ __('member_code') }}</div>
             <div class="back-legal">{{ __('card_back_text') }}</div>
