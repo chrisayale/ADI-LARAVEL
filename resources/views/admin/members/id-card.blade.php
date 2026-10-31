@@ -114,7 +114,7 @@
 
         /* Member Name - Centered in BLUE CENTRAL BAND */
         .member-name {
-            top: 49mm; /* Adjusted to center vertically in yellow badge */
+            top: 50mm; /* Adjusted to center vertically in yellow badge */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
