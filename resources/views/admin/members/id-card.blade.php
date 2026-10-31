@@ -31,9 +31,28 @@
             -moz-osx-font-smoothing: grayscale;
             background-color: #f3f4f6;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+        }
+
+        .card-container {
+            position: relative;
+            width: 53.98mm;
+            height: 85.6mm;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-wrapper {
+            position: relative;
+            width: 53.98mm;
+            height: 85.6mm;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
         }
 
         .card {
@@ -63,6 +82,14 @@
                 background-color: transparent;
                 display: block;
             }
+            .card-container {
+                width: 53.98mm;
+                height: 85.6mm;
+                transform: none !important;
+            }
+            .card-wrapper {
+                transform: none !important;
+            }
             * {
                 page-break-inside: avoid !important;
                 page-break-after: avoid !important;
@@ -70,25 +97,89 @@
             }
         }
 
-        /* Print styles - strict single page */
-        @media print {
-            @page {
-                size: 53.98mm 85.6mm;
-                margin: 0;
-                padding: 0;
-            }
-            html, body {
-                width: 53.98mm;
-                height: 85.6mm;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-            }
-            * {
-                page-break-inside: avoid !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
-            }
+        /* Zoom controls */
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .zoom-controls label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        .zoom-controls input[type="range"] {
+            width: 200px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .zoom-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .zoom-controls input[type="range"]::-webkit-slider-thumb:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+
+        .zoom-controls input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .zoom-controls .zoom-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .zoom-controls button {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .zoom-controls button:hover {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .zoom-controls button:active {
+            background: #d1d5db;
         }
 
         /* Background image as <img> tag - z-index 1 */
@@ -253,37 +344,52 @@
     </style>
 </head>
 <body>
-    <div class="card">
-        <!-- Background Image as <img> with Base64 data URI for universal rendering -->
-        <img src="{!! $bgBase64 ?? '' !!}" class="card-bg" alt="Background">
+    <!-- Zoom Controls -->
+    <div class="zoom-controls" id="zoomControls">
+        <label for="zoomSlider">{{ __('zoom') }}:</label>
+        <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1" aria-label="{{ __('zoom_level') }}">
+        <span class="zoom-value" id="zoomValue">100%</span>
+        <button type="button" id="zoomIn" aria-label="{{ __('zoom_in') }}">+</button>
+        <button type="button" id="zoomOut" aria-label="{{ __('zoom_out') }}">-</button>
+        <button type="button" id="zoomReset" aria-label="{{ __('zoom_reset') }}">{{ __('reset') }}</button>
+    </div>
 
-        <!-- FRONT SIDE - Vertical Portrait -->
-        <div class="card-front">
-            <!-- QR Code - Centered at 18mm -->
-            <div class="qr-frame">
-                <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+    <!-- Card Container with Zoom -->
+    <div class="card-container" id="cardContainer">
+        <div class="card-wrapper" id="cardWrapper">
+            <div class="card">
+                <!-- Background Image as <img> with Base64 data URI for universal rendering -->
+                <img src="{!! $bgBase64 ?? '' !!}" class="card-bg" alt="Background">
+
+                <!-- FRONT SIDE - Vertical Portrait -->
+                <div class="card-front">
+                    <!-- QR Code - Centered at 18mm -->
+                    <div class="qr-frame">
+                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                    </div>
+
+                    <!-- Member Name - Centered in Blue Band -->
+                    <div class="member-name">{{ strtoupper($user->name) }}</div>
+
+                    <!-- Member Code Value Only - Centered in Yellow/White Slot -->
+                    <div class="member-code-value">{{ $user->membership_number }}</div>
+
+                    <!-- Expiry Value Only - Centered in Yellow/White Slot (Black) -->
+                    <div class="member-expiry-value">{{ $expiryDate }}</div>
+
+                    <div class="side-indicator">{{ __('front') }}</div>
+                </div>
+
+                <!-- BACK SIDE - Minimal with QR -->
+                <div class="card-back hidden">
+                    <div class="back-qr-frame">
+                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                    </div>
+                    <div class="back-caption">{{ __('member_code') }}</div>
+                    <div class="back-legal">{{ __('card_back_text') }}</div>
+                    <div class="side-indicator">{{ __('back') }}</div>
+                </div>
             </div>
-
-            <!-- Member Name - Centered in Blue Band -->
-            <div class="member-name">{{ strtoupper($user->name) }}</div>
-
-            <!-- Member Code Value Only - Centered in Yellow/White Slot -->
-            <div class="member-code-value">{{ $user->membership_number }}</div>
-
-            <!-- Expiry Value Only - Centered in Yellow/White Slot (Black) -->
-            <div class="member-expiry-value">{{ $expiryDate }}</div>
-
-            <div class="side-indicator">{{ __('front') }}</div>
-        </div>
-
-        <!-- BACK SIDE - Minimal with QR -->
-        <div class="card-back hidden">
-            <div class="back-qr-frame">
-                <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
-            </div>
-            <div class="back-caption">{{ __('member_code') }}</div>
-            <div class="back-legal">{{ __('card_back_text') }}</div>
-            <div class="side-indicator">{{ __('back') }}</div>
         </div>
     </div>
 
@@ -302,6 +408,61 @@
                 }
             }
         });
+
+        // Zoom functionality
+        (function() {
+            const slider = document.getElementById('zoomSlider');
+            const valueDisplay = document.getElementById('zoomValue');
+            const cardWrapper = document.getElementById('cardWrapper');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const zoomResetBtn = document.getElementById('zoomReset');
+
+            function updateZoom(scale) {
+                cardWrapper.style.transform = 'scale(' + scale + ')';
+                valueDisplay.textContent = Math.round(scale * 100) + '%';
+                slider.value = scale;
+            }
+
+            slider.addEventListener('input', function() {
+                updateZoom(parseFloat(this.value));
+            });
+
+            zoomInBtn.addEventListener('click', function() {
+                const current = parseFloat(slider.value);
+                const next = Math.min(3, current + 0.1);
+                updateZoom(next);
+            });
+
+            zoomOutBtn.addEventListener('click', function() {
+                const current = parseFloat(slider.value);
+                const next = Math.max(0.5, current - 0.1);
+                updateZoom(next);
+            });
+
+            zoomResetBtn.addEventListener('click', function() {
+                updateZoom(1);
+            });
+
+            // Keyboard shortcuts for zoom
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + Plus/Minus for zoom
+                if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')) {
+                    e.preventDefault();
+                    const current = parseFloat(slider.value);
+                    const next = Math.min(3, current + 0.1);
+                    updateZoom(next);
+                } else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+                    e.preventDefault();
+                    const current = parseFloat(slider.value);
+                    const next = Math.max(0.5, current - 0.1);
+                    updateZoom(next);
+                } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+                    e.preventDefault();
+                    updateZoom(1);
+                }
+            });
+        })();
     </script>
 </body>
 </html>
