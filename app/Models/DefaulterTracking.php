@@ -18,6 +18,7 @@ class DefaulterTracking extends Model
     protected $fillable = [
         'loan_application_id',
         'user_id',
+        'sacco_id',
         'amount_overdue',
         'days_overdue',
         'status',

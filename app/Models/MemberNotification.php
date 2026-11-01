@@ -17,7 +17,8 @@ class MemberNotification extends Model
         'message',
         'type',
         'data',
-        'read_at'
+        'read_at',
+        'sacco_id'
     ];
 
     protected $casts = [

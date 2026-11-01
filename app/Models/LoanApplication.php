@@ -15,6 +15,7 @@ class LoanApplication extends Model
         'application_number',
         'user_id',
         'treasurer_id',
+        'sacco_id',
         'amount_applied',
         'amount_approved',
         'interest_rate',
@@ -114,6 +115,7 @@ private function createRepaymentSchedule()
     for ($i = 1; $i <= $this->duration_months; $i++) {
         $this->repayments()->create([
             'repayment_number' => 'RPT-' . $this->id . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+            'sacco_id' => $this->sacco_id,
             'installment_number' => $i,
             'amount_due' => $this->monthly_repayment,
             'due_date' => $dueDate->copy(),
@@ -298,6 +300,7 @@ private function createRepaymentSchedule()
             ['loan_application_id' => $this->id],
             [
                 'user_id' => $this->user_id,
+                'sacco_id' => $this->sacco_id,
                 'amount_overdue' => $this->balance,
                 'days_overdue' => $this->days_overdue,
                 'assigned_to' => $this->treasurer_id,

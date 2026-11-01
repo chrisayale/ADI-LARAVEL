@@ -10,6 +10,7 @@ use App\Models\LoanRepayment;
 use App\Models\DefaulterTracking;
 use App\Models\LoanDocument;
 use App\Models\PaymentTransaction;
+use App\Models\Sacco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -380,9 +381,26 @@ class LoanController extends Controller
         try {
             DB::beginTransaction();
 
+            // Get or create the default SACCO "KANZANZA FINANCE"
+            $sacco = Sacco::firstOrCreate(
+                ['name' => 'KANZANZA FINANCE'],
+                [
+                    'code' => 'KZF',
+                    'registration_number' => 'KZF-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                    'status' => 'active',
+                    'primary_currency' => 'USD',
+                    'secondary_currency' => 'CDF',
+                ]
+            );
+
+            // Get the member user to check their sacco_id
+            $member = User::find($request->user_id);
+            $saccoId = $member?->sacco_id ?? $sacco->id;
+
             // Create loan application
             $loan = LoanApplication::create([
                 'user_id' => $request->user_id,
+                'sacco_id' => $saccoId,
                 'application_number' => 'LN-' . date('Y') . '-' . str_pad(LoanApplication::max('id') + 1, 5, '0', STR_PAD_LEFT),
                 'amount_applied' => $request->amount_applied,
                 'purpose' => $request->purpose,
@@ -398,6 +416,7 @@ class LoanController extends Controller
             $guarantorIds = [];
             foreach ($request->guarantors as $index => $guarantorData) {
                 $guarantor = $loan->guarantors()->create([
+                    'sacco_id' => $saccoId,
                     'name' => $guarantorData['name'],
                     'phone' => $guarantorData['phone'],
                     'email' => $guarantorData['email'] ?? null,
@@ -439,6 +458,7 @@ class LoanController extends Controller
                     // Create document record
                     LoanDocument::create([
                         'loan_application_id' => $loan->id,
+                        'sacco_id' => $saccoId,
                         'uploaded_by' => auth()->id(),
                         'document_name' => $originalName,
                         'original_name' => $originalName,
@@ -733,6 +753,7 @@ public function disburse(Request $request, LoanApplication $loan)
         PaymentTransaction::create([
             'transaction_number' => 'TXN-' . date('Y') . '-' . str_pad(PaymentTransaction::max('id') + 1, 6, '0', STR_PAD_LEFT),
             'user_id' => $loan->user_id,
+            'sacco_id' => $loan->sacco_id,
             'amount' => $loan->amount_approved,
             'payment_type' => 'loan_disbursement',
             'payment_method' => $request->disbursement_method ?? 'cash',
@@ -955,6 +976,7 @@ private function createRepaymentSchedule(LoanApplication $loan)
 
         $loan->repayments()->create([
             'repayment_number' => $repaymentNumber, // Add this line
+            'sacco_id' => $loan->sacco_id,
             'installment_number' => $installmentNumber++,
             'due_date' => $dueDate->copy(),
             'amount_due' => $loan->monthly_repayment,

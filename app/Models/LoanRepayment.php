@@ -12,6 +12,7 @@ class LoanRepayment extends Model
     protected $fillable = [
         'repayment_number',
         'loan_application_id',
+        'sacco_id',
         'installment_number',
         'amount_due',
         'amount_paid',

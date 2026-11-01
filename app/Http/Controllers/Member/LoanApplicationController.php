@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LoanApplication;
 use App\Models\LoanGuarantor;
 use App\Models\LoanDocument;
+use App\Models\Sacco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -56,9 +57,25 @@ class LoanApplicationController extends Controller
         DB::beginTransaction();
 
         try {
+            // Get or create the default SACCO "KANZANZA FINANCE"
+            $sacco = Sacco::firstOrCreate(
+                ['name' => 'KANZANZA FINANCE'],
+                [
+                    'code' => 'KZF',
+                    'registration_number' => 'KZF-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                    'status' => 'active',
+                    'primary_currency' => 'USD',
+                    'secondary_currency' => 'CDF',
+                ]
+            );
+
+            // Determine sacco_id: use user's sacco_id if available, otherwise use default SACCO
+            $saccoId = auth()->user()->sacco_id ?? $sacco->id;
+
             // Create loan application
             $loan = LoanApplication::create([
                 'user_id' => auth()->id(),
+                'sacco_id' => $saccoId,
                 'application_number' => 'LN-' . date('Y') . '-' . str_pad(LoanApplication::max('id') + 1, 5, '0', STR_PAD_LEFT),
                 'amount_applied' => $request->amount_applied,
                 'purpose' => $request->purpose,
@@ -72,6 +89,7 @@ class LoanApplicationController extends Controller
             // Add guarantors
             foreach ($request->guarantors as $guarantorData) {
                 $loan->guarantors()->create([
+                    'sacco_id' => $saccoId,
                     'name' => $guarantorData['name'],
                     'phone' => $guarantorData['phone'],
                     'email' => $guarantorData['email'] ?? null,
@@ -94,6 +112,7 @@ class LoanApplicationController extends Controller
 
                     LoanDocument::create([
                         'loan_application_id' => $loan->id,
+                        'sacco_id' => $saccoId,
                         'uploaded_by' => auth()->id(),
                         'document_name' => $originalName,
                         'original_name' => $originalName,

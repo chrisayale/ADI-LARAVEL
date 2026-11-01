@@ -14,6 +14,7 @@ class LoanDocument extends Model
     protected $fillable = [
         'document_number',
         'loan_application_id',
+        'sacco_id',
         'uploaded_by',
         'document_name',
         'original_name',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Sacco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -121,6 +122,23 @@ class UserController extends Controller
     if ($request->hasFile('profile_photo')) {
         $path = $request->file('profile_photo')->store('profile-photos', 'public');
         $userData['profile_photo'] = $path;
+    }
+
+    // Get or create the default SACCO "KANZANZA FINANCE"
+    $sacco = Sacco::firstOrCreate(
+        ['name' => 'KANZANZA FINANCE'],
+        [
+            'code' => 'KZF',
+            'registration_number' => 'KZF-' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'status' => 'active',
+            'primary_currency' => 'USD',
+            'secondary_currency' => 'CDF',
+        ]
+    );
+
+    // Assign default SACCO if not provided
+    if (empty($userData['sacco_id'])) {
+        $userData['sacco_id'] = $sacco->id;
     }
 
     $user = User::create($userData);

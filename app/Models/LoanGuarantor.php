@@ -12,6 +12,7 @@ class LoanGuarantor extends Model
 
     protected $fillable = [
         'loan_application_id',
+        'sacco_id',
         'name',
         'phone',
         'email',
