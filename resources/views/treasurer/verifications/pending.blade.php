@@ -1,16 +1,16 @@
 {{-- resources/views/treasurer/verifications/pending.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Pending Loan Verifications')
+@section('title', 'Vérifications de prêts en attente')
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Pending Loan Verifications</h1>
+        <h1 class="h3 mb-0 text-gray-800">Vérifications de prêts en attente</h1>
         <div>
             <a href="{{ route('treasurer.verifications.verified') }}" class="btn btn-success">
-                <i class="fas fa-check-circle"></i> Verified Loans
+                <i class="fas fa-check-circle"></i> Prêts vérifiés
             </a>
         </div>
     </div>
@@ -23,7 +23,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Pending</div>
+                                Total en attente</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $counts['total'] }}</div>
                         </div>
                         <div class="col-auto">
@@ -40,7 +40,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                With Collateral</div>
+                                Avec garantie</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $counts['with_collateral'] }}</div>
                         </div>
                         <div class="col-auto">
@@ -57,7 +57,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                With Guarantors</div>
+                                Avec garants</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $counts['with_guarantors'] }}</div>
                         </div>
                         <div class="col-auto">
@@ -72,22 +72,22 @@
     <!-- Search Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Loans</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Filtrer les prêts</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('treasurer.verifications.pending') }}" class="row">
                 <div class="col-md-8 mb-3">
-                    <label for="search">Search by Member Name or Membership Number</label>
+                    <label for="search">Rechercher par nom ou numéro de membre</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Enter name or membership number...">
+                           value="{{ request('search') }}" placeholder="Entrez le nom ou le numéro de membre...">
                 </div>
                 <div class="col-md-4 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-search"></i> Search
+                        <i class="fas fa-search"></i> Rechercher
                     </button>
                     @if(request('search'))
                         <a href="{{ route('treasurer.verifications.pending') }}" class="btn btn-secondary btn-block ml-2">
-                            <i class="fas fa-times"></i> Clear
+                            <i class="fas fa-times"></i> Effacer
                         </a>
                     @endif
                 </div>
@@ -98,7 +98,7 @@
     <!-- Loans Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Loans Pending Verification</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Prêts en attente de vérification</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -106,12 +106,12 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Application #</th>
-                            <th>Member</th>
-                            <th>Amount Applied</th>
-                            <th>Applied Date</th>
-                            <th>Collateral</th>
-                            <th>Guarantors</th>
+                            <th>N° de demande</th>
+                            <th>Membre</th>
+                            <th>Montant demandé</th>
+                            <th>Date de demande</th>
+                            <th>Garanties</th>
+                            <th>Garants</th>
                             <th>Documents</th>
                             <th>Actions</th>
                         </tr>
@@ -147,11 +147,11 @@
                             <td class="text-center">
                                 @if($loan->has_collateral)
                                     <span class="badge badge-info p-2">
-                                        <i class="fas fa-check-circle mr-1"></i> Yes
+                                        <i class="fas fa-check-circle mr-1"></i> Oui
                                     </span>
                                     <br><small class="text-muted">{{ ucfirst($loan->collateral_type) }}</small>
                                 @else
-                                    <span class="badge badge-secondary p-2">No</span>
+                                    <span class="badge badge-secondary p-2">Non</span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -164,10 +164,10 @@
                                         {{ $guarantorCount }} total
                                     </span>
                                     @if($verifiedCount > 0)
-                                        <br><small class="text-success">{{ $verifiedCount }} verified</small>
+                                        <br><small class="text-success">{{ $verifiedCount }} vérifiés</small>
                                     @endif
                                 @else
-                                    <span class="badge badge-secondary p-2">None</span>
+                                    <span class="badge badge-secondary p-2">Aucun</span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -177,19 +177,19 @@
                                 @endphp
                                 @if($docCount > 0)
                                     <span class="badge badge-info p-2">
-                                        {{ $docCount }} files
+                                        {{ $docCount }} fichiers
                                     </span>
                                     @if($verifiedDocCount > 0)
-                                        <br><small class="text-success">{{ $verifiedDocCount }} verified</small>
+                                        <br><small class="text-success">{{ $verifiedDocCount }} vérifiés</small>
                                     @endif
                                 @else
-                                    <span class="badge badge-secondary p-2">None</span>
+                                    <span class="badge badge-secondary p-2">Aucun</span>
                                 @endif
                             </td>
                             <td>
                                 <a href="{{ route('treasurer.verifications.show', $loan) }}"
-                                   class="btn btn-info btn-sm" title="Verify Loan">
-                                    <i class="fas fa-check-circle"></i> Verify
+                                   class="btn btn-info btn-sm" title="Vérifier le prêt">
+                                    <i class="fas fa-check-circle"></i> Vérifier
                                 </a>
                             </td>
                         </tr>
@@ -197,9 +197,9 @@
                         <tr>
                             <td colspan="9" class="text-center py-4">
                                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No loans pending verification</p>
+                                <p class="text-muted">Aucun prêt en attente de vérification</p>
                                 @if(request('search'))
-                                    <p class="text-muted">Try adjusting your search criteria</p>
+                                    <p class="text-muted">Essayez d'ajuster vos critères de recherche</p>
                                 @endif
                             </td>
                         </tr>

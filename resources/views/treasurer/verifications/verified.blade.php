@@ -1,16 +1,16 @@
 {{-- resources/views/treasurer/verifications/verified.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Verified Loans')
+@section('title', 'Prêts vérifiés')
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Verified Loans</h1>
+        <h1 class="h3 mb-0 text-gray-800">Prêts vérifiés</h1>
         <div>
             <a href="{{ route('treasurer.verifications.pending') }}" class="btn btn-warning">
-                <i class="fas fa-clock"></i> Pending Verifications
+                <i class="fas fa-clock"></i> Vérifications en attente
             </a>
         </div>
     </div>
@@ -18,22 +18,22 @@
     <!-- Search Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Verified Loans</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Filtrer les prêts vérifiés</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('treasurer.verifications.verified') }}" class="row">
                 <div class="col-md-8 mb-3">
-                    <label for="search">Search by Member Name or Membership Number</label>
+                    <label for="search">Rechercher par nom ou numéro de membre</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Enter name or membership number...">
+                           value="{{ request('search') }}" placeholder="Entrez le nom ou le numéro de membre...">
                 </div>
                 <div class="col-md-4 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-search"></i> Search
+                        <i class="fas fa-search"></i> Rechercher
                     </button>
                     @if(request('search'))
                         <a href="{{ route('treasurer.verifications.verified') }}" class="btn btn-secondary btn-block ml-2">
-                            <i class="fas fa-times"></i> Clear
+                            <i class="fas fa-times"></i> Effacer
                         </a>
                     @endif
                 </div>
@@ -44,7 +44,7 @@
     <!-- Loans Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Verified Loan Applications</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Demandes de prêts vérifiées</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -52,13 +52,13 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Application #</th>
-                            <th>Member</th>
-                            <th>Amount Applied</th>
-                            <th>Amount Approved</th>
-                            <th>Verified Date</th>
-                            <th>Verified By</th>
-                            <th>Status</th>
+                            <th>N° de demande</th>
+                            <th>Membre</th>
+                            <th>Montant demandé</th>
+                            <th>Montant approuvé</th>
+                            <th>Date de vérification</th>
+                            <th>Vérifié par</th>
+                            <th>Statut</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,7 +90,7 @@
                                 @if($loan->amount_approved)
                                     CDF {{ number_format($loan->amount_approved, 2) }}
                                 @else
-                                    <span class="text-muted">Pending</span>
+                                    <span class="text-muted">En attente</span>
                                 @endif
                             </td>
                             <td>{{ $loan->verified_at ? $loan->verified_at->format('d M Y H:i') : 'N/A' }}</td>
@@ -113,7 +113,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-4">
                                 <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No verified loans found</p>
+                                <p class="text-muted">Aucun prêt vérifié trouvé</p>
                             </td>
                         </tr>
                         @endforelse

@@ -1,16 +1,16 @@
 {{-- resources/views/treasurer/verifications/show.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Verify Loan - ' . $loan->application_number)
+@section('title', 'Vérifier le prêt - ' . $loan->application_number)
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Verify Loan Application</h1>
+        <h1 class="h3 mb-0 text-gray-800">Vérifier la demande de prêt</h1>
         <div>
             <a href="{{ route('treasurer.verifications.pending') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Pending
+                <i class="fas fa-arrow-left"></i> Retour aux en attente
             </a>
         </div>
     </div>
@@ -20,8 +20,8 @@
         <div class="col-12">
             <div class="alert alert-info mb-0">
                 <i class="fas fa-info-circle mr-2"></i>
-                <strong>Loan Application #{{ $loan->application_number }}</strong> -
-                Please verify all guarantors, collateral, and documents before proceeding.
+                <strong>Demande de prêt N°{{ $loan->application_number }}</strong> -
+                Veuillez vérifier tous les garants, garanties et documents avant de continuer.
             </div>
         </div>
     </div>
@@ -32,14 +32,14 @@
             <!-- Member Information -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Member Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Informations du membre</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Name:</th>
+                                    <th width="40%">Nom :</th>
                                     <td>
                                         <strong>{{ $loan->user->name }}</strong>
                                         @if($loan->user->membership_number)
@@ -48,11 +48,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Email:</th>
+                                    <th>Email :</th>
                                     <td>{{ $loan->user->email }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Phone:</th>
+                                    <th>Téléphone :</th>
                                     <td>{{ $loan->user->phone_number ?? 'N/A' }}</td>
                                 </tr>
                             </table>
@@ -60,15 +60,15 @@
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th width="40%">Address:</th>
+                                    <th width="40%">Adresse :</th>
                                     <td>{{ $loan->user->address ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>National ID:</th>
+                                    <th>ID National :</th>
                                     <td>{{ $loan->user->national_id ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Member Since:</th>
+                                    <th>Membre depuis :</th>
                                     <td>{{ $loan->user->created_at->format('d M Y') }}</td>
                                 </tr>
                             </table>
@@ -80,22 +80,22 @@
             <!-- Loan Details -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Loan Details</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Détails du prêt</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th>Amount Applied:</th>
+                                    <th>Montant demandé :</th>
                                     <td><strong>CDF {{ number_format($loan->amount_applied, 2) }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Purpose:</th>
-                                    <td>{{ $loan->purpose ?? 'Not specified' }}</td>
+                                    <th>Objet :</th>
+                                    <td>{{ $loan->purpose ?? 'Non spécifié' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Application Date:</th>
+                                    <th>Date de demande :</th>
                                     <td>{{ $loan->created_at->format('d M Y') }}</td>
                                 </tr>
                             </table>
@@ -103,22 +103,22 @@
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th>Has Collateral:</th>
+                                    <th>Avec garantie :</th>
                                     <td>
                                         @if($loan->has_collateral)
-                                            <span class="badge badge-success">Yes</span>
+                                            <span class="badge badge-success">Oui</span>
                                         @else
-                                            <span class="badge badge-secondary">No</span>
+                                            <span class="badge badge-secondary">Non</span>
                                         @endif
                                     </td>
                                 </tr>
                                 @if($loan->has_collateral)
                                 <tr>
-                                    <th>Collateral Type:</th>
+                                    <th>Type de garantie :</th>
                                     <td>{{ ucfirst($loan->collateral_type) }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Collateral Value:</th>
+                                    <th>Valeur de la garantie :</th>
                                     <td>CDF {{ number_format($loan->collateral_value, 2) }}</td>
                                 </tr>
                                 @endif
@@ -129,7 +129,7 @@
                     @if($loan->has_collateral && $loan->collateral_description)
                     <div class="row mt-3">
                         <div class="col-12">
-                            <strong>Collateral Description:</strong>
+                            <strong>Description de la garantie :</strong>
                             <p class="mb-0">{{ $loan->collateral_description }}</p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@
             <!-- Guarantors Verification -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Guarantors Verification</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Vérification des garants</h6>
                 </div>
                 <div class="card-body">
                     @if($loan->guarantors->count() > 0)
@@ -150,12 +150,12 @@
                                 <div class="col-md-8">
                                     <h6 class="font-weight-bold">{{ $guarantor->name }}</h6>
                                     <p class="mb-1"><i class="fas fa-phone mr-2"></i> {{ $guarantor->phone }}</p>
-                                    <p class="mb-1"><i class="fas fa-id-card mr-2"></i> ID: {{ $guarantor->id_number }}</p>
+                                    <p class="mb-1"><i class="fas fa-id-card mr-2"></i> ID : {{ $guarantor->id_number }}</p>
                                     @if($guarantor->email)
                                         <p class="mb-1"><i class="fas fa-envelope mr-2"></i> {{ $guarantor->email }}</p>
                                     @endif
                                     @if($guarantor->relationship)
-                                        <p class="mb-0"><i class="fas fa-users mr-2"></i> Relationship: {{ $guarantor->relationship }}</p>
+                                        <p class="mb-0"><i class="fas fa-users mr-2"></i> Relation : {{ $guarantor->relationship }}</p>
                                     @endif
                                 </div>
                                 <div class="col-md-4 text-right">
@@ -168,11 +168,11 @@
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-success"
                                                 onclick="verifyGuarantor({{ $guarantor->id }}, 'approved')">
-                                            <i class="fas fa-check"></i> Approve
+                                            <i class="fas fa-check"></i> Approuver
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger"
                                                 onclick="verifyGuarantor({{ $guarantor->id }}, 'rejected')">
-                                            <i class="fas fa-times"></i> Reject
+                                            <i class="fas fa-times"></i> Rejeter
                                         </button>
                                     </div>
                                 </div>
@@ -185,7 +185,7 @@
                         </div>
                         @endforeach
                     @else
-                        <p class="text-muted text-center py-3">No guarantors for this loan</p>
+                        <p class="text-muted text-center py-3">Aucun garant pour ce prêt</p>
                     @endif
                 </div>
             </div>
@@ -193,7 +193,7 @@
             <!-- Documents Verification -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Documents Verification</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Vérification des documents</h6>
                 </div>
                 <div class="card-body">
                     @if($loan->documents->count() > 0)
@@ -202,9 +202,9 @@
                                 <thead>
                                     <tr>
                                         <th>Document</th>
-                                        <th>Category</th>
-                                        <th>Size</th>
-                                        <th>Status</th>
+                                        <th>Catégorie</th>
+                                        <th>Taille</th>
+                                        <th>Statut</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -234,11 +234,11 @@
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-success"
                                                         onclick="verifyDocument({{ $document->id }}, 'verified')">
-                                                    <i class="fas fa-check"></i> Verify
+                                                    <i class="fas fa-check"></i> Vérifier
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-danger"
                                                         onclick="verifyDocument({{ $document->id }}, 'rejected')">
-                                                    <i class="fas fa-times"></i> Reject
+                                                    <i class="fas fa-times"></i> Rejeter
                                                 </button>
                                             </div>
                                         </td>
@@ -248,7 +248,7 @@
                             </table>
                         </div>
                     @else
-                        <p class="text-muted text-center py-3">No documents uploaded for this loan</p>
+                        <p class="text-muted text-center py-3">Aucun document téléchargé pour ce prêt</p>
                     @endif
                 </div>
             </div>
@@ -259,12 +259,12 @@
             <!-- Verification Progress -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Verification Progress</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Progression de la vérification</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-1">
-                            <span>Guarantors</span>
+                            <span>Garants</span>
                             <span>
                                 {{ $loan->guarantors->where('status', 'approved')->count() }}/{{ $loan->guarantors->count() }}
                             </span>
@@ -296,15 +296,15 @@
                     <form action="{{ route('treasurer.verifications.verify', $loan) }}" method="POST" id="verifyForm">
                         @csrf
                         <div class="form-group">
-                            <label for="verification_notes">Verification Notes</label>
+                            <label for="verification_notes">Notes de vérification</label>
                             <textarea class="form-control" id="verification_notes" name="verification_notes"
-                                      rows="3" required placeholder="Enter verification notes..."></textarea>
+                                      rows="3" required placeholder="Entrez les notes de vérification..."></textarea>
                         </div>
 
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="guarantors_verified" name="guarantors_verified" value="1" required>
                             <label class="form-check-label" for="guarantors_verified">
-                                I confirm that all guarantors have been verified
+                                Je confirme que tous les garants ont été vérifiés
                             </label>
                         </div>
 
@@ -312,14 +312,14 @@
                             <input class="form-check-input" type="checkbox" id="collateral_verified" name="collateral_verified" value="1"
                                    {{ $loan->has_collateral ? '' : 'disabled' }} required>
                             <label class="form-check-label" for="collateral_verified">
-                                I confirm that collateral has been verified
+                                Je confirme que la garantie a été vérifiée
                             </label>
                         </div>
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="documents_verified" name="documents_verified" value="1" required>
                             <label class="form-check-label" for="documents_verified">
-                                I confirm that all documents have been verified
+                                Je confirme que tous les documents ont été vérifiés
                             </label>
                         </div>
 
@@ -328,12 +328,12 @@
                         <div class="row">
                             <div class="col-6">
                                 <button type="submit" class="btn btn-success btn-block">
-                                    <i class="fas fa-check-circle"></i> Verify Loan
+                                    <i class="fas fa-check-circle"></i> Vérifier le prêt
                                 </button>
                             </div>
                             <div class="col-6">
                                 <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#rejectModal">
-                                    <i class="fas fa-times-circle"></i> Reject
+                                    <i class="fas fa-times-circle"></i> Rejeter
                                 </button>
                             </div>
                         </div>
@@ -351,7 +351,7 @@
             <form action="{{ route('treasurer.verifications.reject', $loan) }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Reject Loan Application</h5>
+                    <h5 class="modal-title">Rejeter la demande de prêt</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
@@ -359,17 +359,17 @@
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        Rejecting this loan will return it to admin for review.
+                        Le rejet de ce prêt le renverra à l'admin pour révision.
                     </div>
                     <div class="form-group">
-                        <label for="rejection_reason">Reason for Rejection</label>
+                        <label for="rejection_reason">Motif du rejet</label>
                         <textarea class="form-control" id="rejection_reason" name="rejection_reason"
-                                  rows="4" required placeholder="Please explain why this loan is being rejected..."></textarea>
+                                  rows="4" required placeholder="Veuillez expliquer pourquoi ce prêt est rejeté..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Reject Loan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Rejeter le prêt</button>
                 </div>
             </form>
         </div>
@@ -380,7 +380,7 @@
 @push('scripts')
 <script>
     function verifyGuarantor(guarantorId, status) {
-        if (!confirm('Are you sure you want to ' + status + ' this guarantor?')) {
+        if (!confirm('Êtes-vous sûr de vouloir ' + status + ' ce garant ?')) {
             return;
         }
 
@@ -392,7 +392,7 @@
             },
             body: JSON.stringify({
                 status: status,
-                verification_notes: prompt('Enter verification notes (optional):') || ''
+                verification_notes: prompt('Entrez les notes de vérification (optionnel) :') || ''
             })
         })
         .then(response => response.json())
@@ -407,17 +407,17 @@
 
                 alert(data.message);
             } else {
-                alert('Error: ' + (data.message || 'Unknown error'));
+                alert('Erreur : ' + (data.message || 'Erreur inconnue'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to verify guarantor. Please try again.');
+            alert('Échec de la vérification du garant. Veuillez réessayer.');
         });
     }
 
     function verifyDocument(documentId, status) {
-        if (!confirm('Are you sure you want to ' + status + ' this document?')) {
+        if (!confirm('Êtes-vous sûr de vouloir ' + status + ' ce document ?')) {
             return;
         }
 
@@ -429,7 +429,7 @@
             },
             body: JSON.stringify({
                 verification_status: status,
-                verification_notes: prompt('Enter verification notes (optional):') || ''
+                verification_notes: prompt('Entrez les notes de vérification (optionnel) :') || ''
             })
         })
         .then(response => response.json())
@@ -444,12 +444,12 @@
 
                 alert(data.message);
             } else {
-                alert('Error: ' + (data.message || 'Unknown error'));
+                alert('Erreur : ' + (data.message || 'Erreur inconnue'));
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to verify document. Please try again.');
+            alert('Échec de la vérification du document. Veuillez réessayer.');
         });
     }
 
