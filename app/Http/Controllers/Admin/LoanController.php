@@ -621,6 +621,7 @@ class LoanController extends Controller
             'duration_months' => 'nullable|integer|min:1|max:60',
             'duration_value' => 'required|integer|min:1|max:365',
             'repayment_frequency' => 'required|in:daily,weekly,monthly',
+            'amortization_method' => 'required|in:french,flat_rate,constant_capital',
             'approval_notes' => 'nullable|string|max:500'
         ]);
 
@@ -635,7 +636,8 @@ class LoanController extends Controller
             $request->amount_approved,
             $request->interest_rate / 100,
             $request->repayment_frequency,
-            $request->duration_value
+            $request->duration_value,
+            $request->amortization_method
         );
 
         DB::transaction(function () use ($loan, $request, $calculation) {
@@ -646,6 +648,7 @@ class LoanController extends Controller
                 'duration_months' => $request->repayment_frequency === 'monthly' ? $request->duration_value : null,
                 'duration_value' => $request->duration_value,
                 'repayment_frequency' => $request->repayment_frequency,
+                'amortization_method' => $request->amortization_method,
                 'monthly_repayment' => round($calculation['periodic_payment'], 2),
                 'total_repayable' => round($calculation['total_repayable'], 2),
                 'approval_notes' => $request->approval_notes,

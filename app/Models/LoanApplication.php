@@ -22,6 +22,7 @@ class LoanApplication extends Model
         'duration_months',
         'duration_value',
         'repayment_frequency',
+        'amortization_method',
         'monthly_repayment',
         'total_repayable',
         'purpose',
@@ -73,13 +74,14 @@ class LoanApplication extends Model
 
 public function approve($data)
 {
-    // Calculate repayment based on frequency
+    // Calculate repayment based on frequency and amortization method
     $principal = $data['amount_approved'];
     $annualRate = $data['interest_rate'] / 100;
     $frequency = $data['repayment_frequency'] ?? 'monthly';
     $durationValue = $data['duration_value'] ?? $data['duration_months'] ?? 12;
+    $amortizationMethod = $data['amortization_method'] ?? 'french';
 
-    $calculation = $this->calculateRepayment($principal, $annualRate, $frequency, $durationValue);
+    $calculation = $this->calculateRepayment($principal, $annualRate, $frequency, $durationValue, $amortizationMethod);
 
     $this->update([
         'amount_approved' => $data['amount_approved'],
@@ -87,6 +89,7 @@ public function approve($data)
         'duration_months' => $frequency === 'monthly' ? $durationValue : null,
         'duration_value' => $durationValue,
         'repayment_frequency' => $frequency,
+        'amortization_method' => $amortizationMethod,
         'monthly_repayment' => round($calculation['periodic_payment'], 2),
         'total_repayable' => round($calculation['total_repayable'], 2),
         'status' => 'approved',
@@ -101,7 +104,7 @@ public function approve($data)
     $this->createRepaymentSchedule();
 }
 
-public function calculateRepayment($principal, $annualRate, $frequency, $durationValue)
+public function calculateRepayment($principal, $annualRate, $frequency, $durationValue, $amortizationMethod = 'french')
 {
     switch ($frequency) {
         case 'daily':
@@ -126,19 +129,57 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
             break;
     }
 
-    if ($periodicRate > 0) {
-        $periodicPayment = $principal * $periodicRate * pow(1 + $periodicRate, $periods) / (pow(1 + $periodicRate, $periods) - 1);
-    } else {
-        $periodicPayment = $principal / $periods;
-    }
+    switch ($amortizationMethod) {
+        case 'flat_rate':
+            // Flat Rate: Interest calculated on original principal for each period
+            // Periodic interest = Principal × Periodic Rate
+            // Periodic principal = Principal / Periods
+            // Periodic payment = Periodic principal + Periodic interest
+            $periodicPrincipal = $principal / $periods;
+            $periodicInterest = $principal * $periodicRate;
+            $periodicPayment = $periodicPrincipal + $periodicInterest;
+            $totalInterest = $periodicInterest * $periods;
+            $totalRepayable = $principal + $totalInterest;
+            break;
 
-    $totalRepayable = $periodicPayment * $periods;
+        case 'constant_capital':
+            // Constant Capital (Constant Principal): Fixed principal per period, decreasing interest
+            // Periodic principal = Principal / Periods
+            // Periodic interest = Remaining balance × Periodic Rate
+            // We'll return the first period's payment as reference
+            $periodicPrincipal = $principal / $periods;
+            $firstPeriodInterest = $principal * $periodicRate;
+            $periodicPayment = $periodicPrincipal + $firstPeriodInterest; // First payment amount
+            // Total interest = sum of declining balance interest
+            $totalInterest = 0;
+            $remainingBalance = $principal;
+            for ($i = 1; $i <= $periods; $i++) {
+                $totalInterest += $remainingBalance * $periodicRate;
+                $remainingBalance -= $periodicPrincipal;
+            }
+            $totalRepayable = $principal + $totalInterest;
+            break;
+
+        case 'french':
+        default:
+            // French (Standard amortization): Constant payment, declining interest, increasing principal
+            if ($periodicRate > 0) {
+                $periodicPayment = $principal * $periodicRate * pow(1 + $periodicRate, $periods) / (pow(1 + $periodicRate, $periods) - 1);
+            } else {
+                $periodicPayment = $principal / $periods;
+            }
+            $totalRepayable = $periodicPayment * $periods;
+            $totalInterest = $totalRepayable - $principal;
+            break;
+    }
 
     return [
         'periodic_payment' => $periodicPayment,
         'total_repayable' => $totalRepayable,
+        'total_interest' => $totalInterest,
         'periodic_rate' => $periodicRate,
         'periods' => $periods,
+        'amortization_method' => $amortizationMethod,
         'first_payment_date' => $firstPaymentDate,
         'maturity_date' => $maturityDate
     ];
@@ -152,6 +193,23 @@ private function createRepaymentSchedule()
 
     $frequency = $this->repayment_frequency ?? 'monthly';
     $durationValue = $this->duration_value ?? $this->duration_months ?? 12;
+    $amortizationMethod = $this->amortization_method ?? 'french';
+    $principal = $this->amount_approved;
+    $annualRate = $this->interest_rate / 100;
+
+    // Calculate periodic rate based on frequency
+    switch ($frequency) {
+        case 'daily':
+            $periodicRate = $annualRate / 365;
+            break;
+        case 'weekly':
+            $periodicRate = $annualRate / 52;
+            break;
+        case 'monthly':
+        default:
+            $periodicRate = $annualRate / 12;
+            break;
+    }
 
     $dueDate = match ($frequency) {
         'daily' => now()->addDay(),
@@ -160,12 +218,48 @@ private function createRepaymentSchedule()
         default => now()->addMonth()
     };
 
+    $remainingBalance = $principal;
+
     for ($i = 1; $i <= $durationValue; $i++) {
+        $amountDue = 0;
+        $principalDue = 0;
+        $interestDue = 0;
+
+        switch ($amortizationMethod) {
+            case 'flat_rate':
+                // Flat Rate: Constant principal + constant interest
+                $principalDue = $principal / $durationValue;
+                $interestDue = $principal * $periodicRate;
+                $amountDue = $principalDue + $interestDue;
+                break;
+
+            case 'constant_capital':
+                // Constant Capital: Fixed principal, declining interest
+                $principalDue = $principal / $durationValue;
+                $interestDue = $remainingBalance * $periodicRate;
+                $amountDue = $principalDue + $interestDue;
+                $remainingBalance -= $principalDue;
+                break;
+
+            case 'french':
+            default:
+                // French: Constant payment, declining interest, increasing principal
+                if ($periodicRate > 0) {
+                    $amountDue = $principal * $periodicRate * pow(1 + $periodicRate, $durationValue) / (pow(1 + $periodicRate, $durationValue) - 1);
+                } else {
+                    $amountDue = $principal / $durationValue;
+                }
+                $interestDue = $remainingBalance * $periodicRate;
+                $principalDue = $amountDue - $interestDue;
+                $remainingBalance -= $principalDue;
+                break;
+        }
+
         $this->repayments()->create([
             'repayment_number' => 'RPT-' . $this->id . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
             'sacco_id' => $this->sacco_id,
             'installment_number' => $i,
-            'amount_due' => $this->monthly_repayment,
+            'amount_due' => round($amountDue, 2),
             'due_date' => $dueDate->copy(),
             'status' => 'pending'
         ]);

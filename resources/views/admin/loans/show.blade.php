@@ -771,6 +771,16 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
+                                <label for="amortization_method">{{ __('amortization_method') }}</label>
+                                <select class="form-control" id="amortization_method" name="amortization_method" required>
+                                    <option value="french">{{ __('french_method') }}</option>
+                                    <option value="flat_rate">{{ __('flat_rate_method') }}</option>
+                                    <option value="constant_capital">{{ __('constant_capital_method') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
                                 <label for="approval_notes">{{ __('approval_notes') }}</label>
                                 <textarea class="form-control" id="approval_notes" name="approval_notes" rows="3"></textarea>
                             </div>
@@ -911,13 +921,15 @@
         const interestInput = document.getElementById('interest_rate');
         const durationInput = document.getElementById('duration_value');
         const frequencyInput = document.getElementById('repayment_frequency');
+        const amortizationInput = document.getElementById('amortization_method');
 
-        if (amountInput && interestInput && durationInput && frequencyInput) {
+        if (amountInput && interestInput && durationInput && frequencyInput && amortizationInput) {
             function calculateLoan() {
                 const amount = parseFloat(amountInput.value) || 0;
                 const rate = parseFloat(interestInput.value) || 0;
                 const duration = parseInt(durationInput.value) || 1;
                 const frequency = frequencyInput.value || 'monthly';
+                const amortizationMethod = amortizationInput.value || 'french';
 
                 if (amount > 0 && rate > 0) {
                     const annualRate = rate / 100;
@@ -939,15 +951,45 @@
                             break;
                     }
 
-                    let periodicPayment;
-                    if (periodicRate === 0) {
-                        periodicPayment = amount / periods;
-                    } else {
-                        periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
-                    }
+                    let periodicPayment, totalInterest, totalPayment;
+                    let remainingBalance = amount;
 
-                    const totalPayment = periodicPayment * periods;
-                    const totalInterest = totalPayment - amount;
+                    switch (amortizationMethod) {
+                        case 'flat_rate':
+                            // Flat Rate: Interest on original principal for each period
+                            const periodicPrincipal = amount / periods;
+                            const periodicInterest = amount * periodicRate;
+                            periodicPayment = periodicPrincipal + periodicInterest;
+                            totalInterest = periodicInterest * periods;
+                            totalPayment = amount + totalInterest;
+                            break;
+
+                        case 'constant_capital':
+                            // Constant Capital: Fixed principal, declining interest
+                            const fixedPrincipal = amount / periods;
+                            periodicPayment = fixedPrincipal + (amount * periodicRate); // First payment
+                            // Calculate total interest
+                            totalInterest = 0;
+                            remainingBalance = amount;
+                            for (let i = 1; i <= periods; i++) {
+                                totalInterest += remainingBalance * periodicRate;
+                                remainingBalance -= fixedPrincipal;
+                            }
+                            totalPayment = amount + totalInterest;
+                            break;
+
+                        case 'french':
+                        default:
+                            // French (Standard amortization): Constant payment
+                            if (periodicRate === 0) {
+                                periodicPayment = amount / periods;
+                            } else {
+                                periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+                            }
+                            totalPayment = periodicPayment * periods;
+                            totalInterest = totalPayment - amount;
+                            break;
+                    }
 
                     // Update label based on frequency
                     const frequencyLabels = {
@@ -956,7 +998,7 @@
                         'monthly': '{{ __('monthly_payment') }}'
                     };
 
-                    document.getElementById('paymentLabel2').textContent = frequencyLabels[frequency] || frequencyLabels['monthly'] + ':';
+                    document.getElementById('paymentLabel2').textContent = (frequencyLabels[frequency] || frequencyLabels['monthly']) + ':';
 
                     document.getElementById('estimatedMonthly').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
                     document.getElementById('estimatedInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
@@ -968,6 +1010,7 @@
             interestInput.addEventListener('input', calculateLoan);
             durationInput.addEventListener('input', calculateLoan);
             frequencyInput.addEventListener('change', calculateLoan);
+            amortizationInput.addEventListener('change', calculateLoan);
 
             // Initial calculation
             calculateLoan();

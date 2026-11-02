@@ -81,21 +81,21 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="preview_interest_rate">Taux d'intérêt (%)</label>
                                     <input type="number" step="0.1" class="form-control"
                                            id="preview_interest_rate" value="12" min="0" max="100">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="preview_duration">Durée</label>
                                     <input type="number" class="form-control"
-                                           id="preview_duration" name="preview_duration" value="12" min="1" max="60">
+                                           id="preview_duration" name="preview_duration" value="12" min="1" max="365">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="preview_frequency">Fréquence de remboursement</label>
                                     <select class="form-control" id="preview_frequency" name="preview_frequency">
@@ -105,10 +105,19 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>&nbsp;</label>
-                                    <button type="button" class="btn btn-primary btn-block" id="calculateLoan">
+                                    <label for="preview_amortization">Méthode d'amortissement</label>
+                                    <select class="form-control" id="preview_amortization" name="preview_amortization">
+                                        <option value="french" selected>Système Français / Dégressif</option>
+                                        <option value="flat_rate">Taux Fixe / Plat</option>
+                                        <option value="constant_capital">Capital Constant / Amortissable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary" id="calculateLoan">
                                         <i class="fas fa-calculator"></i> Calculer l'échéancier
                                     </button>
                                 </div>
@@ -594,6 +603,7 @@
         const interestRate = parseFloat(document.getElementById('preview_interest_rate').value);
         const duration = parseInt(document.getElementById('preview_duration').value);
         const frequency = document.getElementById('preview_frequency').value;
+        const amortizationMethod = document.getElementById('preview_amortization').value;
 
         if (!amount || amount <= 0) {
             alert('Veuillez d\'abord entrer un montant de prêt valide');
@@ -637,15 +647,45 @@
                 break;
         }
 
-        let periodicPayment;
-        if (periodicRate === 0) {
-            periodicPayment = amount / periods;
-        } else {
-            periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
-        }
+        let periodicPayment, totalInterest, totalPayment;
+        let remainingBalance = amount;
 
-        const totalPayment = periodicPayment * periods;
-        const totalInterest = totalPayment - amount;
+        switch (amortizationMethod) {
+            case 'flat_rate':
+                // Flat Rate: Interest on original principal for each period
+                const periodicPrincipal = amount / periods;
+                const periodicInterest = amount * periodicRate;
+                periodicPayment = periodicPrincipal + periodicInterest;
+                totalInterest = periodicInterest * periods;
+                totalPayment = amount + totalInterest;
+                break;
+
+            case 'constant_capital':
+                // Constant Capital: Fixed principal, declining interest
+                const fixedPrincipal = amount / periods;
+                periodicPayment = fixedPrincipal + (amount * periodicRate); // First payment
+                // Calculate total interest
+                totalInterest = 0;
+                remainingBalance = amount;
+                for (let i = 1; i <= periods; i++) {
+                    totalInterest += remainingBalance * periodicRate;
+                    remainingBalance -= fixedPrincipal;
+                }
+                totalPayment = amount + totalInterest;
+                break;
+
+            case 'french':
+            default:
+                // French (Standard amortization): Constant payment
+                if (periodicRate === 0) {
+                    periodicPayment = amount / periods;
+                } else {
+                    periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+                }
+                totalPayment = periodicPayment * periods;
+                totalInterest = totalPayment - amount;
+                break;
+        }
 
         // Update labels based on frequency
         const frequencyLabels = {
@@ -666,14 +706,32 @@
         document.getElementById('loanSummary').style.display = 'flex';
 
         // Generate amortization schedule
-        let balance = amount;
+        remainingBalance = amount;
         let schedule = '';
         let paymentDate = new Date(firstPaymentDate);
 
         for (let i = 1; i <= periods; i++) {
-            const interestPayment = balance * periodicRate;
-            const principalPayment = periodicPayment - interestPayment;
-            balance -= principalPayment;
+            let principalPayment, interestPayment;
+
+            switch (amortizationMethod) {
+                case 'flat_rate':
+                    principalPayment = amount / periods;
+                    interestPayment = amount * periodicRate;
+                    break;
+
+                case 'constant_capital':
+                    principalPayment = amount / periods;
+                    interestPayment = remainingBalance * periodicRate;
+                    remainingBalance -= principalPayment;
+                    break;
+
+                case 'french':
+                default:
+                    interestPayment = remainingBalance * periodicRate;
+                    principalPayment = periodicPayment - interestPayment;
+                    remainingBalance -= principalPayment;
+                    break;
+            }
 
             // Format date based on frequency
             let dateStr;
@@ -692,7 +750,7 @@
                 <td>CDF ${Math.round(periodicPayment).toLocaleString()}</td>
                 <td>CDF ${Math.round(principalPayment).toLocaleString()}</td>
                 <td>CDF ${Math.round(interestPayment).toLocaleString()}</td>
-                <td>CDF ${Math.max(0, Math.round(balance)).toLocaleString()}</td>
+                <td>CDF ${Math.max(0, Math.round(remainingBalance)).toLocaleString()}</td>
             </tr>`;
 
             // Increment date for next period
