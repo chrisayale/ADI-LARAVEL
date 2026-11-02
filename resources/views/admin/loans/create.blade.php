@@ -611,18 +611,31 @@
             return;
         }
 
-        if (interestRate <= 0) {
-            alert('Veuillez entrer un taux d\'intérêt valide');
-            return;
-        }
-
         if (duration < 1) {
             alert('Veuillez entrer une durée valide');
             return;
         }
 
+        // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
+        // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
+        let calculatedInterestRate = interestRate;
+        let isAutoCalculatedRate = false;
+
+        if (frequency === 'daily' && amortizationMethod === 'flat_rate') {
+            calculatedInterestRate = (duration / 30) * 10;
+            // Update the UI field
+            document.getElementById('preview_interest_rate').value = calculatedInterestRate.toFixed(2);
+            isAutoCalculatedRate = true;
+        }
+
+        // Validate interest rate only if not auto-calculated
+        if (!isAutoCalculatedRate && calculatedInterestRate <= 0) {
+            alert('Veuillez entrer un taux d\'intérêt valide');
+            return;
+        }
+
         // Calculate based on frequency
-        const annualRate = interestRate / 100;
+        const annualRate = calculatedInterestRate / 100;
         let periodicRate, periods, firstPaymentDate;
 
         switch (frequency) {
@@ -652,12 +665,24 @@
 
         switch (amortizationMethod) {
             case 'flat_rate':
-                // Flat Rate: Interest on original principal for each period
-                const periodicPrincipal = amount / periods;
-                const periodicInterest = amount * periodicRate;
-                periodicPayment = periodicPrincipal + periodicInterest;
-                totalInterest = periodicInterest * periods;
-                totalPayment = amount + totalInterest;
+                if (frequency === 'daily') {
+                    // DAILY FLAT RATE: Special calculation per requirements
+                    // Intérêt Total = Capital × Taux (%)
+                    // Montant Total = Capital + Intérêt Total
+                    // Paiement Journalier = Montant Total / Nombre de Jours
+                    // Part Capital journalier = Capital / Nombre de jours
+                    // Part Intérêt journalier = Intérêt Total / Nombre de jours
+                    totalInterest = amount * annualRate; // annualRate here is the full rate (e.g., 0.10 for 10%)
+                    totalPayment = amount + totalInterest;
+                    periodicPayment = totalPayment / periods;
+                } else {
+                    // Regular flat rate (weekly/monthly)
+                    const periodicPrincipal = amount / periods;
+                    const periodicInterest = amount * periodicRate;
+                    periodicPayment = periodicPrincipal + periodicInterest;
+                    totalInterest = periodicInterest * periods;
+                    totalPayment = amount + totalInterest;
+                }
                 break;
 
             case 'constant_capital':
@@ -715,8 +740,14 @@
 
             switch (amortizationMethod) {
                 case 'flat_rate':
-                    principalPayment = amount / periods;
-                    interestPayment = amount * periodicRate;
+                    if (frequency === 'daily') {
+                        // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
+                        principalPayment = amount / periods;
+                        interestPayment = totalInterest / periods;
+                    } else {
+                        principalPayment = amount / periods;
+                        interestPayment = amount * periodicRate;
+                    }
                     break;
 
                 case 'constant_capital':

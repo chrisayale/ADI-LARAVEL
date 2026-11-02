@@ -106,6 +106,14 @@ public function approve($data)
 
 public function calculateRepayment($principal, $annualRate, $frequency, $durationValue, $amortizationMethod = 'french')
 {
+    // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
+    // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
+    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    if ($isDailyFlatRate) {
+        // Override annualRate based on duration in days
+        $annualRate = (($durationValue / 30) * 10) / 100;
+    }
+
     switch ($frequency) {
         case 'daily':
             // Use 365 days for daily frequency
@@ -131,15 +139,29 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
 
     switch ($amortizationMethod) {
         case 'flat_rate':
-            // Flat Rate: Interest calculated on original principal for each period
-            // Periodic interest = Principal × Periodic Rate
-            // Periodic principal = Principal / Periods
-            // Periodic payment = Periodic principal + Periodic interest
-            $periodicPrincipal = $principal / $periods;
-            $periodicInterest = $principal * $periodicRate;
-            $periodicPayment = $periodicPrincipal + $periodicInterest;
-            $totalInterest = $periodicInterest * $periods;
-            $totalRepayable = $principal + $totalInterest;
+            if ($isDailyFlatRate) {
+                // DAILY FLAT RATE: Special calculation per requirements
+                // Intérêt Total = Capital × Taux (%)
+                // Montant Total = Capital + Intérêt Total
+                // Paiement Journalier = Montant Total / Nombre de Jours
+                // Part Capital journalier = Capital / Nombre de jours
+                // Part Intérêt journalier = Intérêt Total / Nombre de jours
+                // annualRate is already the full rate (e.g., 0.10 for 30 days, 0.20 for 60 days)
+                $totalInterest = $principal * $annualRate;
+                $totalRepayable = $principal + $totalInterest;
+                $periodicPayment = $totalRepayable / $periods;
+            } else {
+                // Regular flat rate (weekly/monthly)
+                // Flat Rate: Interest calculated on original principal for each period
+                // Periodic interest = Principal × Periodic Rate
+                // Periodic principal = Principal / Periods
+                // Periodic payment = Periodic principal + Periodic interest
+                $periodicPrincipal = $principal / $periods;
+                $periodicInterest = $principal * $periodicRate;
+                $periodicPayment = $periodicPrincipal + $periodicInterest;
+                $totalInterest = $periodicInterest * $periods;
+                $totalRepayable = $principal + $totalInterest;
+            }
             break;
 
         case 'constant_capital':
@@ -197,6 +219,13 @@ private function createRepaymentSchedule()
     $principal = $this->amount_approved;
     $annualRate = $this->interest_rate / 100;
 
+    // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
+    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    if ($isDailyFlatRate) {
+        // Override annualRate based on duration in days: Taux (%) = (Durée en jours / 30) * 10%
+        $annualRate = (($durationValue / 30) * 10) / 100;
+    }
+
     // Calculate periodic rate based on frequency
     switch ($frequency) {
         case 'daily':
@@ -220,6 +249,15 @@ private function createRepaymentSchedule()
 
     $remainingBalance = $principal;
 
+    // Pre-calculate values for daily flat rate
+    if ($isDailyFlatRate) {
+        $totalInterest = $principal * $annualRate;
+        $totalRepayable = $principal + $totalInterest;
+        $dailyPayment = $totalRepayable / $durationValue;
+        $dailyPrincipal = $principal / $durationValue;
+        $dailyInterest = $totalInterest / $durationValue;
+    }
+
     for ($i = 1; $i <= $durationValue; $i++) {
         $amountDue = 0;
         $principalDue = 0;
@@ -227,10 +265,17 @@ private function createRepaymentSchedule()
 
         switch ($amortizationMethod) {
             case 'flat_rate':
-                // Flat Rate: Constant principal + constant interest
-                $principalDue = $principal / $durationValue;
-                $interestDue = $principal * $periodicRate;
-                $amountDue = $principalDue + $interestDue;
+                if ($isDailyFlatRate) {
+                    // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
+                    $amountDue = $dailyPayment;
+                    $principalDue = $dailyPrincipal;
+                    $interestDue = $dailyInterest;
+                } else {
+                    // Flat Rate: Constant principal + constant interest
+                    $principalDue = $principal / $durationValue;
+                    $interestDue = $principal * $periodicRate;
+                    $amountDue = $principalDue + $interestDue;
+                }
                 break;
 
             case 'constant_capital':

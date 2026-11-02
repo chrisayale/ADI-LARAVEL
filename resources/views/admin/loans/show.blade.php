@@ -931,79 +931,110 @@
                 const frequency = frequencyInput.value || 'monthly';
                 const amortizationMethod = amortizationInput.value || 'french';
 
-                if (amount > 0 && rate > 0) {
-                    const annualRate = rate / 100;
-                    let periodicRate, periods;
+                if (amount <= 0 || duration < 1) {
+                    return;
+                }
 
-                    switch (frequency) {
-                        case 'daily':
-                            periodicRate = annualRate / 365;
-                            periods = duration;
-                            break;
-                        case 'weekly':
-                            periodicRate = annualRate / 52;
-                            periods = duration;
-                            break;
-                        case 'monthly':
-                        default:
-                            periodicRate = annualRate / 12;
-                            periods = duration;
-                            break;
-                    }
+                // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
+                // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
+                let calculatedRate = rate;
+                let isAutoCalculatedRate = false;
 
-                    let periodicPayment, totalInterest, totalPayment;
-                    let remainingBalance = amount;
+                if (frequency === 'daily' && amortizationMethod === 'flat_rate') {
+                    calculatedRate = (duration / 30) * 10;
+                    // Update the UI field
+                    interestInput.value = calculatedRate.toFixed(2);
+                    isAutoCalculatedRate = true;
+                }
 
-                    switch (amortizationMethod) {
-                        case 'flat_rate':
-                            // Flat Rate: Interest on original principal for each period
+                // Validate rate only if not auto-calculated
+                if (!isAutoCalculatedRate && calculatedRate <= 0) {
+                    return;
+                }
+
+                const annualRate = calculatedRate / 100;
+                let periodicRate, periods;
+
+                switch (frequency) {
+                    case 'daily':
+                        periodicRate = annualRate / 365;
+                        periods = duration;
+                        break;
+                    case 'weekly':
+                        periodicRate = annualRate / 52;
+                        periods = duration;
+                        break;
+                    case 'monthly':
+                    default:
+                        periodicRate = annualRate / 12;
+                        periods = duration;
+                        break;
+                }
+
+                let periodicPayment, totalInterest, totalPayment;
+                let remainingBalance = amount;
+
+                switch (amortizationMethod) {
+                    case 'flat_rate':
+                        if (frequency === 'daily') {
+                            // DAILY FLAT RATE: Special calculation per requirements
+                            // Intérêt Total = Capital × Taux (%)
+                            // Montant Total = Capital + Intérêt Total
+                            // Paiement Journalier = Montant Total / Nombre de Jours
+                            // Part Capital journalier = Capital / Nombre de jours
+                            // Part Intérêt journalier = Intérêt Total / Nombre de jours
+                            totalInterest = amount * annualRate;
+                            totalPayment = amount + totalInterest;
+                            periodicPayment = totalPayment / periods;
+                        } else {
+                            // Regular flat rate (weekly/monthly)
                             const periodicPrincipal = amount / periods;
                             const periodicInterest = amount * periodicRate;
                             periodicPayment = periodicPrincipal + periodicInterest;
                             totalInterest = periodicInterest * periods;
                             totalPayment = amount + totalInterest;
-                            break;
+                        }
+                        break;
 
-                        case 'constant_capital':
-                            // Constant Capital: Fixed principal, declining interest
-                            const fixedPrincipal = amount / periods;
-                            periodicPayment = fixedPrincipal + (amount * periodicRate); // First payment
-                            // Calculate total interest
-                            totalInterest = 0;
-                            remainingBalance = amount;
-                            for (let i = 1; i <= periods; i++) {
-                                totalInterest += remainingBalance * periodicRate;
-                                remainingBalance -= fixedPrincipal;
-                            }
-                            totalPayment = amount + totalInterest;
-                            break;
+                    case 'constant_capital':
+                        // Constant Capital: Fixed principal, declining interest
+                        const fixedPrincipal = amount / periods;
+                        periodicPayment = fixedPrincipal + (amount * periodicRate); // First payment
+                        // Calculate total interest
+                        totalInterest = 0;
+                        remainingBalance = amount;
+                        for (let i = 1; i <= periods; i++) {
+                            totalInterest += remainingBalance * periodicRate;
+                            remainingBalance -= fixedPrincipal;
+                        }
+                        totalPayment = amount + totalInterest;
+                        break;
 
-                        case 'french':
-                        default:
-                            // French (Standard amortization): Constant payment
-                            if (periodicRate === 0) {
-                                periodicPayment = amount / periods;
-                            } else {
-                                periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
-                            }
-                            totalPayment = periodicPayment * periods;
-                            totalInterest = totalPayment - amount;
-                            break;
-                    }
-
-                    // Update label based on frequency
-                    const frequencyLabels = {
-                        'daily': '{{ __('daily_payment') }}',
-                        'weekly': '{{ __('weekly_payment') }}',
-                        'monthly': '{{ __('monthly_payment') }}'
-                    };
-
-                    document.getElementById('paymentLabel2').textContent = (frequencyLabels[frequency] || frequencyLabels['monthly']) + ':';
-
-                    document.getElementById('estimatedMonthly').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
-                    document.getElementById('estimatedInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
-                    document.getElementById('estimatedTotal').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
+                    case 'french':
+                    default:
+                        // French (Standard amortization): Constant payment
+                        if (periodicRate === 0) {
+                            periodicPayment = amount / periods;
+                        } else {
+                            periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+                        }
+                        totalPayment = periodicPayment * periods;
+                        totalInterest = totalPayment - amount;
+                        break;
                 }
+
+                // Update label based on frequency
+                const frequencyLabels = {
+                    'daily': '{{ __('daily_payment') }}',
+                    'weekly': '{{ __('weekly_payment') }}',
+                    'monthly': '{{ __('monthly_payment') }}'
+                };
+
+                document.getElementById('paymentLabel2').textContent = (frequencyLabels[frequency] || frequencyLabels['monthly']) + ':';
+
+                document.getElementById('estimatedMonthly').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
+                document.getElementById('estimatedInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
+                document.getElementById('estimatedTotal').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
             }
 
             amountInput.addEventListener('input', calculateLoan);
