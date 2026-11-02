@@ -108,14 +108,14 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="preview_amortization">Méthode d'amortissement</label>
-                            </div>
-                                    <label for="preview_amortization">Méthode d'amortissement</label>
                                     <select class="form-control" id="preview_amortization" name="preview_amortization">
                                         <option value="pato_ndogo" selected>Pato Ndogo</option>
                                         <option value="french">Système Français / Dégressif</option>
                                         <option value="flat_rate">Taux Fixe / Plat</option>
                                         <option value="constant_capital">Capital Constant / Amortissable</option>
                                     </select>
+                                </div>
+                            </div>
                             <div class="col-12">
                                 <div class="form-group">
                                     <button type="button" class="btn btn-primary" id="calculateLoan">
@@ -211,6 +211,8 @@
                                             <option value="savings" {{ old('collateral_type') == 'savings' ? 'selected' : '' }}>Épargne</option>
                                             <option value="other" {{ old('collateral_type') == 'other' ? 'selected' : '' }}>Autre</option>
                                         </select>
+                                </div>
+                            </div>
                                         @error('collateral_type')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -373,6 +375,8 @@
                                                 <option value="application_form">Formulaire de Demande</option>
                                                 <option value="other">Autre</option>
                                             </select>
+                                </div>
+                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -384,6 +388,8 @@
                                                     <option value="guarantor_{{ $i }}">Garant {{ $i + 1 }}</option>
                                                 @endfor
                                             </select>
+                                </div>
+                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
