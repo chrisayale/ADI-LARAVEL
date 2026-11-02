@@ -773,10 +773,10 @@
                             <div class="form-group">
                                 <label for="amortization_method">{{ __('amortization_method') }}</label>
                                 <select class="form-control" id="amortization_method" name="amortization_method" required>
+                                    <option value="pato_ndogo" selected>{{ __('pato_ndogo_method') }}</option>
                                     <option value="french">{{ __('french_method') }}</option>
                                     <option value="flat_rate">{{ __('flat_rate_method') }}</option>
                                     <option value="constant_capital">{{ __('constant_capital_method') }}</option>
-                                    <option value="pato_ndogo">{{ __('pato_ndogo_method') }}</option>
                                 </select>
                             </div>
                         </div>
