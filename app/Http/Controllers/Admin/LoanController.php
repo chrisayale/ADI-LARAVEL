@@ -618,7 +618,9 @@ class LoanController extends Controller
         $validator = Validator::make($request->all(), [
             'amount_approved' => 'required|numeric|min:1|max:' . $loan->amount_applied,
             'interest_rate' => 'required|numeric|min:0|max:100',
-            'duration_months' => 'required|integer|min:1|max:60',
+            'duration_months' => 'nullable|integer|min:1|max:60',
+            'duration_value' => 'required|integer|min:1|max:365',
+            'repayment_frequency' => 'required|in:daily,weekly,monthly',
             'approval_notes' => 'nullable|string|max:500'
         ]);
 
@@ -628,32 +630,33 @@ class LoanController extends Controller
                 ->withInput();
         }
 
-        // Calculate monthly repayment and total repayable
-        $principal = $request->amount_approved;
-        $annualRate = $request->interest_rate / 100;
-        $monthlyRate = $annualRate / 12;
-        $months = $request->duration_months;
+        // Use the model's calculateRepayment method
+        $calculation = $loan->calculateRepayment(
+            $request->amount_approved,
+            $request->interest_rate / 100,
+            $request->repayment_frequency,
+            $request->duration_value
+        );
 
-        // Simple interest calculation (you can use more complex formula if needed)
-        $totalInterest = $principal * $annualRate * ($months / 12);
-        $totalRepayable = $principal + $totalInterest;
-        $monthlyRepayment = $totalRepayable / $months;
-
-        DB::transaction(function () use ($loan, $request, $totalRepayable, $monthlyRepayment) {
+        DB::transaction(function () use ($loan, $request, $calculation) {
             $loan->update([
                 'status' => 'approved',
                 'amount_approved' => $request->amount_approved,
                 'interest_rate' => $request->interest_rate,
-                'duration_months' => $request->duration_months,
-                'monthly_repayment' => round($monthlyRepayment, 2),
-                'total_repayable' => round($totalRepayable, 2),
+                'duration_months' => $request->repayment_frequency === 'monthly' ? $request->duration_value : null,
+                'duration_value' => $request->duration_value,
+                'repayment_frequency' => $request->repayment_frequency,
+                'monthly_repayment' => round($calculation['periodic_payment'], 2),
+                'total_repayable' => round($calculation['total_repayable'], 2),
                 'approval_notes' => $request->approval_notes,
                 'approved_by' => auth()->id(),
-                'approved_at' => now()
+                'approved_at' => now(),
+                'first_payment_date' => $calculation['first_payment_date'],
+                'maturity_date' => $calculation['maturity_date']
             ]);
 
             // Create repayment schedule
-            $this->createRepaymentSchedule($loan);
+            $loan->createRepaymentSchedule();
         });
 
         return redirect()->route('admin.loans.show', $loan)

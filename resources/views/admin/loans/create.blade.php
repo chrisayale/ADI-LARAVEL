@@ -90,9 +90,19 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="preview_duration">Durée (Mois)</label>
+                                    <label for="preview_duration">Durée</label>
                                     <input type="number" class="form-control"
-                                           id="preview_duration" value="12" min="1" max="60">
+                                           id="preview_duration" name="preview_duration" value="12" min="1" max="60">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="preview_frequency">Fréquence de remboursement</label>
+                                    <select class="form-control" id="preview_frequency" name="preview_frequency">
+                                        <option value="monthly" selected>Mensuel</option>
+                                        <option value="weekly">Hebdomadaire</option>
+                                        <option value="daily">Quotidien</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -110,7 +120,7 @@
                             <div class="col-md-3">
                                 <div class="card bg-success text-white">
                                     <div class="card-body py-2">
-                                        <small>Paiement Mensuel</small>
+                                        <small id="paymentLabel">Paiement Mensuel</small>
                                         <h6 id="monthlyPayment">CDF 0</h6>
                                     </div>
                                 </div>
@@ -148,7 +158,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Date de paiement</th>
-                                        <th>Paiement Mensuel</th>
+                                        <th id="paymentHeader">Paiement Mensuel</th>
                                         <th>Principal</th>
                                         <th>Intérêt</th>
                                         <th>Solde</th>
@@ -582,7 +592,8 @@
     document.getElementById('calculateLoan').addEventListener('click', function() {
         const amount = parseFloat(document.getElementById('amount_applied').value);
         const interestRate = parseFloat(document.getElementById('preview_interest_rate').value);
-        const months = parseInt(document.getElementById('preview_duration').value);
+        const duration = parseInt(document.getElementById('preview_duration').value);
+        const frequency = document.getElementById('preview_frequency').value;
 
         if (!amount || amount <= 0) {
             alert('Veuillez d\'abord entrer un montant de prêt valide');
@@ -595,26 +606,60 @@
             return;
         }
 
-        if (months < 1) {
+        if (duration < 1) {
             alert('Veuillez entrer une durée valide');
             return;
         }
 
-        // Calculate monthly payment using standard loan amortization formula
-        const monthlyRate = interestRate / 100 / 12;
-        let monthlyPayment;
+        // Calculate based on frequency
+        const annualRate = interestRate / 100;
+        let periodicRate, periods, firstPaymentDate;
 
-        if (monthlyRate === 0) {
-            monthlyPayment = amount / months;
-        } else {
-            monthlyPayment = amount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+        switch (frequency) {
+            case 'daily':
+                periodicRate = annualRate / 365;
+                periods = duration;
+                firstPaymentDate = new Date();
+                firstPaymentDate.setDate(firstPaymentDate.getDate() + 1);
+                break;
+            case 'weekly':
+                periodicRate = annualRate / 52;
+                periods = duration;
+                firstPaymentDate = new Date();
+                firstPaymentDate.setDate(firstPaymentDate.getDate() + 7);
+                break;
+            case 'monthly':
+            default:
+                periodicRate = annualRate / 12;
+                periods = duration;
+                firstPaymentDate = new Date();
+                firstPaymentDate.setMonth(firstPaymentDate.getMonth() + 1);
+                break;
         }
 
-        const totalPayment = monthlyPayment * months;
+        let periodicPayment;
+        if (periodicRate === 0) {
+            periodicPayment = amount / periods;
+        } else {
+            periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+        }
+
+        const totalPayment = periodicPayment * periods;
         const totalInterest = totalPayment - amount;
 
+        // Update labels based on frequency
+        const frequencyLabels = {
+            'daily': { payment: 'Paiement Quotidien', period: 'jour' },
+            'weekly': { payment: 'Paiement Hebdomadaire', period: 'semaine' },
+            'monthly': { payment: 'Paiement Mensuel', period: 'mois' }
+        };
+
+        const labels = frequencyLabels[frequency] || frequencyLabels['monthly'];
+        document.getElementById('paymentLabel').textContent = labels.payment;
+        document.getElementById('paymentHeader').textContent = labels.payment;
+
         // Display summary with formatted numbers
-        document.getElementById('monthlyPayment').textContent = 'CDF ' + Math.round(monthlyPayment).toLocaleString();
+        document.getElementById('monthlyPayment').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
         document.getElementById('totalInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
         document.getElementById('totalPayment').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
 
@@ -623,31 +668,53 @@
         // Generate amortization schedule
         let balance = amount;
         let schedule = '';
-        let paymentDate = new Date();
+        let paymentDate = new Date(firstPaymentDate);
 
-        for (let i = 1; i <= months; i++) {
-            const interestPayment = balance * monthlyRate;
-            const principalPayment = monthlyPayment - interestPayment;
+        for (let i = 1; i <= periods; i++) {
+            const interestPayment = balance * periodicRate;
+            const principalPayment = periodicPayment - interestPayment;
             balance -= principalPayment;
 
-            // Format date - increment month for each payment
+            // Format date based on frequency
+            let dateStr;
             const currentDate = new Date(paymentDate);
-            currentDate.setMonth(currentDate.getMonth() + i);
-            const dateStr = currentDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+            if (frequency === 'daily') {
+                dateStr = currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+            } else if (frequency === 'weekly') {
+                dateStr = 'Sem ' + getWeekNumber(currentDate) + ' ' + currentDate.getFullYear();
+            } else {
+                dateStr = currentDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+            }
 
             schedule += `<tr>
                 <td>${i}</td>
                 <td>${dateStr}</td>
-                <td>CDF ${Math.round(monthlyPayment).toLocaleString()}</td>
+                <td>CDF ${Math.round(periodicPayment).toLocaleString()}</td>
                 <td>CDF ${Math.round(principalPayment).toLocaleString()}</td>
                 <td>CDF ${Math.round(interestPayment).toLocaleString()}</td>
                 <td>CDF ${Math.max(0, Math.round(balance)).toLocaleString()}</td>
             </tr>`;
+
+            // Increment date for next period
+            if (frequency === 'daily') {
+                paymentDate.setDate(paymentDate.getDate() + 1);
+            } else if (frequency === 'weekly') {
+                paymentDate.setDate(paymentDate.getDate() + 7);
+            } else {
+                paymentDate.setMonth(paymentDate.getMonth() + 1);
+            }
         }
 
         document.getElementById('amortizationBody').innerHTML = schedule;
         document.getElementById('amortizationTable').style.display = 'block';
     });
+
+    // Helper function to get week number
+    function getWeekNumber(date) {
+        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    }
 
     // Optional: Auto-calculate when amount changes (if needed)
     document.getElementById('amount_applied').addEventListener('change', function() {

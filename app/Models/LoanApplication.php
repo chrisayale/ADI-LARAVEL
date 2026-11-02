@@ -20,6 +20,8 @@ class LoanApplication extends Model
         'amount_approved',
         'interest_rate',
         'duration_months',
+        'duration_value',
+        'repayment_frequency',
         'monthly_repayment',
         'total_repayable',
         'purpose',
@@ -71,37 +73,75 @@ class LoanApplication extends Model
 
 public function approve($data)
 {
-    // Calculate monthly repayment using standard loan formula
+    // Calculate repayment based on frequency
     $principal = $data['amount_approved'];
     $annualRate = $data['interest_rate'] / 100;
-    $monthlyRate = $annualRate / 12;
-    $months = $data['duration_months'];
+    $frequency = $data['repayment_frequency'] ?? 'monthly';
+    $durationValue = $data['duration_value'] ?? $data['duration_months'] ?? 12;
 
-    // Standard loan amortization formula
-    if ($monthlyRate > 0) {
-        $monthlyPayment = $principal * $monthlyRate * pow(1 + $monthlyRate, $months) / (pow(1 + $monthlyRate, $months) - 1);
-    } else {
-        $monthlyPayment = $principal / $months;
-    }
-
-    $totalRepayable = $monthlyPayment * $months;
+    $calculation = $this->calculateRepayment($principal, $annualRate, $frequency, $durationValue);
 
     $this->update([
         'amount_approved' => $data['amount_approved'],
         'interest_rate' => $data['interest_rate'],
-        'duration_months' => $data['duration_months'],
-        'monthly_repayment' => round($monthlyPayment, 2),
-        'total_repayable' => round($totalRepayable, 2),
+        'duration_months' => $frequency === 'monthly' ? $durationValue : null,
+        'duration_value' => $durationValue,
+        'repayment_frequency' => $frequency,
+        'monthly_repayment' => round($calculation['periodic_payment'], 2),
+        'total_repayable' => round($calculation['total_repayable'], 2),
         'status' => 'approved',
         'approved_by' => auth()->id(),
         'approved_at' => now(),
         'approval_notes' => $data['approval_notes'] ?? null,
-        'first_payment_date' => now()->addMonth(),
-        'maturity_date' => now()->addMonths($data['duration_months'])
+        'first_payment_date' => $calculation['first_payment_date'],
+        'maturity_date' => $calculation['maturity_date']
     ]);
 
     // Create repayment schedule - THIS SHOULD BE CALLED HERE
     $this->createRepaymentSchedule();
+}
+
+public function calculateRepayment($principal, $annualRate, $frequency, $durationValue)
+{
+    switch ($frequency) {
+        case 'daily':
+            // Use 365 days for daily frequency
+            $periodicRate = $annualRate / 365;
+            $periods = $durationValue;
+            $firstPaymentDate = now()->addDay();
+            $maturityDate = now()->addDays($durationValue);
+            break;
+        case 'weekly':
+            $periodicRate = $annualRate / 52;
+            $periods = $durationValue;
+            $firstPaymentDate = now()->addWeek();
+            $maturityDate = now()->addWeeks($durationValue);
+            break;
+        case 'monthly':
+        default:
+            $periodicRate = $annualRate / 12;
+            $periods = $durationValue;
+            $firstPaymentDate = now()->addMonth();
+            $maturityDate = now()->addMonths($durationValue);
+            break;
+    }
+
+    if ($periodicRate > 0) {
+        $periodicPayment = $principal * $periodicRate * pow(1 + $periodicRate, $periods) / (pow(1 + $periodicRate, $periods) - 1);
+    } else {
+        $periodicPayment = $principal / $periods;
+    }
+
+    $totalRepayable = $periodicPayment * $periods;
+
+    return [
+        'periodic_payment' => $periodicPayment,
+        'total_repayable' => $totalRepayable,
+        'periodic_rate' => $periodicRate,
+        'periods' => $periods,
+        'first_payment_date' => $firstPaymentDate,
+        'maturity_date' => $maturityDate
+    ];
 }
 
 // Make sure createRepaymentSchedule method exists
@@ -110,9 +150,17 @@ private function createRepaymentSchedule()
     // Delete any existing repayments first
     $this->repayments()->delete();
 
-    $dueDate = now()->addMonth();
+    $frequency = $this->repayment_frequency ?? 'monthly';
+    $durationValue = $this->duration_value ?? $this->duration_months ?? 12;
 
-    for ($i = 1; $i <= $this->duration_months; $i++) {
+    $dueDate = match ($frequency) {
+        'daily' => now()->addDay(),
+        'weekly' => now()->addWeek(),
+        'monthly' => now()->addMonth(),
+        default => now()->addMonth()
+    };
+
+    for ($i = 1; $i <= $durationValue; $i++) {
         $this->repayments()->create([
             'repayment_number' => 'RPT-' . $this->id . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
             'sacco_id' => $this->sacco_id,
@@ -122,7 +170,12 @@ private function createRepaymentSchedule()
             'status' => 'pending'
         ]);
 
-        $dueDate->addMonth();
+        $dueDate = match ($frequency) {
+            'daily' => $dueDate->copy()->addDay(),
+            'weekly' => $dueDate->copy()->addWeek(),
+            'monthly' => $dueDate->copy()->addMonth(),
+            default => $dueDate->copy()->addMonth()
+        };
     }
 }
 

@@ -207,7 +207,37 @@
                                     <td>{{ $loan->interest_rate }}% {{ __('per_annum') }}</td>
                                 </tr>
                                 @endif
-                                @if($loan->duration_months)
+                                @if($loan->repayment_frequency)
+                                <tr>
+                                    <th>{{ __('repayment_frequency') }}:</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->repayment_frequency == 'daily')
+                                                {{ __('daily') }}
+                                            @elseif($loan->repayment_frequency == 'weekly')
+                                                {{ __('weekly') }}
+                                            @else
+                                                {{ __('monthly') }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->duration_value)
+                                <tr>
+                                    <th>{{ __('duration') }}:</th>
+                                    <td>
+                                        {{ $loan->duration_value }}
+                                        @if($loan->repayment_frequency == 'daily')
+                                            {{ __('days') }}
+                                        @elseif($loan->repayment_frequency == 'weekly')
+                                            {{ __('weeks') }}
+                                        @else
+                                            {{ __('months') }}
+                                        @endif
+                                    </td>
+                                </tr>
+                                @elseif($loan->duration_months)
                                 <tr>
                                     <th>{{ __('duration') }}:</th>
                                     <td>{{ $loan->duration_months }} {{ __('months') }}</td>
@@ -215,8 +245,14 @@
                                 @endif
                                 @if($loan->monthly_repayment)
                                 <tr>
-                                    <th>{{ __('monthly_payment') }}:</th>
-                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
+                                    <th>{{ __('periodic_payment') }}:</th>
+                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong>
+                                        @if($loan->repayment_frequency)
+                                            <small class="text-muted ml-2">
+                                                ({{ $loan->repayment_frequency == 'daily' ? __('daily') : ($loan->repayment_frequency == 'weekly' ? __('weekly') : __('monthly')) }})
+                                            </small>
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endif
                                 @if($loan->total_repayable)
@@ -716,14 +752,24 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
-                                <label for="duration_months">{{ __('duration_months') }}</label>
-                                <input type="number" class="form-control" id="duration_months"
-                                       name="duration_months" value="12" required min="1" max="60">
+                                <label for="duration_value">{{ __('duration') }}</label>
+                                <input type="number" class="form-control" id="duration_value"
+                                       name="duration_value" value="12" required min="1" max="365">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="repayment_frequency">{{ __('repayment_frequency') }}</label>
+                                <select class="form-control" id="repayment_frequency" name="repayment_frequency" required>
+                                    <option value="monthly">{{ __('monthly') }}</option>
+                                    <option value="weekly">{{ __('weekly') }}</option>
+                                    <option value="daily">{{ __('daily') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="approval_notes">{{ __('approval_notes') }}</label>
                                 <textarea class="form-control" id="approval_notes" name="approval_notes" rows="3"></textarea>
@@ -734,7 +780,7 @@
                     <div class="alert alert-info mt-3">
                         <div class="row">
                             <div class="col-md-4">
-                                <strong>{{ __('monthly_payment') }}:</strong><br>
+                                <strong><span id="paymentLabel2">{{ __('periodic_payment') }}:</span></strong><br>
                                 <span id="estimatedMonthly">CDF 0</span>
                             </div>
                             <div class="col-md-4">
@@ -863,28 +909,56 @@
     document.addEventListener('DOMContentLoaded', function() {
         const amountInput = document.getElementById('amount_approved');
         const interestInput = document.getElementById('interest_rate');
-        const durationInput = document.getElementById('duration_months');
+        const durationInput = document.getElementById('duration_value');
+        const frequencyInput = document.getElementById('repayment_frequency');
 
-        if (amountInput && interestInput && durationInput) {
+        if (amountInput && interestInput && durationInput && frequencyInput) {
             function calculateLoan() {
                 const amount = parseFloat(amountInput.value) || 0;
                 const rate = parseFloat(interestInput.value) || 0;
-                const months = parseInt(durationInput.value) || 1;
+                const duration = parseInt(durationInput.value) || 1;
+                const frequency = frequencyInput.value || 'monthly';
 
                 if (amount > 0 && rate > 0) {
-                    const monthlyRate = rate / 100 / 12;
-                    let monthlyPayment;
+                    const annualRate = rate / 100;
+                    let periodicRate, periods;
 
-                    if (monthlyRate === 0) {
-                        monthlyPayment = amount / months;
-                    } else {
-                        monthlyPayment = amount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+                    switch (frequency) {
+                        case 'daily':
+                            periodicRate = annualRate / 365;
+                            periods = duration;
+                            break;
+                        case 'weekly':
+                            periodicRate = annualRate / 52;
+                            periods = duration;
+                            break;
+                        case 'monthly':
+                        default:
+                            periodicRate = annualRate / 12;
+                            periods = duration;
+                            break;
                     }
 
-                    const totalPayment = monthlyPayment * months;
+                    let periodicPayment;
+                    if (periodicRate === 0) {
+                        periodicPayment = amount / periods;
+                    } else {
+                        periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+                    }
+
+                    const totalPayment = periodicPayment * periods;
                     const totalInterest = totalPayment - amount;
 
-                    document.getElementById('estimatedMonthly').textContent = 'CDF ' + Math.round(monthlyPayment).toLocaleString();
+                    // Update label based on frequency
+                    const frequencyLabels = {
+                        'daily': '{{ __('daily_payment') }}',
+                        'weekly': '{{ __('weekly_payment') }}',
+                        'monthly': '{{ __('monthly_payment') }}'
+                    };
+
+                    document.getElementById('paymentLabel2').textContent = frequencyLabels[frequency] || frequencyLabels['monthly'] + ':';
+
+                    document.getElementById('estimatedMonthly').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
                     document.getElementById('estimatedInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
                     document.getElementById('estimatedTotal').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
                 }
@@ -893,6 +967,7 @@
             amountInput.addEventListener('input', calculateLoan);
             interestInput.addEventListener('input', calculateLoan);
             durationInput.addEventListener('input', calculateLoan);
+            frequencyInput.addEventListener('change', calculateLoan);
 
             // Initial calculation
             calculateLoan();
