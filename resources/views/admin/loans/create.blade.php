@@ -112,6 +112,7 @@
                                         <option value="french" selected>Système Français / Dégressif</option>
                                         <option value="flat_rate">Taux Fixe / Plat</option>
                                         <option value="constant_capital">Capital Constant / Amortissable</option>
+                                        <option value="pato_ndogo">Pato Ndogo</option>
                                     </select>
                                 </div>
                             </div>
@@ -621,7 +622,7 @@
         let calculatedInterestRate = interestRate;
         let isAutoCalculatedRate = false;
 
-        if (frequency === 'daily' && amortizationMethod === 'flat_rate') {
+        if (frequency === 'daily' && (amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo')) {
             calculatedInterestRate = (duration / 30) * 10;
             // Update the UI field
             document.getElementById('preview_interest_rate').value = calculatedInterestRate.toFixed(2);
@@ -665,6 +666,7 @@
 
         switch (amortizationMethod) {
             case 'flat_rate':
+            case 'pato_ndogo':
                 if (frequency === 'daily') {
                     // DAILY FLAT RATE: Special calculation per requirements
                     // Intérêt Total = Capital × Taux (%)
@@ -740,6 +742,7 @@
 
             switch (amortizationMethod) {
                 case 'flat_rate':
+            case 'pato_ndogo':
                     if (frequency === 'daily') {
                         // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
                         principalPayment = amount / periods;

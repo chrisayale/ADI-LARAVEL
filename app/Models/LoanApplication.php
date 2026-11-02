@@ -108,7 +108,7 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
 {
     // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
     // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
-    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    $isDailyFlatRate = ($frequency === 'daily' && ($amortizationMethod === 'flat_rate' || $amortizationMethod === 'pato_ndogo'));
     if ($isDailyFlatRate) {
         // Override annualRate based on duration in days
         $annualRate = (($durationValue / 30) * 10) / 100;
@@ -139,6 +139,7 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
 
     switch ($amortizationMethod) {
         case 'flat_rate':
+        case 'pato_ndogo':
             if ($isDailyFlatRate) {
                 // DAILY FLAT RATE: Special calculation per requirements
                 // Intérêt Total = Capital × Taux (%)
@@ -220,7 +221,7 @@ private function createRepaymentSchedule()
     $annualRate = $this->interest_rate / 100;
 
     // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
-    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    $isDailyFlatRate = ($frequency === 'daily' && ($amortizationMethod === 'flat_rate' || $amortizationMethod === 'pato_ndogo'));
     if ($isDailyFlatRate) {
         // Override annualRate based on duration in days: Taux (%) = (Durée en jours / 30) * 10%
         $annualRate = (($durationValue / 30) * 10) / 100;
@@ -265,6 +266,7 @@ private function createRepaymentSchedule()
 
         switch ($amortizationMethod) {
             case 'flat_rate':
+        case 'pato_ndogo':
                 if ($isDailyFlatRate) {
                     // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
                     $amountDue = $dailyPayment;

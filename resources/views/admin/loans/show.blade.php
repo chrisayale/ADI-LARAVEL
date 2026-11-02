@@ -776,6 +776,7 @@
                                     <option value="french">{{ __('french_method') }}</option>
                                     <option value="flat_rate">{{ __('flat_rate_method') }}</option>
                                     <option value="constant_capital">{{ __('constant_capital_method') }}</option>
+                                    <option value="pato_ndogo">{{ __('pato_ndogo_method') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -940,7 +941,7 @@
                 let calculatedRate = rate;
                 let isAutoCalculatedRate = false;
 
-                if (frequency === 'daily' && amortizationMethod === 'flat_rate') {
+                if (frequency === 'daily' && (amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo')) {
                     calculatedRate = (duration / 30) * 10;
                     // Update the UI field
                     interestInput.value = calculatedRate.toFixed(2);
@@ -976,6 +977,7 @@
 
                 switch (amortizationMethod) {
                     case 'flat_rate':
+                    case 'pato_ndogo':
                         if (frequency === 'daily') {
                             // DAILY FLAT RATE: Special calculation per requirements
                             // Intérêt Total = Capital × Taux (%)
