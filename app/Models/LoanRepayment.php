@@ -15,6 +15,9 @@ class LoanRepayment extends Model
         'sacco_id',
         'installment_number',
         'amount_due',
+        'adjusted_amount',
+        'difference_amount',
+        'difference_type',
         'amount_paid',
         'penalty_amount',
         'total_paid',
@@ -28,6 +31,8 @@ class LoanRepayment extends Model
 
     protected $casts = [
         'amount_due' => 'decimal:2',
+        'adjusted_amount' => 'decimal:2',
+        'difference_amount' => 'decimal:2',
         'amount_paid' => 'decimal:2',
         'penalty_amount' => 'decimal:2',
         'total_paid' => 'decimal:2',
@@ -64,6 +69,25 @@ class LoanRepayment extends Model
     {
         if ($this->amount_due == 0) return 0;
         return round(($this->amount_paid / $this->amount_due) * 100, 2);
+    }
+
+    // Accessors for adjustment tracking
+    public function getHasAdjustmentAttribute()
+    {
+        return $this->adjusted_amount !== null && $this->adjusted_amount != $this->amount_due;
+    }
+
+    public function getEffectiveAmountDueAttribute()
+    {
+        // Return adjusted_amount if set, otherwise amount_due
+        return $this->adjusted_amount ?? $this->amount_due;
+    }
+
+    public function getSurplusBalanceAttribute()
+    {
+        // Cumulative surplus across all repayments for this loan
+        if (!$this->loanApplication) return $this->difference_amount;
+        return $this->loanApplication->repayments->sum('difference_amount');
     }
 
     public function scopePending($query)

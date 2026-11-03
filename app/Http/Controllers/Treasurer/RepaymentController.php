@@ -143,7 +143,9 @@ class RepaymentController extends Controller
             'amount' => 'required|numeric|min:0.001',
             'payment_method' => 'required|in:cash,bank_transfer,mobile_money',
             'reference_number' => 'nullable|string|max:100',
-            'notes' => 'nullable|string|max:500'
+            'notes' => 'nullable|string|max:500',
+            'adjusted_amounts' => 'nullable|array',
+            'adjusted_amounts.*' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -168,6 +170,27 @@ class RepaymentController extends Controller
 
             if ($repayments->isEmpty()) {
                 throw new \Exception('No valid repayments selected');
+            }
+
+            // Process adjusted amounts if provided
+            $adjustedAmounts = $request->input('adjusted_amounts', []);
+            foreach ($repayments as $repayment) {
+                if (isset($adjustedAmounts[$repayment->id])) {
+                    $adjusted = (float)$adjustedAmounts[$repayment->id];
+                    $theoretical = (float)$repayment->amount_due;
+
+                    if ($adjusted > 0 && $adjusted != $theoretical) {
+                        $repayment->adjusted_amount = $adjusted;
+                        $difference = $adjusted - $theoretical;
+                        $repayment->difference_amount = $difference;
+                        $repayment->difference_type = $difference > 0 ? 'surplus' : ($difference < 0 ? 'shortfall' : 'none');
+                    } else {
+                        $repayment->adjusted_amount = null;
+                        $repayment->difference_amount = 0;
+                        $repayment->difference_type = 'none';
+                    }
+                    $repayment->save();
+                }
             }
 
             $remainingAmount = $request->amount;
@@ -195,14 +218,16 @@ class RepaymentController extends Controller
             foreach ($repayments as $repayment) {
                 if ($remainingAmount <= 0) break;
 
-                $balance = $repayment->amount_due - $repayment->amount_paid;
+                // Use effective amount due (adjusted if set, otherwise theoretical)
+                $effectiveDue = $repayment->effective_amount_due;
+                $balance = $effectiveDue - $repayment->amount_paid;
                 $paymentToApply = min($remainingAmount, $balance);
 
                 if ($paymentToApply > 0) {
                     $repayment->amount_paid += $paymentToApply;
                     $repayment->total_paid += $paymentToApply;
 
-                    if ($repayment->amount_paid >= $repayment->amount_due) {
+                    if ($repayment->amount_paid >= $effectiveDue) {
                         $repayment->status = 'paid';
                         $repayment->paid_date = now();
                     } elseif ($repayment->amount_paid > 0) {
@@ -215,7 +240,7 @@ class RepaymentController extends Controller
             }
 
             // Check if loan is fully paid
-            $totalDue = $loan->repayments->sum('amount_due');
+            $totalDue = $loan->repayments->sum('effective_amount_due');
             $totalPaid = $loan->repayments->sum('amount_paid');
 
             if ($totalPaid >= $totalDue) {

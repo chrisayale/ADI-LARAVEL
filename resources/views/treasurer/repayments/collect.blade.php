@@ -104,17 +104,22 @@
                                     </th>
                                     <th>Installment</th>
                                     <th>Due Date</th>
-                                    <th>Amount Due</th>
+                                    <th>Theoretical Amount</th>
+                                    <th>Adjusted Amount</th>
                                     <th>Amount Paid</th>
                                     <th>Balance</th>
+                                    <th>Difference</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($loan->repayments as $repayment)
                                     @php
-                                        $balance = $repayment->amount_due - $repayment->amount_paid;
+                                        $effectiveDue = $repayment->effective_amount_due;
+                                        $balance = $effectiveDue - $repayment->amount_paid;
                                         $isOverdue = $repayment->due_date < now() && $repayment->status != 'paid';
+                                        $difference = $repayment->difference_amount;
+                                        $differenceClass = $repayment->difference_type === 'surplus' ? 'text-success' : ($repayment->difference_type === 'shortfall' ? 'text-danger' : '');
                                     @endphp
                                     @if($balance > 0)
                                     <tr class="{{ $isOverdue ? 'table-danger' : '' }}">
@@ -123,13 +128,37 @@
                                                    class="repayment-checkbox loan-{{ $loan->id }}"
                                                    value="{{ $repayment->id }}"
                                                    data-amount="{{ $balance }}"
+                                                   data-theoretical="{{ $repayment->amount_due }}"
+                                                   data-adjusted="{{ $repayment->adjusted_amount ?? $repayment->amount_due }}"
                                                    data-loan="{{ $loan->id }}">
                                         </td>
                                         <td>{{ $repayment->installment_number }}</td>
                                         <td>{{ $repayment->due_date->format('d/m/Y') }}</td>
                                         <td>CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                                        <td>
+                                            <input type="number"
+                                                   class="form-control form-control-sm adjusted-amount-input"
+                                                   data-repayment-id="{{ $repayment->id }}"
+                                                   value="{{ number_format($repayment->adjusted_amount ?? $repayment->amount_due, 2, '.', '') }}"
+                                                   step="0.01"
+                                                   min="0.01"
+                                                   style="width: 100px;">
+                                        </td>
                                         <td>CDF {{ number_format($repayment->amount_paid, 2) }}</td>
                                         <td class="font-weight-bold">CDF {{ number_format($balance, 2) }}</td>
+                                        <td class="{{ $differenceClass }} font-weight-bold">
+                                            @if($repayment->has_adjustment)
+                                                @if($repayment->difference_type === 'surplus')
+                                                    <i class="fas fa-arrow-up"></i> CDF {{ number_format($difference, 2) }}
+                                                @elseif($repayment->difference_type === 'shortfall')
+                                                    <i class="fas fa-arrow-down"></i> CDF {{ number_format($difference, 2) }}
+                                                @else
+                                                    -
+                                                @endif
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         <td>
                                             @if($repayment->status == 'paid')
                                                 <span class="badge bg-success">Paid</span>
@@ -150,6 +179,22 @@
                 </div>
             @endforeach
 
+            <!-- Cumulative Surplus Display -->
+            @php
+                $totalSurplus = 0;
+                if (isset($loan)) {
+                    $totalSurplus = $loan->repayments->sum('difference_amount');
+                }
+            @endphp
+            @if($totalSurplus > 0)
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-info-circle"></i> Cumulative Surplus:
+                        <span class="text-success font-weight-bold">CDF {{ number_format($totalSurplus, 2) }}</span>
+                    </h6>
+                    <small class="text-muted">The surplus will be refunded or transferred to savings at loan closure.</small>
+                </div>
+            @endif
+
             <!-- Payment Form -->
             <div class="card mt-4 border-primary">
                 <div class="card-header bg-primary text-white">
@@ -162,23 +207,35 @@
                         <input type="hidden" name="loan_id" id="selected_loan_id" value="">
                         <div id="selectedRepayments"></div>
 
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Selected Installments</label>
-                                    <div class="form-control bg-light" id="selectedCount">0</div>
+                                    <div class="form-control bg-light font-weight-bold" id="selectedCount">0</div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Total Amount Due</label>
-                                    <div class="form-control bg-light font-weight-bold" id="totalAmount">0.00</div>
+                                    <label>Total Theoretical Due</label>
+                                    <div class="form-control bg-light font-weight-bold text-primary" id="totalTheoreticalAmount">0.00</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Total Adjusted Due</label>
+                                    <div class="form-control bg-light font-weight-bold" id="totalAdjustedAmount">0.00</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Total Difference</label>
+                                    <div class="form-control bg-light font-weight-bold text-info" id="totalDifferenceAmount">0.00</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="amount">Payment Amount *</label>
                                     <div class="input-group">
@@ -195,7 +252,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="payment_method">Payment Method *</label>
                                     <select name="payment_method" id="payment_method" class="form-control form-control-lg" required>
@@ -208,7 +265,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="reference_number">Reference Number (Optional)</label>
@@ -263,14 +320,49 @@ $(document).ready(function() {
     let selectedRepayments = new Map();
     let selectedLoanId = null;
 
+    // Handle adjusted amount input changes
+    $(document).on('change', '.adjusted-amount-input', function() {
+        const repaymentId = $(this).data('repayment-id');
+        const theoreticalAmount = parseFloat($(this).closest('tr').find('input.repayment-checkbox').data('theoretical'));
+        const adjustedAmount = parseFloat($(this).val()) || 0;
+
+        // Update the difference display
+        const difference = adjustedAmount - theoreticalAmount;
+        const diffCell = $(this).closest('tr').find('td:nth-child(8)');
+
+        if (difference > 0) {
+            diffCell.html('<i class="fas fa-arrow-up text-success"></i> CDF ' + difference.toFixed(2));
+            diffCell.removeClass('text-danger').addClass('text-success');
+        } else if (difference < 0) {
+            diffCell.html('<i class="fas fa-arrow-down text-danger"></i> CDF ' + Math.abs(difference).toFixed(2));
+            diffCell.removeClass('text-success').addClass('text-danger');
+        } else {
+            diffCell.html('-');
+            diffCell.removeClass('text-success text-danger');
+        }
+
+        // Update the checkbox data-amount to use adjusted amount
+        $(this).closest('tr').find('input.repayment-checkbox').data('amount', adjustedAmount.toFixed(2));
+        $(this).closest('tr').find('input.repayment-checkbox').data('adjusted', adjustedAmount.toFixed(2));
+
+        // Recalculate totals if this repayment is selected
+        if (selectedRepayments.has(repaymentId)) {
+            selectedRepayments.set(repaymentId, {
+                ...selectedRepayments.get(repaymentId),
+                amount: adjustedAmount
+            });
+            updateTotals();
+        }
+    });
+
     // Handle checkbox changes
-    $('.repayment-checkbox').change(function() {
+    $(document).on('change', '.repayment-checkbox', function() {
         const repaymentId = $(this).val();
         const amount = parseFloat($(this).data('amount'));
+        const theoreticalAmount = parseFloat($(this).data('theoretical'));
         const loanId = $(this).data('loan');
 
         if ($(this).is(':checked')) {
-            // Check if this repayment belongs to the same loan as already selected ones
             if (selectedRepayments.size > 0 && selectedLoanId && selectedLoanId !== loanId) {
                 alert('You can only select repayments from one loan at a time.');
                 $(this).prop('checked', false);
@@ -280,16 +372,15 @@ $(document).ready(function() {
             selectedRepayments.set(repaymentId, {
                 id: repaymentId,
                 amount: parseFloat(amount.toFixed(2)),
+                theoreticalAmount: theoreticalAmount,
                 loanId: loanId
             });
 
-            // Set the loan ID
             selectedLoanId = loanId;
             $('#selected_loan_id').val(loanId);
         } else {
             selectedRepayments.delete(repaymentId);
 
-            // If no repayments selected, clear the loan ID
             if (selectedRepayments.size === 0) {
                 selectedLoanId = null;
                 $('#selected_loan_id').val('');
@@ -301,7 +392,7 @@ $(document).ready(function() {
     });
 
     // Select all per loan
-    $('.select-all').change(function() {
+    $(document).on('change', '.select-all', function() {
         const loanId = $(this).data('loan');
         const isChecked = $(this).is(':checked');
 
@@ -320,25 +411,28 @@ $(document).ready(function() {
         });
 
         $('#selectedCount').text(selectedRepayments.size);
-
-        // Enable/disable submit button based on selection
         $('#submitBtn').prop('disabled', selectedRepayments.size === 0);
-
-        // Also disable if amount is invalid
         validateAmount();
     }
 
     // Update totals
     function updateTotals() {
-        let total = 0;
+        let totalTheoretical = 0;
+        let totalAdjusted = 0;
+        let totalDifference = 0;
+
         selectedRepayments.forEach((value) => {
-            total = parseFloat((total + value.amount).toFixed(2));
+            totalTheoretical = parseFloat((totalTheoretical + value.theoreticalAmount).toFixed(2));
+            totalAdjusted = parseFloat((totalAdjusted + value.amount).toFixed(2));
+            totalDifference = parseFloat((totalDifference + (value.amount - value.theoreticalAmount)).toFixed(2));
         });
 
-        $('#totalAmount').text(total.toFixed(2));
-        $('#amount').attr('max', total.toFixed(2));
+        $('#totalTheoreticalAmount').text(totalTheoretical.toFixed(2));
+        $('#totalAdjustedAmount').text(totalAdjusted.toFixed(2));
+        $('#totalDifferenceAmount').text(totalDifference.toFixed(2));
+        $('#totalAmount').text(totalAdjusted.toFixed(2));
+        $('#amount').attr('max', totalAdjusted.toFixed(2));
 
-        // Re-validate amount when totals change
         validateAmount();
     }
 
@@ -400,12 +494,30 @@ $(document).ready(function() {
             return false;
         }
 
+        // Add adjusted amounts to form data
+        const adjustedAmounts = {};
+        $('.adjusted-amount-input').each(function() {
+            const repaymentId = $(this).data('repayment-id');
+            const theoreticalAmount = parseFloat($(this).closest('tr').find('input.repayment-checkbox').data('theoretical'));
+            const adjustedAmount = parseFloat($(this).val()) || 0;
+
+            if (adjustedAmount > 0 && adjustedAmount != theoreticalAmount) {
+                adjustedAmounts[repaymentId] = adjustedAmount;
+            }
+        });
+
+        // Remove any existing adjusted_amounts inputs
+        $('input[name^="adjusted_amounts"]').remove();
+
+        // Add adjusted amounts as hidden inputs
+        Object.keys(adjustedAmounts).forEach(function(key) {
+            $('#paymentForm').append(`<input type="hidden" name="adjusted_amounts[${key}]" value="${adjustedAmounts[key]}">`);
+        });
+
         return true;
     });
 
-    // Function to refresh member summary (placeholder)
     window.refreshMemberSummary = function(memberId) {
-        // You can implement this if needed
         location.reload();
     };
 });

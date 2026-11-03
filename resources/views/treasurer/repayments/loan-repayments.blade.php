@@ -147,9 +147,11 @@
                         <tr>
                             <th>#</th>
                             <th>Due Date</th>
-                            <th>Amount Due</th>
+                            <th>Theoretical Amount</th>
+                            <th>Adjusted Amount</th>
                             <th>Amount Paid</th>
                             <th>Balance</th>
+                            <th>Difference</th>
                             <th>Status</th>
                             <th>Paid Date</th>
                             <th>Receipt</th>
@@ -157,6 +159,18 @@
                     </thead>
                     <tbody>
                         @foreach($loan->repayments as $repayment)
+                            @php
+                                $effectiveDue = $repayment->effective_amount_due;
+                                $balance = $effectiveDue - $repayment->amount_paid;
+                                $difference = $repayment->difference_amount;
+                                $differenceClass = $repayment->difference_type === 'surplus' ? 'text-success' : ($repayment->difference_type === 'shortfall' ? 'text-danger' : '');
+                                $statusColors = [
+                                    'pending' => 'secondary',
+                                    'partial' => 'info',
+                                    'paid' => 'success',
+                                    'overdue' => 'danger'
+                                ];
+                            @endphp
                         <tr class="{{ $repayment->due_date < now() && $repayment->status != 'paid' ? 'table-danger' : '' }}">
                             <td>{{ $repayment->installment_number }}</td>
                             <td>
@@ -166,19 +180,31 @@
                                 @endif
                             </td>
                             <td class="text-right">CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                            <td class="text-right">
+                                @if($repayment->has_adjustment)
+                                    <span class="font-weight-bold">CDF {{ number_format($repayment->adjusted_amount, 2) }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td class="text-right">CDF {{ number_format($repayment->amount_paid, 2) }}</td>
                             <td class="text-right">
-                                <strong>CDF {{ number_format($repayment->amount_due - $repayment->amount_paid, 2) }}</strong>
+                                <strong>CDF {{ number_format($balance, 2) }}</strong>
+                            </td>
+                            <td class="{{ $differenceClass }} text-right font-weight-bold">
+                                @if($repayment->has_adjustment)
+                                    @if($repayment->difference_type === 'surplus')
+                                        <i class="fas fa-arrow-up"></i> CDF {{ number_format($difference, 2) }}
+                                    @elseif($repayment->difference_type === 'shortfall')
+                                        <i class="fas fa-arrow-down"></i> CDF {{ number_format($difference, 2) }}
+                                    @else
+                                        -
+                                    @endif
+                                @else
+                                    -
+                                @endif
                             </td>
                             <td>
-                                @php
-                                    $statusColors = [
-                                        'pending' => 'secondary',
-                                        'partial' => 'info',
-                                        'paid' => 'success',
-                                        'overdue' => 'danger'
-                                    ];
-                                @endphp
                                 <span class="badge badge-{{ $statusColors[$repayment->status] ?? 'secondary' }} p-2">
                                     {{ translate_status($repayment->status) }}
                                 </span>
@@ -198,5 +224,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Cumulative Surplus Summary -->
+    @php
+        $totalSurplus = $loan->repayments->sum('difference_amount');
+    @endphp
+    @if($totalSurplus != 0)
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-{{ $totalSurplus > 0 ? 'success' : 'warning' }} text-white">
+            <h6 class="m-0 font-weight-bold">Surplus / Shortfall Summary</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Cumulative Difference: <span class="text-{{ $totalSurplus > 0 ? 'success' : 'danger' }} font-weight-bold">CDF {{ number_format($totalSurplus, 2) }}</span></h5>
+                    <p class="text-muted">
+                        @if($totalSurplus > 0)
+                            Total surplus (overpayment) to be refunded or transferred to savings at loan closure.
+                        @else
+                            Total shortfall (underpayment) to be collected.
+                        @endif
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-right">
+                    @if($totalSurplus > 0)
+                        <span class="badge badge-success p-2">Surplus</span>
+                    @else
+                        <span class="badge badge-danger p-2">Shortfall</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 @endsection
