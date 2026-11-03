@@ -474,7 +474,7 @@
                             <small class="text-muted d-block mt-2">Maximum 10 documents autorisés. Téléchargez des copies claires et lisibles.</small>
 
                             <!-- Document type hints -->
-                            <div class="alert alert-light small p-2 mt-3">
+                            <div class="alert alert-light small p-2 mt-3 permanent-note">
                                 <i class="fas fa-info-circle text-info"></i>
                                 <strong>Documents recommandés :</strong>
                                 <ul class="mb-0 mt-1 pl-3">
