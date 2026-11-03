@@ -992,5 +992,11 @@
     "total_surplus": "Trop-perçu total",
     "adjust_payment": "Ajuster le paiement",
     "round_to": "Arrondir à",
-    "surplus_note": "L'excédent sera remboursé ou basculé en épargne à la fin du prêt"
+    "surplus_note": "L'excédent sera remboursé ou basculé en épargne à la fin du prêt",
+    "late_penalty": "Pénalité de Retard",
+    "apply_late_penalty": "Appliquer une pénalité de retard",
+    "late_penalty_amount": "Montant de la pénalité",
+    "late_penalty_default": "Par défaut : 2 000 CDF",
+    "late_penalty_settings": "Paramètres de Pénalité de Retard",
+    "late_penalty_note": "Montant fixe appliqué par paiement en retard. Par défaut : 2 000 CDF"
 }

@@ -236,6 +236,38 @@
                             <input type="hidden" id="surplus_type" name="surplus_type" value="">
                         </div>
 
+                        <!-- Late Penalty Settings -->
+                        <div class="row mt-3" id="latePenaltyRow" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-dark py-2">
+                                        <h6 class="m-0 font-weight-bold"><i class="fas fa-exclamation-triangle"></i> Paramètres de Pénalité de Retard</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="apply_late_penalty" name="apply_late_penalty" value="1" checked>
+                                                        <label class="custom-control-label" for="apply_late_penalty">
+                                                            <strong>Appliquer une pénalité de retard</strong>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="late_penalty_amount">Montant de la pénalité (CDF)</label>
+                                                    <input type="number" step="0.01" class="form-control" id="late_penalty_amount" name="late_penalty_amount" value="2000" min="0">
+                                                    <small class="text-muted">Montant fixe appliqué par paiement en retard. Par défaut : 2 000 CDF</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Amortization Table -->
                         <div class="table-responsive mt-3" id="amortizationTable" style="display: none;">
                             <table class="table table-sm table-bordered">
@@ -256,7 +288,7 @@
                     </div>
                 </div>
 
-                <!-- Collateral Information -->
+                                <!-- Collateral Information -->
                 <div class="card mb-4">
                     <div class="card-header">
                         <h6 class="m-0 font-weight-bold text-primary">Informations sur la Garantie</h6>
@@ -264,20 +296,20 @@
                     <div class="card-body">
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="has_collateral" name="has_collateral" value="1" {{ old('has_collateral') ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="has_collateral" name="has_collateral" value="1" {{ old('has_collateral', true) ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="has_collateral">
                                     <strong>A une Garantie</strong>
                                 </label>
                             </div>
                         </div>
 
-                        <div id="collateral-fields" style="{{ old('has_collateral') ? '' : 'display: none;' }}">
+                        <div id="collateral-fields" style="{{ old('has_collateral', true) ? '' : 'display: none;' }}">
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="collateral_type">Type de Garantie</label>
+                                        <label for="collateral_type">Type de Garantie <span class="text-danger">*</span></label>
                                         <select class="form-control @error('collateral_type') is-invalid @enderror"
-                                                id="collateral_type" name="collateral_type">
+                                                id="collateral_type" name="collateral_type" required>
                                             <option value="">Sélectionner le type</option>
                                             <option value="land" {{ old('collateral_type') == 'land' ? 'selected' : '' }}>Terrain/Propriété</option>
                                             <option value="vehicle" {{ old('collateral_type') == 'vehicle' ? 'selected' : '' }}>Véhicule</option>
@@ -286,8 +318,6 @@
                                             <option value="savings" {{ old('collateral_type') == 'savings' ? 'selected' : '' }}>Épargne</option>
                                             <option value="other" {{ old('collateral_type') == 'other' ? 'selected' : '' }}>Autre</option>
                                         </select>
-                                </div>
-                            </div>
                                         @error('collateral_type')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -295,9 +325,9 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="collateral_value">Valeur Estimée (CDF)</label>
+                                        <label for="collateral_value">Valeur Estimée (CDF) <span class="text-danger">*</span></label>
                                         <input type="number" step="0.01" class="form-control @error('collateral_value') is-invalid @enderror"
-                                               id="collateral_value" name="collateral_value" value="{{ old('collateral_value') }}">
+                                               id="collateral_value" name="collateral_value" value="{{ old('collateral_value') }}" required min="1">
                                         @error('collateral_value')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -305,9 +335,9 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="collateral_description">Description de la Garantie</label>
+                                        <label for="collateral_description">Description de la Garantie <span class="text-danger">*</span></label>
                                         <textarea class="form-control @error('collateral_description') is-invalid @enderror"
-                                                  id="collateral_description" name="collateral_description" rows="2" placeholder="Fournir une description détaillée de la garantie">{{ old('collateral_description') }}</textarea>
+                                                  id="collateral_description" name="collateral_description" rows="2" placeholder="Fournir une description détaillée de la garantie" required>{{ old('collateral_description') }}</textarea>
                                         @error('collateral_description')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
@@ -317,8 +347,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Guarantors Information (External People) -->
+<!-- Guarantors Information (External People) -->
                 <div class="card mb-4">
                     <div class="card-header">
                         <h6 class="m-0 font-weight-bold text-primary">Informations sur les Garants</h6>
@@ -826,6 +855,14 @@
             calculateSurplus();
         } else {
             adjustedRow.style.display = 'none';
+        }
+
+        // Show/hide late penalty row for daily flat_rate/pato_ndogo
+        const latePenaltyRow = document.getElementById('latePenaltyRow');
+        if ((amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo') && frequency === 'daily') {
+            latePenaltyRow.style.display = 'block';
+        } else {
+            latePenaltyRow.style.display = 'none';
         }
 
         // Update labels based on frequency

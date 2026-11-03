@@ -827,6 +827,38 @@
                         <input type="hidden" id="total_surplus_amount2" name="total_surplus_amount" value="">
                         <input type="hidden" id="surplus_type2" name="surplus_type" value="">
                     </div>
+
+                    <!-- Late Penalty Settings -->
+                    <div class="row mt-3" id="latePenaltyRow2" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark py-2">
+                                    <h6 class="m-0 font-weight-bold"><i class="fas fa-exclamation-triangle"></i> Paramètres de Pénalité de Retard</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="apply_late_penalty2" name="apply_late_penalty" value="1" checked>
+                                                    <label class="custom-control-label" for="apply_late_penalty2">
+                                                        <strong>Appliquer une pénalité de retard</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="late_penalty_amount2">Montant de la pénalité (CDF)</label>
+                                                <input type="number" step="0.01" class="form-control" id="late_penalty_amount2" name="late_penalty_amount" value="2000" min="0">
+                                                <small class="text-muted">Montant fixe appliqué par paiement en retard. Par défaut : 2 000 CDF</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('cancel') }}</button>
@@ -1063,6 +1095,14 @@
                     calculateSurplus2();
                 } else {
                     adjustedRow.style.display = 'none';
+                }
+
+                // Show/hide late penalty row for daily flat_rate/pato_ndogo
+                const latePenaltyRow = document.getElementById('latePenaltyRow2');
+                if ((amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo') && frequency === 'daily') {
+                    latePenaltyRow.style.display = 'block';
+                } else {
+                    latePenaltyRow.style.display = 'none';
                 }
 
                 // Update label based on frequency

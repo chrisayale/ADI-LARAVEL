@@ -621,8 +621,10 @@ class LoanController extends Controller
             'duration_months' => 'nullable|integer|min:1|max:60',
             'duration_value' => 'required|integer|min:1|max:365',
             'repayment_frequency' => 'required|in:daily,weekly,monthly',
-            'amortization_method' => 'required|in:french,flat_rate,constant_capital',
-            'approval_notes' => 'nullable|string|max:500'
+            'amortization_method' => 'required|in:french,flat_rate,constant_capital,pato_ndogo',
+            'approval_notes' => 'nullable|string|max:500',
+            'apply_late_penalty' => 'nullable|boolean',
+            'late_penalty_amount' => 'nullable|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -655,7 +657,9 @@ class LoanController extends Controller
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
                 'first_payment_date' => $calculation['first_payment_date'],
-                'maturity_date' => $calculation['maturity_date']
+                'maturity_date' => $calculation['maturity_date'],
+                'apply_late_penalty' => $request->boolean('apply_late_penalty', true),
+                'late_penalty_amount' => $request->late_penalty_amount ?? 2000
             ]);
 
             // Create repayment schedule

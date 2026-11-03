@@ -40,7 +40,9 @@ class LoanApplication extends Model
         'disbursed_by',
         'disbursed_at',
         'first_payment_date',
-        'maturity_date'
+        'maturity_date',
+        'apply_late_penalty',
+        'late_penalty_amount'
     ];
 
     protected $casts = [
@@ -55,7 +57,9 @@ class LoanApplication extends Model
         'approved_at' => 'datetime',
         'disbursed_at' => 'datetime',
         'first_payment_date' => 'date',
-        'maturity_date' => 'date'
+        'maturity_date' => 'date',
+        'apply_late_penalty' => 'boolean',
+        'late_penalty_amount' => 'decimal:2'
     ];
 
     // Relationships
