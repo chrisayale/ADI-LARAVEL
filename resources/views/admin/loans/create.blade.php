@@ -504,21 +504,13 @@
             </form>
         </div>
 
-        <!-- Form Footer with Submit Buttons -->
-        <div class="card-footer bg-light border-top d-flex justify-content-end py-4">
-            <div class="d-md-none w-100 text-right mb-3">
+        <!-- Form Footer with Submit Buttons (Mobile only - hidden on desktop where sticky footer shows) -->
+        <div class="card-footer bg-light border-top d-flex justify-content-end py-4 d-md-none">
+            <div class="w-100 text-right">
                 <button type="submit" form="loan-form" class="btn btn-primary">
                     <i class="fas fa-save"></i> Soumettre la Demande
                 </button>
                 <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary ml-2">Annuler</a>
-            </div>
-            <div class="d-none d-md-flex">
-                <button type="submit" form="loan-form" class="btn btn-primary btn-lg px-5">
-                    <i class="fas fa-save"></i> Soumettre la Demande
-                </button>
-                <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary btn-lg px-4 ml-2">
-                    Annuler
-                </a>
             </div>
         </div>
     </div>
