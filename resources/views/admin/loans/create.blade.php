@@ -42,11 +42,6 @@
         padding-bottom: 120px;
     }
 
-    /* Card body extra padding to ensure buttons don't overlap with app footer */
-    .card-body form {
-        padding-bottom: 3rem;
-    }
-
     @media (max-width: 767.98px) {
         .sticky-footer {
             display: none;
@@ -432,8 +427,6 @@
                                                 <option value="application_form">Formulaire de Demande</option>
                                                 <option value="other">Autre</option>
                                             </select>
-                                </div>
-                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -445,8 +438,6 @@
                                                     <option value="guarantor_{{ $i }}">Garant {{ $i + 1 }}</option>
                                                 @endfor
                                             </select>
-                                </div>
-                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -475,22 +466,25 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-sm btn-primary" id="add-document">
-                            <i class="fas fa-plus"></i> Ajouter un Autre Document
-                        </button>
-                        <small class="text-muted d-block mt-2">Maximum 10 documents autorisés. Téléchargez des copies claires et lisibles.</small>
+                        <!-- Document Actions & Hints -->
+                        <div class="mt-4 pt-3 border-top">
+                            <button type="button" class="btn btn-sm btn-primary" id="add-document">
+                                <i class="fas fa-plus"></i> Ajouter un Autre Document
+                            </button>
+                            <small class="text-muted d-block mt-2">Maximum 10 documents autorisés. Téléchargez des copies claires et lisibles.</small>
 
-                        <!-- Document type hints -->
-                        <div class="alert alert-light small p-2 mt-3">
-                            <i class="fas fa-info-circle text-info"></i>
-                            <strong>Documents recommandés :</strong>
-                            <ul class="mb-0 mt-1 pl-3">
-                                <li>Copies des pièces d'identité des garants (liées au garant spécifique)</li>
-                                <li>Photos/documents de la garantie</li>
-                                <li>Preuves de revenu (bulletins de paie, relevés bancaires)</li>
-                                <li>Relevés bancaires (3-6 derniers mois)</li>
-                                <li>Formulaire de demande complété</li>
-                            </ul>
+                            <!-- Document type hints -->
+                            <div class="alert alert-light small p-2 mt-3">
+                                <i class="fas fa-info-circle text-info"></i>
+                                <strong>Documents recommandés :</strong>
+                                <ul class="mb-0 mt-1 pl-3">
+                                    <li>Copies des pièces d'identité des garants (liées au garant spécifique)</li>
+                                    <li>Photos/documents de la garantie</li>
+                                    <li>Preuves de revenu (bulletins de paie, relevés bancaires)</li>
+                                    <li>Relevés bancaires (3-6 derniers mois)</li>
+                                    <li>Formulaire de demande complété</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -507,15 +501,25 @@
                         <li>Cette demande sera en attente jusqu'à ce qu'elle soit assignée à un trésorier pour vérification</li>
                     </ul>
                 </div>
-
-                <!-- Form Action Buttons - Inline (visible on mobile, hidden on desktop where sticky footer shows) -->
-                <div class="form-group mb-5 d-md-none text-right">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Soumettre la Demande
-                    </button>
-                    <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary ml-2">Annuler</a>
-                </div>
             </form>
+        </div>
+
+        <!-- Form Footer with Submit Buttons -->
+        <div class="card-footer bg-light border-top d-flex justify-content-end py-4">
+            <div class="d-md-none w-100 text-right mb-3">
+                <button type="submit" form="loan-form" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Soumettre la Demande
+                </button>
+                <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary ml-2">Annuler</a>
+            </div>
+            <div class="d-none d-md-flex">
+                <button type="submit" form="loan-form" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-save"></i> Soumettre la Demande
+                </button>
+                <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary btn-lg px-4 ml-2">
+                    Annuler
+                </a>
+            </div>
         </div>
     </div>
 </div>
