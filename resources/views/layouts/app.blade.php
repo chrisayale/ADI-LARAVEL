@@ -457,9 +457,9 @@
             }
         });
 
-        // Auto-dismiss alerts
+        // Auto-dismiss alerts (excluding permanent notes)
         setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
+            const alerts = document.querySelectorAll('.alert:not(.permanent-note)');
             alerts.forEach(function(alert) {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();

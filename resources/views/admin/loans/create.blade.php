@@ -490,7 +490,7 @@
                 </div>
 
                 <!-- Important Notes -->
-                <div class="alert alert-info">
+                <div class="alert alert-info permanent-note">
                     <i class="fas fa-info-circle"></i>
                     <strong>Note sur le Traitement du Prêt :</strong>
                     <ul class="mb-0 mt-2">
