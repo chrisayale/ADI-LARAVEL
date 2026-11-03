@@ -353,9 +353,9 @@ class LoanController extends Controller
             'amount_applied' => 'required|numeric|min:1|max:10000000',
             'purpose' => 'required|string|max:1000',
             'has_collateral' => 'boolean',
-            'collateral_type' => 'required_if:has_collateral,true|string|max:100',
-            'collateral_description' => 'required_if:has_collateral,true|string',
-            'collateral_value' => 'required_if:has_collateral,true|numeric|min:1',
+            'collateral_type' => 'nullable|string|max:100',
+            'collateral_description' => 'nullable|string',
+            'collateral_value' => 'nullable|numeric|min:0',
             'guarantors' => 'required|array|min:1|max:3',
             'guarantors.*.name' => 'required|string|max:255',
             'guarantors.*.phone' => 'required|string|max:20',
@@ -397,6 +397,12 @@ class LoanController extends Controller
             $member = User::find($request->user_id);
             $saccoId = $member?->sacco_id ?? $sacco->id;
 
+            // Determine collateral values based on checkbox
+            $hasCollateral = $request->boolean('has_collateral');
+            $collateralType = $hasCollateral ? $request->collateral_type : 'N/A';
+            $collateralDescription = $hasCollateral ? $request->collateral_description : 'Aucune garantie';
+            $collateralValue = $hasCollateral ? $request->collateral_value : 0;
+
             // Create loan application
             $loan = LoanApplication::create([
                 'user_id' => $request->user_id,
@@ -404,10 +410,10 @@ class LoanController extends Controller
                 'application_number' => 'LN-' . date('Y') . '-' . str_pad(LoanApplication::max('id') + 1, 5, '0', STR_PAD_LEFT),
                 'amount_applied' => $request->amount_applied,
                 'purpose' => $request->purpose,
-                'has_collateral' => $request->has_collateral ?? false,
-                'collateral_type' => $request->collateral_type,
-                'collateral_description' => $request->collateral_description,
-                'collateral_value' => $request->collateral_value,
+                'has_collateral' => $hasCollateral,
+                'collateral_type' => $collateralType,
+                'collateral_description' => $collateralDescription,
+                'collateral_value' => $collateralValue,
                 'status' => 'pending',
                 'created_by' => auth()->id()
             ]);
