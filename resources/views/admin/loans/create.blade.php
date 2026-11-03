@@ -591,7 +591,21 @@
 
     // Toggle collateral fields
     document.getElementById('has_collateral').addEventListener('change', function() {
-        document.getElementById('collateral-fields').style.display = this.checked ? 'block' : 'none';
+        const collateralFields = document.getElementById('collateral-fields');
+        const isChecked = this.checked;
+
+        // Show/hide the fields container
+        collateralFields.style.display = isChecked ? 'block' : 'none';
+
+        // Toggle required attribute on all collateral form controls
+        const collateralInputs = collateralFields.querySelectorAll('input, select, textarea');
+        collateralInputs.forEach(function(input) {
+            if (isChecked) {
+                input.setAttribute('required', 'required');
+            } else {
+                input.removeAttribute('required');
+            }
+        });
     });
 
     // Guarantor management
