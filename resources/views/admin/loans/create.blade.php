@@ -2,6 +2,58 @@
 
 @section('title', 'Créer une Demande de Prêt')
 
+@section('styles')
+<style>
+    /* Sticky Footer Styles */
+    .sticky-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 20%);
+        padding: 1rem 1.5rem;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+        border-top: 1px solid #e3e6f0;
+    }
+
+    .sticky-footer .btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .sticky-footer .btn-primary {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+    }
+
+    .sticky-footer .btn-primary:hover {
+        background: linear-gradient(135deg, #2e59d9 0%, #1a3c9e 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(78, 115, 223, 0.4);
+    }
+
+    .sticky-footer .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+    }
+
+    /* Ensure form has bottom padding to not be hidden behind sticky footer */
+    #loan-form {
+        padding-bottom: 100px;
+    }
+
+    @media (max-width: 767.98px) {
+        .sticky-footer {
+            display: none;
+        }
+
+        #loan-form {
+            padding-bottom: 20px;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
@@ -27,7 +79,7 @@
             <h6 class="m-0 font-weight-bold text-primary">Formulaire de Demande de Prêt</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.loans.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.loans.store') }}" method="POST" enctype="multipart/form-data" id="loan-form">
                 @csrf
 
                 <!-- Member Selection -->
@@ -453,13 +505,29 @@
 
                 <hr>
 
-                <div class="form-group mb-0">
+                <div class="form-group mb-5">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Soumettre la Demande
                     </button>
                     <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary">Annuler</a>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sticky Footer for Submit Button -->
+<div class="sticky-footer d-none d-md-block">
+    <div class="container-fluid">
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <button type="submit" form="loan-form" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-save"></i> Soumettre la Demande
+                </button>
+                <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary btn-lg px-4 ml-2">
+                    Annuler
+                </a>
+            </div>
         </div>
     </div>
 </div>
