@@ -407,7 +407,6 @@ class LoanController extends Controller
             $loan = LoanApplication::create([
                 'user_id' => $request->user_id,
                 'sacco_id' => $saccoId,
-                'application_number' => 'LN-' . date('Y') . '-' . str_pad(LoanApplication::max('id') + 1, 5, '0', STR_PAD_LEFT),
                 'amount_applied' => $request->amount_applied,
                 'purpose' => $request->purpose,
                 'has_collateral' => $hasCollateral,

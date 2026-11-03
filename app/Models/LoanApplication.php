@@ -538,7 +538,26 @@ private function createRepaymentSchedule()
         parent::boot();
 
         static::creating(function ($loan) {
-            $loan->application_number = 'LN-' . date('Y') . '-' . str_pad(static::max('id') + 1, 5, '0', STR_PAD_LEFT);
+            if (empty($loan->application_number)) {
+                // Use a reliable atomic counter approach
+                $year = date('Y');
+                $prefix = "LN-{$year}-";
+
+                // Get the last application number for this year and increment
+                $lastLoan = static::where('application_number', 'like', $prefix . '%')
+                    ->orderBy('id', 'desc')
+                    ->first();
+
+                if ($lastLoan) {
+                    // Extract the sequence number from the last application_number
+                    $lastNumber = (int) substr($lastLoan->application_number, strlen($prefix));
+                    $nextNumber = $lastNumber + 1;
+                } else {
+                    $nextNumber = 1;
+                }
+
+                $loan->application_number = $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            }
         });
     }
 
