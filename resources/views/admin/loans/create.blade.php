@@ -862,9 +862,12 @@
                         principalPayment = amount / periods;
                         interestPayment = totalInterest / periods;
                     } else {
+                        // Regular flat rate (weekly/monthly) - constant principal and interest
                         principalPayment = amount / periods;
                         interestPayment = amount * periodicRate;
                     }
+                    // Decrement remaining balance for flat rate methods
+                    remainingBalance -= principalPayment;
                     break;
 
                 case 'constant_capital':
