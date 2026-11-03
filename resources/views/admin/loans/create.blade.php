@@ -213,6 +213,29 @@
                             </div>
                         </div>
 
+                        <!-- Adjusted Amount Field (Pato Ndogo only) -->
+                        <div class="row mt-3" id="adjustedAmountRow" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adjusted_daily_amount">Montant ajusté / Arrondi (CDF) <span class="text-info">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" id="adjusted_daily_amount"
+                                           name="adjusted_daily_amount" placeholder="Entrez le montant journalier arrondi" min="1">
+                                    <small class="text-muted">Modifiez le montant journalier théorique pour un arrondi pratique. L'écart sera suivi comme surplus/manquant.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="surplus_amount">Écart (Surplus / Manquant)</label>
+                                    <input type="text" class="form-control" id="surplus_amount" readonly>
+                                    <small class="text-muted" id="surplus_description"></small>
+                                </div>
+                            </div>
+                            <!-- Hidden fields for form submission -->
+                            <input type="hidden" id="theoretical_daily_amount" name="theoretical_daily_amount" value="">
+                            <input type="hidden" id="total_surplus_amount" name="total_surplus_amount" value="">
+                            <input type="hidden" id="surplus_type" name="surplus_type" value="">
+                        </div>
+
                         <!-- Amortization Table -->
                         <div class="table-responsive mt-3" id="amortizationTable" style="display: none;">
                             <table class="table table-sm table-bordered">
@@ -673,6 +696,8 @@
     });
 
     // Loan Calculator Function with real-time validation
+    let calculatedPeriodicPayment = 0; // Store for adjusted amount calculation
+
     document.getElementById('calculateLoan').addEventListener('click', function() {
         const amount = parseFloat(document.getElementById('amount_applied').value);
         const interestRate = parseFloat(document.getElementById('preview_interest_rate').value);
@@ -788,6 +813,21 @@
                 break;
         }
 
+        // Store calculated periodic payment for adjusted amount feature
+        calculatedPeriodicPayment = periodicPayment;
+
+        // Show/hide adjusted amount row for Pato Ndogo daily
+        const adjustedRow = document.getElementById('adjustedAmountRow');
+        if (amortizationMethod === 'pato_ndogo' && frequency === 'daily') {
+            adjustedRow.style.display = 'flex';
+            // Pre-fill with calculated amount
+            document.getElementById('adjusted_daily_amount').value = periodicPayment.toFixed(2);
+            // Trigger surplus calculation
+            calculateSurplus();
+        } else {
+            adjustedRow.style.display = 'none';
+        }
+
         // Update labels based on frequency
         const frequencyLabels = {
             'daily': { payment: 'Paiement Quotidien', period: 'jour' },
@@ -874,6 +914,53 @@
         document.getElementById('amortizationBody').innerHTML = schedule;
         document.getElementById('amortizationTable').style.display = 'block';
     });
+
+    // Surplus/Shortfall calculation for adjusted amount
+    function calculateSurplus() {
+        const theoreticalAmount = calculatedPeriodicPayment;
+        const adjustedAmount = parseFloat(document.getElementById('adjusted_daily_amount').value) || 0;
+        const surplusInput = document.getElementById('surplus_amount');
+        const surplusDesc = document.getElementById('surplus_description');
+
+        if (adjustedAmount > 0) {
+            const duration = parseInt(document.getElementById('preview_duration').value) || 1;
+            const difference = (adjustedAmount - theoreticalAmount) * duration;
+            const absDiff = Math.abs(difference);
+
+            if (difference > 0) {
+                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Surplus total)';
+                surplusInput.className = 'form-control text-success';
+                surplusDesc.textContent = 'Surplus total à rembourser au membre ou transférer à l\'épargne à la clôture';
+                surplusDesc.className = 'text-success';
+                document.getElementById('surplus_type').value = 'surplus';
+            } else if (difference < 0) {
+                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Manquant total)';
+                surplusInput.className = 'form-control text-danger';
+                surplusDesc.textContent = 'Manquant total à collecter du membre à la clôture';
+                surplusDesc.className = 'text-danger';
+                document.getElementById('surplus_type').value = 'shortfall';
+            } else {
+                surplusInput.value = 'CDF 0 (Équilibré)';
+                surplusInput.className = 'form-control text-info';
+                surplusDesc.textContent = 'Montant ajusté équivaut au montant théorique';
+                surplusDesc.className = 'text-info';
+                document.getElementById('surplus_type').value = 'none';
+            }
+
+            // Populate hidden fields for form submission
+            document.getElementById('theoretical_daily_amount').value = theoreticalAmount.toFixed(2);
+            document.getElementById('total_surplus_amount').value = absDiff.toFixed(2);
+        } else {
+            surplusInput.value = '';
+            surplusDesc.textContent = '';
+            document.getElementById('surplus_type').value = '';
+            document.getElementById('theoretical_daily_amount').value = '';
+            document.getElementById('total_surplus_amount').value = '';
+        }
+    }
+
+    // Event listener for adjusted amount input
+    document.getElementById('adjusted_daily_amount').addEventListener('input', calculateSurplus);
 
     // Helper function to get week number
     function getWeekNumber(date) {
