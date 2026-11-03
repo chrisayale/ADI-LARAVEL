@@ -39,7 +39,12 @@
 
     /* Ensure form has bottom padding to not be hidden behind sticky footer */
     #loan-form {
-        padding-bottom: 100px;
+        padding-bottom: 120px;
+    }
+
+    /* Card body extra padding to ensure buttons don't overlap with app footer */
+    .card-body form {
+        padding-bottom: 3rem;
     }
 
     @media (max-width: 767.98px) {
@@ -503,20 +508,19 @@
                     </ul>
                 </div>
 
-                <hr>
-
-                <div class="form-group mb-5">
+                <!-- Form Action Buttons - Inline (visible on mobile, hidden on desktop where sticky footer shows) -->
+                <div class="form-group mb-5 d-md-none text-right">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Soumettre la Demande
                     </button>
-                    <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary">Annuler</a>
+                    <a href="{{ route('admin.loans.index') }}" class="btn btn-secondary ml-2">Annuler</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Sticky Footer for Submit Button -->
+<!-- Sticky Footer for Submit Button (Desktop only) -->
 <div class="sticky-footer d-none d-md-block">
     <div class="container-fluid">
         <div class="row justify-content-end">
