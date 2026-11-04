@@ -540,14 +540,26 @@ private function createRepaymentSchedule()
         static::creating(function ($model) {
             if (empty($model->application_number)) {
                 $year = date('Y');
-                // Trouve le dernier enregistrement de l'année pour incrémenter correctement
-                $latest = self::where('application_number', 'like', "LN-{$year}-%")->latest('id')->first();
+                // Recherche le dernier numéro de l'année en cours
+                $latest = self::where('application_number', 'like', "LN-{$year}-%")
+                    ->orderBy('id', 'desc')
+                    ->first();
 
                 $nextNumber = 1;
                 if ($latest && preg_match('/-(\d+)$/', $latest->application_number, $matches)) {
                     $nextNumber = intval($matches[1]) + 1;
                 }
-                $model->application_number = 'LN-' . $year . '-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
+                // Boucle de sécurité pour s'assurer que le numéro n'existe pas déjà
+                do {
+                    $applicationNumber = 'LN-' . $year . '-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+                    $exists = self::where('application_number', $applicationNumber)->exists();
+                    if ($exists) {
+                        $nextNumber++;
+                    }
+                } while ($exists);
+
+                $model->application_number = $applicationNumber;
             }
         });
     }
