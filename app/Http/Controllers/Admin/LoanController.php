@@ -381,6 +381,10 @@ class LoanController extends Controller
         try {
             DB::beginTransaction();
 
+            // Ensure application_number is never passed from request - let model generate it
+            $validatedData = $validator->validated();
+            unset($validatedData['application_number']);
+
             // Get or create the default SACCO "KANZANZA FINANCE"
             $sacco = Sacco::firstOrCreate(
                 ['name' => 'KANZANZA FINANCE'],
