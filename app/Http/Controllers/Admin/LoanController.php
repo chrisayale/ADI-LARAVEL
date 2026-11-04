@@ -382,8 +382,8 @@ class LoanController extends Controller
             DB::beginTransaction();
 
             // Ensure application_number is never passed from request - let model generate it
-            $validatedData = $validator->validated();
-            unset($validatedData['application_number']);
+            $data = $request->validated();
+            unset($data['application_number']);
 
             // Get or create the default SACCO "KANZANZA FINANCE"
             $sacco = Sacco::firstOrCreate(
@@ -407,12 +407,9 @@ class LoanController extends Controller
             $collateralDescription = $hasCollateral ? $request->collateral_description : 'Aucune garantie';
             $collateralValue = $hasCollateral ? $request->collateral_value : 0;
 
-            // Create loan application
-            $loan = LoanApplication::create([
-                'user_id' => $request->user_id,
+            // Merge validated data with computed fields
+            $data = array_merge($data, [
                 'sacco_id' => $saccoId,
-                'amount_applied' => $request->amount_applied,
-                'purpose' => $request->purpose,
                 'has_collateral' => $hasCollateral,
                 'collateral_type' => $collateralType,
                 'collateral_description' => $collateralDescription,
@@ -420,6 +417,9 @@ class LoanController extends Controller
                 'status' => 'pending',
                 'created_by' => auth()->id()
             ]);
+
+            // Create loan application
+            $loan = LoanApplication::create($data);
 
             // Add external guarantors
             $guarantorIds = [];

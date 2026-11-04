@@ -57,6 +57,10 @@ class LoanApplicationController extends Controller
         DB::beginTransaction();
 
         try {
+            // Ensure application_number is never passed from request - let model generate it
+            $data = $request->validated();
+            unset($data['application_number']);
+
             // Get or create the default SACCO "KANZANZA FINANCE"
             $sacco = Sacco::firstOrCreate(
                 ['name' => 'KANZANZA FINANCE'],
@@ -72,18 +76,25 @@ class LoanApplicationController extends Controller
             // Determine sacco_id: use user's sacco_id if available, otherwise use default SACCO
             $saccoId = auth()->user()->sacco_id ?? $sacco->id;
 
-            // Create loan application
-            $loan = LoanApplication::create([
+            // Determine collateral values based on checkbox
+            $hasCollateral = $request->boolean('has_collateral');
+            $collateralType = $hasCollateral ? $request->collateral_type : 'N/A';
+            $collateralDescription = $hasCollateral ? $request->collateral_description : 'Aucune garantie';
+            $collateralValue = $hasCollateral ? $request->collateral_value : 0;
+
+            // Merge validated data with computed fields
+            $data = array_merge($data, [
                 'user_id' => auth()->id(),
                 'sacco_id' => $saccoId,
-                'amount_applied' => $request->amount_applied,
-                'purpose' => $request->purpose,
-                'has_collateral' => $request->has_collateral ?? false,
-                'collateral_type' => $request->collateral_type,
-                'collateral_description' => $request->collateral_description,
-                'collateral_value' => $request->collateral_value,
+                'has_collateral' => $hasCollateral,
+                'collateral_type' => $collateralType,
+                'collateral_description' => $collateralDescription,
+                'collateral_value' => $collateralValue,
                 'status' => 'pending'
             ]);
+
+            // Create loan application
+            $loan = LoanApplication::create($data);
 
             // Add guarantors
             foreach ($request->guarantors as $guarantorData) {
