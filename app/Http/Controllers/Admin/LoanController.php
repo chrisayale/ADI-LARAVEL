@@ -352,6 +352,9 @@ class LoanController extends Controller
             $data = $request->validated();
             unset($data['application_number']);
 
+            // Ensure user_id is present (from form selection for admin)
+            $data['user_id'] = $data['user_id'] ?? $request->input('user_id');
+
             // Get or create the default SACCO "KANZANZA FINANCE"
             $sacco = Sacco::firstOrCreate(
                 ['name' => 'KANZANZA FINANCE'],
@@ -373,6 +376,14 @@ class LoanController extends Controller
             $collateralType = $hasCollateral ? $request->collateral_type : 'N/A';
             $collateralDescription = $hasCollateral ? $request->collateral_description : 'Aucune garantie';
             $collateralValue = $hasCollateral ? $request->collateral_value : 0;
+
+            // Ensure collateral defaults when not checked
+            if (!$hasCollateral) {
+                $data['has_collateral'] = 0;
+                $data['collateral_type'] = 'N/A';
+                $data['collateral_description'] = 'Aucune garantie';
+                $data['collateral_value'] = 0;
+            }
 
             // Merge validated data with computed fields
             $data = array_merge($data, [
