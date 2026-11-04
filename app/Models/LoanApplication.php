@@ -538,29 +538,22 @@ private function createRepaymentSchedule()
         parent::boot();
 
         static::creating(function ($model) {
-            if (empty($model->application_number)) {
-                $year = date('Y');
-                // Recherche le dernier numéro de l'année en cours
-                $latest = self::where('application_number', 'like', "LN-{$year}-%")
-                    ->orderBy('id', 'desc')
-                    ->first();
+            // Force la génération dynamique unique - toujours écraser
+            $year = date('Y');
+            $latest = self::where('application_number', 'like', "LN-{$year}-%")
+                ->orderBy('id', 'desc')
+                ->first();
 
-                $nextNumber = 1;
-                if ($latest && preg_match('/-(\d+)$/', $latest->application_number, $matches)) {
-                    $nextNumber = intval($matches[1]) + 1;
-                }
+            $nextNumber = $latest && preg_match('/-(\d+)$/', $latest->application_number, $matches)
+                ? intval($matches[1]) + 1
+                : 1;
 
-                // Boucle de sécurité pour s'assurer que le numéro n'existe pas déjà
-                do {
-                    $applicationNumber = 'LN-' . $year . '-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-                    $exists = self::where('application_number', $applicationNumber)->exists();
-                    if ($exists) {
-                        $nextNumber++;
-                    }
-                } while ($exists);
+            do {
+                $num = 'LN-' . $year . '-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+                $nextNumber++;
+            } while (self::where('application_number', $num)->exists());
 
-                $model->application_number = $applicationNumber;
-            }
+            $model->application_number = $num;
         });
     }
 
