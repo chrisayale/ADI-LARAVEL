@@ -98,17 +98,109 @@
                                     <th>Date de demande :</th>
                                     <td>{{ $loan->created_at->format('d M Y') }}</td>
                                 </tr>
+                                @if($loan->amount_approved)
+                                <tr>
+                                    <th>Montant approuvé :</th>
+                                    <td><strong class="text-success">CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
+                                </tr>
+                                @endif
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless">
                                 <tr>
-                                    <th>Avec garantie :</th>
+                                    <th>Fréquence de remboursement :</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->repayment_frequency == 'daily')
+                                                Quotidien
+                                            @elseif($loan->repayment_frequency == 'weekly')
+                                                Hebdomadaire
+                                            @else
+                                                Mensuel
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Durée :</th>
+                                    <td>
+                                        @if($loan->duration_value)
+                                            {{ $loan->duration_value }}
+                                            @if($loan->repayment_frequency == 'daily')
+                                                jour(s)
+                                            @elseif($loan->repayment_frequency == 'weekly')
+                                                semaine(s)
+                                            @else
+                                                mois
+                                            @endif
+                                        @elseif($loan->duration_months)
+                                            {{ $loan->duration_months }} mois
+                                        @else
+                                            Non spécifié
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Méthode d'amortissement :</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->amortization_method == 'pato_ndogo')
+                                                Pato Ndogo
+                                            @elseif($loan->amortization_method == 'french')
+                                                Française (Standard)
+                                            @elseif($loan->amortization_method == 'flat_rate')
+                                                Taux fixe
+                                            @elseif($loan->amortization_method == 'constant_capital')
+                                                Capital constant
+                                            @else
+                                                {{ ucfirst($loan->amortization_method) }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                @if($loan->interest_rate)
+                                <tr>
+                                    <th>Taux d'intérêt :</th>
+                                    <td>
+                                        @if($loan->interest_rate_label)
+                                            {{ $loan->interest_rate_label }}
+                                        @else
+                                            {{ number_format($loan->interest_rate, 2) }}% par an
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->monthly_repayment)
+                                <tr>
+                                    <th>Paiement {{ $loan->repayment_frequency == 'daily' ? 'journalier' : ($loan->repayment_frequency == 'weekly' ? 'hebdomadaire' : 'mensuel') }} :</th>
+                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
+                                </tr>
+                                @endif
+                                @if($loan->total_repayable)
+                                <tr>
+                                    <th>Total à rembourser :</th>
+                                    <td><strong>CDF {{ number_format($loan->total_repayable, 2) }}</strong></td>
+                                </tr>
+                                @endif
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Garantie :</th>
                                     <td>
                                         @if($loan->has_collateral)
-                                            <span class="badge badge-success">Oui</span>
+                                            <span class="badge badge-success">Avec garantie</span>
                                         @else
-                                            <span class="badge badge-secondary">Non</span>
+                                            <span class="badge badge-secondary">Sans garantie</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -120,6 +212,22 @@
                                 <tr>
                                     <th>Valeur de la garantie :</th>
                                     <td>CDF {{ number_format($loan->collateral_value, 2) }}</td>
+                                </tr>
+                                @endif
+                                @if($loan->apply_late_penalty !== null)
+                                <tr>
+                                    <th>Pénalité de retard :</th>
+                                    <td>
+                                        <span class="badge badge-{{ $loan->apply_late_penalty ? 'success' : 'secondary' }}">
+                                            {{ $loan->apply_late_penalty ? 'Oui' : 'Non' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->late_penalty_amount)
+                                <tr>
+                                    <th>Montant pénalité :</th>
+                                    <td><strong>CDF {{ number_format($loan->late_penalty_amount, 2) }}</strong></td>
                                 </tr>
                                 @endif
                             </table>

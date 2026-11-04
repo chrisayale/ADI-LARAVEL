@@ -95,33 +95,105 @@
                                     </td>
                                 </tr>
                                 @endif
-                                @if($loan->duration_months)
+                                @if($loan->amortization_method)
                                 <tr>
-                                    <th>Duration:</th>
-                                    <td>{{ $loan->duration_months }} months</td>
+                                    <th>{{ __('amortization_method') }}:</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->amortization_method == 'pato_ndogo')
+                                                {{ __('pato_ndogo_method') }}
+                                            @elseif($loan->amortization_method == 'french')
+                                                {{ __('french_method') }}
+                                            @elseif($loan->amortization_method == 'flat_rate')
+                                                {{ __('flat_rate_method') }}
+                                            @elseif($loan->amortization_method == 'constant_capital')
+                                                {{ __('constant_capital_method') }}
+                                            @else
+                                                {{ ucfirst($loan->amortization_method) }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->repayment_frequency)
+                                <tr>
+                                    <th>{{ __('repayment_frequency') }}:</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->repayment_frequency == 'daily')
+                                                {{ __('daily') }}
+                                            @elseif($loan->repayment_frequency == 'weekly')
+                                                {{ __('weekly') }}
+                                            @else
+                                                {{ __('monthly') }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->duration_value)
+                                <tr>
+                                    <th>{{ __('duration') }}:</th>
+                                    <td>
+                                        {{ $loan->duration_value }}
+                                        @if($loan->repayment_frequency == 'daily')
+                                            {{ __('days') }}
+                                        @elseif($loan->repayment_frequency == 'weekly')
+                                            {{ __('weeks') }}
+                                        @else
+                                            {{ __('months') }}
+                                        @endif
+                                    </td>
+                                </tr>
+                                @elseif($loan->duration_months)
+                                <tr>
+                                    <th>{{ __('duration') }}:</th>
+                                    <td>{{ $loan->duration_months }} {{ __('months') }}</td>
                                 </tr>
                                 @endif
                                 @if($loan->monthly_repayment)
                                 <tr>
-                                    <th>Monthly Repayment:</th>
-                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
+                                    <th>{{ __('periodic_payment') }}:</th>
+                                    <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong>
+                                        @if($loan->repayment_frequency)
+                                            <small class="text-muted ml-2">
+                                                ({{ $loan->repayment_frequency == 'daily' ? __('daily') : ($loan->repayment_frequency == 'weekly' ? __('weekly') : __('monthly')) }})
+                                            </small>
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endif
                                 @if($loan->total_repayable)
                                 <tr>
-                                    <th>Total Repayable:</th>
+                                    <th>{{ __('total_repayable') }}:</th>
                                     <td><strong>CDF {{ number_format($loan->total_repayable, 2) }}</strong></td>
+                                </tr>
+                                @endif
+                                @if($loan->apply_late_penalty !== null)
+                                <tr>
+                                    <th>{{ __('apply_late_penalty') }}:</th>
+                                    <td>
+                                        <span class="badge badge-{{ $loan->apply_late_penalty ? 'success' : 'secondary' }}">
+                                            {{ $loan->apply_late_penalty ? __('yes') : __('no') }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->late_penalty_amount)
+                                <tr>
+                                    <th>{{ __('late_penalty_amount') }}:</th>
+                                    <td><strong>CDF {{ number_format($loan->late_penalty_amount, 2) }}</strong></td>
                                 </tr>
                                 @endif
                                 @if($loan->first_payment_date)
                                 <tr>
-                                    <th>First Payment:</th>
+                                    <th>{{ __('first_payment') }}:</th>
                                     <td>{{ $loan->first_payment_date->format('d M Y') }}</td>
                                 </tr>
                                 @endif
                                 @if($loan->maturity_date)
                                 <tr>
-                                    <th>Maturity Date:</th>
+                                    <th>{{ __('maturity_date') }}:</th>
                                     <td>{{ $loan->maturity_date->format('d M Y') }}</td>
                                 </tr>
                                 @endif
@@ -214,27 +286,39 @@
             @endif
 
             <!-- Collateral Information -->
-            @if($loan->has_collateral)
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Collateral Information</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ __('collateral_information') }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <strong>Type:</strong> {{ ucfirst($loan->collateral_type) }}
+                            <strong>{{ __('collateral_status') }}:</strong>
+                            @if($loan->has_collateral)
+                                <span class="badge badge-success ml-2">{{ __('with_collateral') }}</span>
+                            @else
+                                <span class="badge badge-secondary ml-2">{{ __('without_collateral') }}</span>
+                            @endif
+                        </div>
+                        @if($loan->has_collateral)
+                        <div class="col-md-4">
+                            <strong>{{ __('collateral_type') }}:</strong> {{ ucfirst($loan->collateral_type) }}
                         </div>
                         <div class="col-md-4">
-                            <strong>Value:</strong> CDF {{ number_format($loan->collateral_value, 2) }}
+                            <strong>{{ __('collateral_value') }}:</strong> CDF {{ number_format($loan->collateral_value, 2) }}
                         </div>
-                        <div class="col-md-12 mt-3">
-                            <strong>Description:</strong>
+                        @endif
+                    </div>
+                    @if($loan->has_collateral && $loan->collateral_description)
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <strong>{{ __('collateral_description') }}:</strong>
                             <p class="mb-0">{{ $loan->collateral_description }}</p>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
-            @endif
 
             <!-- Documents -->
             @if($loan->documents && $loan->documents->count() > 0)
