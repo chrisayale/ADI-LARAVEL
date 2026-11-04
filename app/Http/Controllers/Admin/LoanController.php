@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLoanApplicationRequest;
 use App\Models\LoanApplication;
 use App\Models\User;
 use App\Models\LoanRepayment;
@@ -14,7 +15,6 @@ use App\Models\Sacco;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class LoanController extends Controller
 {
@@ -343,41 +343,8 @@ class LoanController extends Controller
     /**
      * Store a newly created loan application.
      */
-   /**
-     * Store a newly created loan application.
-     */
-    public function store(Request $request)
+    public function store(StoreLoanApplicationRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'amount_applied' => 'required|numeric|min:1|max:10000000',
-            'purpose' => 'required|string|max:1000',
-            'has_collateral' => 'boolean',
-            'collateral_type' => 'nullable|string|max:100',
-            'collateral_description' => 'nullable|string',
-            'collateral_value' => 'nullable|numeric|min:0',
-            'guarantors' => 'required|array|min:1|max:3',
-            'guarantors.*.name' => 'required|string|max:255',
-            'guarantors.*.phone' => 'required|string|max:20',
-            'guarantors.*.email' => 'nullable|email|max:255',
-            'guarantors.*.id_number' => 'required|string|max:50',
-            'guarantors.*.occupation' => 'nullable|string|max:100',
-            'guarantors.*.address' => 'nullable|string',
-            'guarantors.*.relationship' => 'nullable|string|max:100',
-            'documents' => 'nullable|array|max:10',
-            'documents.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:15360', // 15MB in KB
-            'document_categories' => 'nullable|array|max:10',
-            'document_categories.*' => 'nullable|string|in:guarantor_id,collateral_photo,collateral_document,proof_of_income,bank_statement,application_form,other',
-            'document_guarantor' => 'nullable|array|max:10',
-            'document_descriptions' => 'nullable|array|max:10',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
             DB::beginTransaction();
 

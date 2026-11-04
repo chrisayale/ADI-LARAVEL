@@ -840,7 +840,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="apply_late_penalty2" name="apply_late_penalty" value="1" checked>
+                                                    <input type="checkbox" class="custom-control-input" id="apply_late_penalty2" name="apply_late_penalty" value="1" {{ old('apply_late_penalty', true) ? 'checked' : '' }}>
                                                     <label class="custom-control-label" for="apply_late_penalty2">
                                                         <strong>Appliquer une pénalité de retard</strong>
                                                     </label>
@@ -850,8 +850,8 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="late_penalty_amount2">Montant de la pénalité (CDF)</label>
-                                                <input type="number" step="0.01" class="form-control" id="late_penalty_amount2" name="late_penalty_amount" value="2000" min="0">
-                                                <small class="text-muted">Montant fixe appliqué par paiement en retard. Par défaut : 2 000 CDF</small>
+                                                <input type="number" step="1" class="form-control" id="late_penalty_amount2" name="late_penalty_amount" value="{{ old('late_penalty_amount', 2000) }}" min="0">
+                                                <small class="text-muted">Montant fixe appliqué par paiement en retard. Par défaut : 2 000 CDF (modifiable manuellement)</small>
                                             </div>
                                         </div>
                                     </div>

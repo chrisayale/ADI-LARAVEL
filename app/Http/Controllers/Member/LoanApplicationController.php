@@ -4,13 +4,12 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLoanApplicationRequest;
 use App\Models\LoanApplication;
 use App\Models\LoanGuarantor;
 use App\Models\LoanDocument;
 use App\Models\Sacco;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
@@ -27,33 +26,8 @@ class LoanApplicationController extends Controller
     /**
      * Store loan application
      */
-    public function store(Request $request)
+    public function store(StoreLoanApplicationRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'amount_applied' => 'required|numeric|min:10000|max:10000000',
-            'purpose' => 'required|string|max:1000',
-            'has_collateral' => 'boolean',
-            'collateral_type' => 'required_if:has_collateral,true|string|max:100',
-            'collateral_description' => 'required_if:has_collateral,true|string',
-            'collateral_value' => 'required_if:has_collateral,true|numeric|min:1',
-            'guarantors' => 'required|array|min:1|max:3',
-            'guarantors.*.name' => 'required|string|max:255',
-            'guarantors.*.phone' => 'required|string|max:20',
-            'guarantors.*.email' => 'nullable|email|max:255',
-            'guarantors.*.id_number' => 'required|string|max:50',
-            'guarantors.*.occupation' => 'nullable|string|max:100',
-            'guarantors.*.address' => 'nullable|string',
-            'guarantors.*.relationship' => 'nullable|string|max:100',
-            'documents' => 'nullable|array|max:5',
-            'documents.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         DB::beginTransaction();
 
         try {
