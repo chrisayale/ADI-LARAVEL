@@ -118,10 +118,14 @@ class LoanVerificationController extends Controller
                 ->with('error', 'This loan is not assigned to you.');
         }
 
+        // Determine if collateral verification is required
+        // For 'pato_ndogo' method, collateral is optional if loan has no collateral
+        $isPatoNdogoWithoutCollateral = ($loan->amortization_method === 'pato_ndogo' && !$loan->has_collateral);
+
         $validator = Validator::make($request->all(), [
             'verification_notes' => 'required|string|max:1000',
             'guarantors_verified' => 'required|boolean',
-            'collateral_verified' => 'required|boolean',
+            'collateral_verified' => $isPatoNdogoWithoutCollateral ? 'nullable|boolean' : 'required|boolean',
             'documents_verified' => 'required|boolean',
         ]);
 

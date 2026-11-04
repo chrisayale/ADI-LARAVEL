@@ -416,11 +416,27 @@
                             </label>
                         </div>
 
+                        @php
+                            $isPatoNdogoWithoutCollateral = ($loan->amortization_method === 'pato_ndogo' && !$loan->has_collateral);
+                        @endphp
+
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="collateral_verified" name="collateral_verified" value="1"
-                                   {{ $loan->has_collateral ? '' : 'disabled' }} required>
+                                   @if($isPatoNdogoWithoutCollateral)
+                                       disabled
+                                   @elseif(!$loan->has_collateral)
+                                       disabled
+                                   @else
+                                       required
+                                   @endif>
                             <label class="form-check-label" for="collateral_verified">
-                                Je confirme que la garantie a été vérifiée
+                                @if($isPatoNdogoWithoutCollateral)
+                                    Je confirme qu'aucune garantie n'est requise pour cette méthode (Pato Ndogo sans garantie)
+                                @elseif(!$loan->has_collateral)
+                                    Je confirme que la garantie n'est pas applicable
+                                @else
+                                    Je confirme que la garantie a été vérifiée
+                                @endif
                             </label>
                         </div>
 
