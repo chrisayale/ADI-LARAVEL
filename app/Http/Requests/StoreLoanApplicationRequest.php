@@ -25,6 +25,10 @@ class StoreLoanApplicationRequest extends FormRequest
         $rules = [
             'amount_applied' => 'required|numeric|min:10000|max:10000000',
             'purpose' => 'required|string|max:1000',
+            'repayment_frequency' => 'nullable|in:daily,weekly,monthly',
+            'duration_value' => 'nullable|integer|min:1|max:365',
+            'amortization_method' => 'nullable|in:french,flat_rate,constant_capital,pato_ndogo',
+            'interest_rate' => 'nullable|numeric|min:0|max:100',
             'has_collateral' => 'nullable|boolean',
             'collateral_type' => 'required_if:has_collateral,1,true|nullable|string|max:255',
             'collateral_description' => 'required_if:has_collateral,1,true|nullable|string',

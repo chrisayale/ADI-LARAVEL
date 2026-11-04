@@ -85,8 +85,14 @@
                             <table class="table table-borderless">
                                 @if($loan->interest_rate)
                                 <tr>
-                                    <th width="45%">Interest Rate:</th>
-                                    <td>{{ $loan->interest_rate }}% per annum</td>
+                                    <th width="45%">{{ __('interest_rate') }}:</th>
+                                    <td>
+                                        @if($loan->interest_rate_label)
+                                            {{ $loan->interest_rate_label }}
+                                        @else
+                                            {{ number_format($loan->interest_rate, 2) }}% {{ __('per_annum') }}
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endif
                                 @if($loan->duration_months)

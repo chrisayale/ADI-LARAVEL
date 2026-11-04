@@ -117,8 +117,22 @@
                             <td class="text-right">
                                 <strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong>
                             </td>
-                            <td class="text-center">{{ $loan->interest_rate }}%</td>
-                            <td class="text-center">{{ $loan->duration_months }} months</td>
+                            <td class="text-center">
+                                @if($loan->interest_rate_label)
+                                    {{ $loan->interest_rate_label }}
+                                @else
+                                    {{ number_format($loan->interest_rate, 2) }}%
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($loan->duration_value && $loan->duration_period_label)
+                                    {{ $loan->duration_value }} {{ $loan->duration_period_label }}
+                                @elseif($loan->duration_months)
+                                    {{ $loan->duration_months }} {{ __('months') }}
+                                @else
+                                    {{ __('n_a') }}
+                                @endif
+                            </td>
                             <td class="text-right">CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
                             <td class="text-right {{ $loan->balance > 0 ? 'text-danger' : 'text-success' }}">
                                 <strong>CDF {{ number_format($loan->balance, 2) }}</strong>

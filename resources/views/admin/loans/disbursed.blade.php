@@ -189,8 +189,22 @@
                                 </div>
                             </td>
                             <td><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
-                            <td>{{ $loan->interest_rate }}%</td>
-                            <td>{{ $loan->duration_months }} {{ __('months') }}</td>
+                            <td>
+                                @if($loan->interest_rate_label)
+                                    {{ $loan->interest_rate_label }}
+                                @else
+                                    {{ number_format($loan->interest_rate, 2) }}%
+                                @endif
+                            </td>
+                            <td>
+                                @if($loan->duration_value && $loan->duration_period_label)
+                                    {{ $loan->duration_value }} {{ $loan->duration_period_label }}
+                                @elseif($loan->duration_months)
+                                    {{ $loan->duration_months }} {{ __('months') }}
+                                @else
+                                    {{ __('n_a') }}
+                                @endif
+                            </td>
                             <td>CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
                             <td>CDF {{ number_format($loan->total_repayable, 2) }}</td>
                             <td>{{ $loan->disbursed_at->format('d M Y') }}</td>

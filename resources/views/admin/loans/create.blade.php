@@ -177,6 +177,12 @@
                             </div>
                         </div>
 
+                        <!-- Hidden fields to sync preview calculator with actual loan fields -->
+                        <input type="hidden" name="repayment_frequency" id="repayment_frequency" value="monthly">
+                        <input type="hidden" name="duration_value" id="duration_value" value="12">
+                        <input type="hidden" name="amortization_method" id="amortization_method" value="pato_ndogo">
+                        <input type="hidden" name="interest_rate" id="interest_rate" value="12">
+
                         <!-- Loan Summary Cards -->
                         <div class="row mt-3" id="loanSummary" style="display: none;">
                             <div class="col-md-3">
@@ -896,6 +902,12 @@
         document.getElementById('totalPayment').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
 
         document.getElementById('loanSummary').style.display = 'flex';
+
+        // Sync preview calculator values to hidden loan fields
+        document.getElementById('repayment_frequency').value = frequency;
+        document.getElementById('duration_value').value = duration;
+        document.getElementById('amortization_method').value = amortizationMethod;
+        document.getElementById('interest_rate').value = calculatedInterestRate;
 
         // Generate amortization schedule
         remainingBalance = amount;

@@ -204,7 +204,33 @@
                                 @if($loan->interest_rate)
                                 <tr>
                                     <th width="45%">{{ __('interest_rate') }}:</th>
-                                    <td>{{ $loan->interest_rate }}% {{ __('per_annum') }}</td>
+                                    <td>
+                                        @if($loan->interest_rate_label)
+                                            {{ $loan->interest_rate_label }}
+                                        @else
+                                            {{ number_format($loan->interest_rate, 2) }}% {{ __('per_annum') }}
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->amortization_method)
+                                <tr>
+                                    <th>{{ __('amortization_method') }}:</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @if($loan->amortization_method == 'pato_ndogo')
+                                                {{ __('pato_ndogo_method') }}
+                                            @elseif($loan->amortization_method == 'french')
+                                                {{ __('french_method') }}
+                                            @elseif($loan->amortization_method == 'flat_rate')
+                                                {{ __('flat_rate_method') }}
+                                            @elseif($loan->amortization_method == 'constant_capital')
+                                                {{ __('constant_capital_method') }}
+                                            @else
+                                                {{ ucfirst($loan->amortization_method) }}
+                                            @endif
+                                        </span>
+                                    </td>
                                 </tr>
                                 @endif
                                 @if($loan->repayment_frequency)
@@ -259,6 +285,22 @@
                                 <tr>
                                     <th>{{ __('total_repayable') }}:</th>
                                     <td><strong>CDF {{ number_format($loan->total_repayable, 2) }}</strong></td>
+                                </tr>
+                                @endif
+                                @if($loan->apply_late_penalty !== null)
+                                <tr>
+                                    <th>{{ __('apply_late_penalty') }}:</th>
+                                    <td>
+                                        <span class="badge badge-{{ $loan->apply_late_penalty ? 'success' : 'secondary' }}">
+                                            {{ $loan->apply_late_penalty ? __('yes') : __('no') }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endif
+                                @if($loan->late_penalty_amount)
+                                <tr>
+                                    <th>{{ __('late_penalty_amount') }}:</th>
+                                    <td><strong>CDF {{ number_format($loan->late_penalty_amount, 2) }}</strong></td>
                                 </tr>
                                 @endif
                                 @if($loan->first_payment_date)

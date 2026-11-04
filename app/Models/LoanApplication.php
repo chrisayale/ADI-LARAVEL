@@ -213,7 +213,7 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
 }
 
 // Make sure createRepaymentSchedule method exists
-private function createRepaymentSchedule()
+public function createRepaymentSchedule()
 {
     // Delete any existing repayments first
     $this->repayments()->delete();
@@ -443,6 +443,30 @@ private function createRepaymentSchedule()
             ->first();
 
         return $latestOverdue ? now()->diffInDays($latestOverdue->due_date) : 0;
+    }
+
+    /**
+     * Get the duration period label in French based on repayment_frequency
+     */
+    public function getDurationPeriodLabelAttribute()
+    {
+        return match ($this->repayment_frequency) {
+            'daily' => $this->duration_value <= 1 ? 'jour' : 'jours',
+            'weekly' => $this->duration_value <= 1 ? 'semaine' : 'semaines',
+            'monthly' => $this->duration_value <= 1 ? 'mois' : 'mois',
+            default => 'mois'
+        };
+    }
+
+    /**
+     * Get the full interest rate label with dynamic period
+     */
+    public function getInterestRateLabelAttribute()
+    {
+        if (!$this->interest_rate || !$this->duration_value) {
+            return null;
+        }
+        return number_format($this->interest_rate, 2) . '% pour ' . $this->duration_value . ' ' . $this->duration_period_label;
     }
 
     // Methods

@@ -224,7 +224,11 @@
                             </td>
                             <td>
                                 @if($loan->interest_rate)
-                                    {{ $loan->interest_rate }}%
+                                    @if($loan->interest_rate_label)
+                                        {{ $loan->interest_rate_label }}
+                                    @else
+                                        {{ number_format($loan->interest_rate, 2) }}%
+                                    @endif
                                 @else
                                     <span class="text-muted">{{ __('n_a') }}</span>
                                 @endif

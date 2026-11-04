@@ -956,31 +956,4 @@ public function disburse(Request $request, LoanApplication $loan)
         return view('admin.loans.applications', compact('applications'));
     }
 
-    /**
-     * Create repayment schedule for approved loan.
-     */
-   /**
- * Create repayment schedule for approved loan.
- */
-private function createRepaymentSchedule(LoanApplication $loan)
-{
-    $dueDate = now()->addMonth();
-    $installmentNumber = 1;
-
-    for ($i = 1; $i <= $loan->duration_months; $i++) {
-        // Generate a unique repayment number
-        $repaymentNumber = 'RPMT-' . $loan->id . '-' . date('Y') . '-' . str_pad($installmentNumber, 3, '0', STR_PAD_LEFT);
-
-        $loan->repayments()->create([
-            'repayment_number' => $repaymentNumber, // Add this line
-            'sacco_id' => $loan->sacco_id,
-            'installment_number' => $installmentNumber++,
-            'due_date' => $dueDate->copy(),
-            'amount_due' => $loan->monthly_repayment,
-            'status' => 'pending'
-        ]);
-
-        $dueDate->addMonth();
-    }
-}
 }

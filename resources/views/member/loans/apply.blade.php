@@ -54,6 +54,31 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="repayment_frequency">Repayment Frequency <span class="text-danger">*</span></label>
+                        <select class="form-control" id="repayment_frequency" name="repayment_frequency" required>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="duration_value">Duration <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="duration_value" name="duration_value" value="12" required min="1" max="365">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="amortization_method">Amortization Method <span class="text-danger">*</span></label>
+                        <select class="form-control" id="amortization_method" name="amortization_method" required>
+                            <option value="pato_ndogo" selected>Pato Ndogo</option>
+                            <option value="french">French (Standard)</option>
+                            <option value="flat_rate">Flat Rate</option>
+                            <option value="constant_capital">Constant Capital</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="interest_rate">Interest Rate (%) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.1" class="form-control" id="interest_rate" name="interest_rate" value="12" required min="0" max="100">
+                    </div>
                 </div>
 
                 <!-- Collateral Information -->

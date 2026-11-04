@@ -41,8 +41,14 @@
                             <td><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
                         </tr>
                         <tr>
-                            <th>Interest Rate:</th>
-                            <td>{{ $loan->interest_rate }}%</td>
+                            <th>{{ __('interest_rate') }}:</th>
+                            <td>
+                                @if($loan->interest_rate_label)
+                                    {{ $loan->interest_rate_label }}
+                                @else
+                                    {{ number_format($loan->interest_rate, 2) }}%
+                                @endif
+                            </td>
                         </tr>
                     </table>
                 </div>
