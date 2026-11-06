@@ -342,6 +342,57 @@ class LoanController extends Controller
     }
 
     /**
+     * Find member by QR code / membership number for auto-selection
+     */
+    public function findMemberByQrCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'qr_code' => 'required|string|max:100'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Code QR invalide'], 422);
+        }
+
+        $qrCode = trim($request->qr_code);
+
+        // Try to find member by membership_number (which is what QR code contains)
+        $member = User::role('member')
+            ->where('status', 'active')
+            ->where('membership_number', $qrCode)
+            ->first();
+
+        if (!$member) {
+            // Also try to extract membership number from formats like "#MEM-2024-001"
+            if (preg_match('/MEM-?(\d+)-?(\d+)/i', $qrCode, $matches)) {
+                $membershipNumber = strtoupper($matches[0]);
+                $member = User::role('member')
+                    ->where('status', 'active')
+                    ->where('membership_number', $membershipNumber)
+                    ->first();
+            }
+        }
+
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucun membre trouvé avec ce code QR : ' . $qrCode
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'member' => [
+                'id' => $member->id,
+                'name' => $member->name,
+                'membership_number' => $member->membership_number,
+                'email' => $member->email,
+                'phone_number' => $member->phone_number,
+            ]
+        ]);
+    }
+
+    /**
      * Store a newly created loan application.
      */
     public function store(StoreLoanApplicationRequest $request)
@@ -612,7 +663,11 @@ class LoanController extends Controller
             'amortization_method' => 'required|in:french,flat_rate,constant_capital,pato_ndogo',
             'approval_notes' => 'nullable|string|max:500',
             'apply_late_penalty' => 'nullable|boolean',
-            'late_penalty_amount' => 'nullable|numeric|min:0'
+            'late_penalty_amount' => 'nullable|numeric|min:0',
+            'adjusted_daily_amount' => 'nullable|numeric|min:0.01',
+            'theoretical_daily_amount' => 'nullable|numeric|min:0',
+            'total_surplus_amount' => 'nullable|numeric|min:0',
+            'surplus_type' => 'nullable|in:surplus,shortfall,none'
         ]);
 
         if ($validator->fails()) {
@@ -630,7 +685,25 @@ class LoanController extends Controller
             $request->amortization_method
         );
 
-        DB::transaction(function () use ($loan, $request, $calculation) {
+        // Handle adjusted daily amount for pato_ndogo daily
+        $isDailyPatoNdogo = ($request->repayment_frequency === 'daily' && $request->amortization_method === 'pato_ndogo');
+        $adjustedDailyAmount = $request->adjusted_daily_amount ?? null;
+        $theoreticalDailyAmount = $request->theoretical_daily_amount ?? null;
+        $totalSurplusAmount = $request->total_surplus_amount ?? 0;
+        $surplusType = $request->surplus_type ?? 'none';
+
+        // If adjusted amount provided and different from theoretical, use it
+        $periodicPayment = $calculation['periodic_payment'];
+        $totalRepayable = $calculation['total_repayable'];
+        $totalInterest = $calculation['total_interest'];
+
+        if ($isDailyPatoNdogo && $adjustedDailyAmount && $adjustedDailyAmount > 0) {
+            $periodicPayment = $adjustedDailyAmount;
+            $totalRepayable = $adjustedDailyAmount * $request->duration_value;
+            $totalInterest = $totalRepayable - $request->amount_approved;
+        }
+
+        DB::transaction(function () use ($loan, $request, $calculation, $periodicPayment, $totalRepayable, $totalInterest, $isDailyPatoNdogo, $adjustedDailyAmount, $theoreticalDailyAmount, $totalSurplusAmount, $surplusType) {
             $loan->update([
                 'status' => 'approved',
                 'amount_approved' => $request->amount_approved,
@@ -639,15 +712,19 @@ class LoanController extends Controller
                 'duration_value' => $request->duration_value,
                 'repayment_frequency' => $request->repayment_frequency,
                 'amortization_method' => $request->amortization_method,
-                'monthly_repayment' => round($calculation['periodic_payment'], 2),
-                'total_repayable' => round($calculation['total_repayable'], 2),
+                'monthly_repayment' => round($periodicPayment, 2),
+                'total_repayable' => round($totalRepayable, 2),
                 'approval_notes' => $request->approval_notes,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
                 'first_payment_date' => $calculation['first_payment_date'],
                 'maturity_date' => $calculation['maturity_date'],
                 'apply_late_penalty' => $request->boolean('apply_late_penalty', true),
-                'late_penalty_amount' => $request->late_penalty_amount ?? 2000
+                'late_penalty_amount' => $request->late_penalty_amount ?? 2000,
+                'adjusted_daily_amount' => $isDailyPatoNdogo ? ($adjustedDailyAmount ?? null) : null,
+                'theoretical_daily_amount' => $isDailyPatoNdogo ? ($theoreticalDailyAmount ?? null) : null,
+                'total_surplus_amount' => $isDailyPatoNdogo ? $totalSurplusAmount : 0,
+                'surplus_type' => $isDailyPatoNdogo ? $surplusType : 'none'
             ]);
 
             // Create repayment schedule

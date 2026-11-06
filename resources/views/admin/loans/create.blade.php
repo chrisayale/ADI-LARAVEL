@@ -82,20 +82,32 @@
             <form action="{{ route('admin.loans.store') }}" method="POST" enctype="multipart/form-data" id="loan-form">
                 @csrf
 
-                <!-- Member Selection -->
+                <!-- Member Selection with QR Code / Manual Input -->
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="user_id">Sélectionner un Membre <span class="text-danger">*</span></label>
-                            <select class="form-control @error('user_id') is-invalid @enderror"
-                                    id="user_id" name="user_id" required>
-                                <option value="">Choisir un membre...</option>
-                                @foreach($members as $member)
-                                    <option value="{{ $member->id }}" {{ old('user_id') == $member->id ? 'selected' : '' }}>
-                                        {{ $member->name }} ({{ $member->membership_number ?? 'Aucun #' }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="input-group">
+                                <select class="form-control @error('user_id') is-invalid @enderror"
+                                        id="user_id" name="user_id" required>
+                                    <option value="">Choisir un membre...</option>
+                                    @foreach($members as $member)
+                                        <option value="{{ $member->id }}" {{ old('user_id') == $member->id ? 'selected' : '' }}>
+                                            {{ $member->name }} ({{ $member->membership_number ?? 'Aucun #' }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-primary" id="btn-qr-scanner"
+                                            title="Scanner le QR Code du membre" data-toggle="tooltip">
+                                        <i class="fas fa-qrcode"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btn-manual-input"
+                                            title="Saisie manuelle du code membre" data-toggle="tooltip">
+                                        <i class="fas fa-keyboard"></i>
+                                    </button>
+                                </div>
+                            </div>
                             @error('user_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -151,9 +163,9 @@
                                 <div class="form-group">
                                     <label for="preview_frequency">Fréquence de remboursement</label>
                                     <select class="form-control" id="preview_frequency" name="preview_frequency">
-                                        <option value="monthly" selected>Mensuel</option>
+                                        <option value="daily" selected>Quotidien</option>
                                         <option value="weekly">Hebdomadaire</option>
-                                        <option value="daily">Quotidien</option>
+                                        <option value="monthly">Mensuel</option>
                                     </select>
                                 </div>
                             </div>
@@ -595,66 +607,584 @@
 @push('scripts')
 <script>
 
-    // Toggle collateral fields
-    document.getElementById('has_collateral').addEventListener('change', function() {
-        const collateralFields = document.getElementById('collateral-fields');
-        const isChecked = this.checked;
+    // ============================================
+    // QR CODE / MANUAL MEMBER SELECTION HANDLERS
+    // ============================================
+    let html5QrCodeScanner = null;
+    let isScanning = false;
 
-        // Show/hide the fields container
-        collateralFields.style.display = isChecked ? 'block' : 'none';
+    // QR Code Scanner Modal HTML
+    const qrScannerModalHtml = `
+        <div class="modal fade" id="qrScannerModal" tabindex="-1" role="dialog" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="qrScannerModalLabel"><i class="fas fa-qrcode"></i> Scanner le QR Code du Membre</h5>
+                        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close" onclick="stopQrScanner(); $('#qrScannerModal').modal('hide');">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <div id="qr-reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                        <div class="mt-3 text-center">
+                            <div class="alert alert-info" id="qr-scanner-status" style="display: none;"></div>
+                            <div class="alert alert-warning" id="https-warning" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>HTTPS requis :</strong> La caméra nécessite une connexion sécurisée (HTTPS).
+                                <br>Sur localhost, utilisez <a href="#" onclick="showManualInputModal(); return false;">la saisie manuelle</a> ou configurez HTTPS local.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="stopQrScanner(); $('#qrScannerModal').modal('hide');">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="showManualInputModal(); stopQrScanner();">
+                            <i class="fas fa-keyboard"></i> Saisie Manuelle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
-        // Toggle required attribute on all collateral form controls
-        const collateralInputs = collateralFields.querySelectorAll('input, select, textarea');
-        collateralInputs.forEach(function(input) {
-            if (isChecked) {
-                input.setAttribute('required', 'required');
-            } else {
-                input.removeAttribute('required');
-            }
-        });
+    // Manual Input Modal HTML
+    const manualInputModalHtml = `
+        <div class="modal fade" id="manualInputModal" tabindex="-1" role="dialog" aria-labelledby="manualInputModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title" id="manualInputModalLabel"><i class="fas fa-keyboard"></i> Saisie Manuelle du Code Membre</h5>
+                        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close" onclick="$('#manualInputModal').modal('hide');">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <div class="form-group">
+                            <label for="manual_qr_code">Numéro de Membre / Code QR</label>
+                            <input type="text" class="form-control form-control-lg text-center" id="manual_qr_code"
+                                   placeholder="Ex: MEM-2024-001" autocomplete="off" autofocus
+                                   style="font-size: 1.25rem; letter-spacing: 0.1em;">
+                            <small class="text-muted">Entrez le numéro de membre ou le code du QR code</small>
+                        </div>
+                        <div class="alert alert-info mt-3" id="manual-input-status" style="display: none;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="$('#manualInputModal').modal('hide');">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="searchMemberByManualCode()">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Inject modals into DOM
+    document.body.insertAdjacentHTML('beforeend', qrScannerModalHtml);
+    document.body.insertAdjacentHTML('beforeend', manualInputModalHtml);
+
+    // Check if we're on localhost (insecure context for camera)
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isSecureContext = window.isSecureContext || window.location.protocol === 'https:';
+
+    // Open QR Scanner Modal
+    document.getElementById('btn-qr-scanner')?.addEventListener('click', function() {
+        $('#qrScannerModal').modal('show');
     });
 
-    // Guarantor management
-    let guarantorCount = 1;
-    const maxGuarantors = 3;
+    // Open Manual Input Modal
+    document.getElementById('btn-manual-input')?.addEventListener('click', function() {
+        showManualInputModal();
+    });
 
-    document.getElementById('add-guarantor').addEventListener('click', function() {
-        if (guarantorCount >= maxGuarantors) {
-            alert('Maximum de ' + maxGuarantors + ' garants autorisés');
+    function showManualInputModal() {
+        $('#manualInputModal').modal('show');
+        setTimeout(() => {
+            const input = document.getElementById('manual_qr_code');
+            if (input) input.focus();
+        }, 300);
+    }
+
+    // Check camera permission and HTTPS requirement - called when modal is fully shown
+    function checkCameraPermission() {
+        const statusDiv = document.getElementById('qr-scanner-status');
+        const httpsWarning = document.getElementById('https-warning');
+        const readerDiv = document.getElementById('qr-reader');
+
+        // If elements don't exist, fail silently (modal not ready or not our modal)
+        if (!statusDiv || !httpsWarning || !readerDiv) {
+            console.debug('QR scanner modal elements not found');
             return;
         }
 
-        const container = document.getElementById('guarantors-container');
-        const template = document.querySelector('.guarantor-row').cloneNode(true);
+        if (!isSecureContext && isLocalhost) {
+            // Show HTTPS warning
+            httpsWarning.style.display = 'block';
+            readerDiv.style.display = 'none';
+            statusDiv.style.display = 'none';
+            return;
+        } else {
+            httpsWarning.style.display = 'none';
+            readerDiv.style.display = 'block';
+        }
 
-        // Update indices and clear values
-        template.querySelectorAll('input, textarea, select').forEach(element => {
-            const name = element.getAttribute('name');
-            if (name) {
-                element.setAttribute('name', name.replace(/\[\d+\]/, `[${guarantorCount}]`));
-                if (element.tagName === 'SELECT') {
-                    element.value = '';
-                } else {
-                    element.value = '';
-                }
-            }
-        });
+        // Try to start scanner
+        startQrScanner();
+    }
 
-        // Show remove button
-        const removeBtn = template.querySelector('.remove-guarantor');
-        removeBtn.style.display = 'inline-block';
-        removeBtn.addEventListener('click', function() {
-            if (document.querySelectorAll('.guarantor-row').length > 1) {
-                template.remove();
-                guarantorCount--;
-            }
-        });
-
-        container.appendChild(template);
-        guarantorCount++;
+    // Initialize scanner when QR modal is fully shown
+    $('#qrScannerModal').on('shown.bs.modal', function() {
+        checkCameraPermission();
     });
 
-    // Initialize remove buttons for existing rows
+    // Start QR Code Scanner using html5-qrcode library
+    function startQrScanner() {
+        if (isScanning) return;
+
+        // Check if html5-qrcode is available
+        if (typeof Html5QrcodeScanner === 'undefined') {
+            // Load the library dynamically
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js';
+            script.onload = () => initQrScanner();
+            script.onerror = () => {
+                const statusDiv = document.getElementById('qr-scanner-status');
+                const readerDiv = document.getElementById('qr-reader');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreur de chargement du scanner. Utilisez la saisie manuelle.';
+                    statusDiv.style.display = 'block';
+                }
+                if (readerDiv) {
+                    readerDiv.style.display = 'none';
+                }
+            };
+            document.head.appendChild(script);
+        } else {
+            initQrScanner();
+        }
+    }
+
+    function initQrScanner() {
+        const readerDiv = document.getElementById('qr-reader');
+        const statusDiv = document.getElementById('qr-scanner-status');
+
+        if (!readerDiv) return;
+
+        // Check camera permission before initializing
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    // Stop the test stream
+                    stream.getTracks().forEach(track => track.stop());
+                    initHtml5QrCodeScanner();
+                })
+                .catch(err => {
+                    console.error('Camera access error:', err);
+                    if (statusDiv) {
+                        let msg = 'Impossible d\'accéder à la caméra. ';
+                        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                            msg += 'Veuillez autoriser l\'accès à la caméra dans les paramètres du navigateur.';
+                        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                            msg += 'Aucune caméra détectée sur cet appareil.';
+                        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                            msg += 'La caméra est déjà utilisée par une autre application.';
+                        } else if (err.name === 'OverconstrainedError') {
+                            msg += 'La caméra ne supporte pas la configuration requise.';
+                        } else {
+                            msg += 'Erreur : ' + err.message;
+                        }
+                        msg += ' <button type=\"button\" class=\"btn btn-sm btn-outline-primary ml-2\" onclick=\"showManualInputModal(); stopQrScanner();\"><i class=\"fas fa-keyboard\"></i> Saisie Manuelle</button>';
+                        statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                        statusDiv.className = 'alert alert-danger';
+                        statusDiv.style.display = 'block';
+                    }
+                    if (readerDiv) {
+                        readerDiv.style.display = 'none';
+                    }
+                });
+        } else {
+            // Fallback if getUserMedia not available
+            initHtml5QrCodeScanner();
+        }
+
+        function initHtml5QrCodeScanner() {
+            html5QrCodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    rememberLastUsedCamera: true,
+                    showTorchButtonIfSupported: true,
+                    showZoomSliderIfSupported: true
+                },
+                false
+            );
+
+            html5QrCodeScanner.render(
+                onQrScanSuccess,
+                onQrScanFailure
+            );
+
+            isScanning = true;
+            if (statusDiv) statusDiv.style.display = 'none';
+            readerDiv.style.display = 'block';
+        }
+    }
+
+    function onQrScanSuccess(decodedText, decodedResult) {
+        // Stop scanner after successful scan
+        stopQrScanner();
+
+        // Search for member
+        searchMemberByQrCode(decodedText);
+    }
+
+    function onQrScanFailure(error) {
+        // Silently handle scan failures (continuous scanning)
+        // Only show if it's a permission error
+        if (error && error.name === 'NotAllowedError') {
+            const statusDiv = document.getElementById('qr-scanner-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Accès caméra refusé. Veuillez autoriser l\'accès à la caméra ou utiliser la saisie manuelle.';
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.style.display = 'block';
+            }
+            stopQrScanner();
+        }
+    }
+
+    function stopQrScanner() {
+        if (html5QrCodeScanner && isScanning) {
+            html5QrCodeScanner.clear().catch(err => console.warn('QR Scanner clear error:', err));
+            isScanning = false;
+        }
+        $('#qrScannerModal').modal('hide');
+    }
+
+    // Search member by QR code (AJAX)
+    function searchMemberByQrCode(qrCode) {
+        const statusDiv = document.getElementById('qr-scanner-status');
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche du membre...';
+            statusDiv.className = 'alert alert-info';
+            statusDiv.style.display = 'block';
+        }
+
+        fetch('{{ route("admin.loans.find-member-qr") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ qr_code: qrCode })
+        })
+        .then(response => {
+            // Handle HTTP errors (404, 500, etc.) with user-friendly messages
+            if (!response.ok) {
+                let errorMsg = '';
+                switch (response.status) {
+                    case 404:
+                        errorMsg = 'La route de recherche est introuvable ou le service est temporairement indisponible (404).';
+                        break;
+                    case 422:
+                        errorMsg = 'Données invalides envoyées au serveur (422).';
+                        break;
+                    case 500:
+                        errorMsg = 'Erreur interne du serveur (500). Veuillez réessayer plus tard.';
+                        break;
+                    case 419:
+                        errorMsg = 'Session expirée. Veuillez rafraîchir la page.';
+                        break;
+                    default:
+                        errorMsg = 'Erreur de communication avec le serveur (' + response.status + ').';
+                }
+                return response.json().catch(() => ({})).then(err => {
+                    throw new Error(errorMsg + (err.message ? ' - ' + err.message : ''));
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.member) {
+                selectMember(data.member);
+                $('#qrScannerModal').modal('hide');
+                showToast('success', 'Membre trouvé : ' + data.member.name);
+            } else {
+                throw new Error(data.message || 'Membre non trouvé');
+            }
+        })
+        .catch(error => {
+            console.error('QR Search error:', error);
+            let msg = error.message || 'Erreur lors de la recherche';
+
+            // Don't show technical 404 message for "member not found" (that's expected)
+            if (msg.includes('Aucun membre trouvé')) {
+                msg = 'Aucun membre trouvé avec ce code. Vérifiez le numéro et réessayez.';
+            }
+
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.style.display = 'block';
+            }
+            // Don't hide modal, let user retry or switch to manual
+        });
+    }
+
+    // Search member by manual code input
+    function searchMemberByManualCode() {
+        const input = document.getElementById('manual_qr_code');
+        const statusDiv = document.getElementById('manual-input-status');
+        const qrCode = input?.value?.trim();
+
+        if (!qrCode) {
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Veuillez entrer un code membre';
+                statusDiv.className = 'alert alert-warning';
+                statusDiv.style.display = 'block';
+            }
+            input?.focus();
+            return;
+        }
+
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche du membre...';
+            statusDiv.className = 'alert alert-info';
+            statusDiv.style.display = 'block';
+        }
+
+        fetch('{{ route("admin.loans.find-member-qr") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ qr_code: qrCode })
+        })
+        .then(response => {
+            // Handle HTTP errors (404, 500, etc.) with user-friendly messages
+            if (!response.ok) {
+                let errorMsg = '';
+                switch (response.status) {
+                    case 404:
+                        errorMsg = 'La route de recherche est introuvable ou le service est temporairement indisponible (404).';
+                        break;
+                    case 422:
+                        errorMsg = 'Données invalides envoyées au serveur (422).';
+                        break;
+                    case 500:
+                        errorMsg = 'Erreur interne du serveur (500). Veuillez réessayer plus tard.';
+                        break;
+                    case 419:
+                        errorMsg = 'Session expirée. Veuillez rafraîchir la page.';
+                        break;
+                    default:
+                        errorMsg = 'Erreur de communication avec le serveur (' + response.status + ').';
+                }
+                return response.json().catch(() => ({})).then(err => {
+                    throw new Error(errorMsg + (err.message ? ' - ' + err.message : ''));
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.member) {
+                selectMember(data.member);
+                $('#manualInputModal').modal('hide');
+                showToast('success', 'Membre trouvé : ' + data.member.name);
+            } else {
+                throw new Error(data.message || 'Membre non trouvé');
+            }
+        })
+        .catch(error => {
+            console.error('Manual Search error:', error);
+            let msg = error.message || 'Erreur lors de la recherche';
+
+            // Don't show technical 404 message for "member not found" (that's expected)
+            if (msg.includes('Aucun membre trouvé')) {
+                msg = 'Aucun membre trouvé avec ce code. Vérifiez le numéro et réessayez.';
+            }
+
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.style.display = 'block';
+            }
+        });
+    }
+
+    // Select member in dropdown
+    function selectMember(member) {
+        const select = document.getElementById('user_id');
+        if (!select) return;
+
+        // Check if member already exists in options
+        let option = select.querySelector(`option[value="${member.id}"]`);
+        if (!option) {
+            // Add new option
+            option = document.createElement('option');
+            option.value = member.id;
+            option.textContent = `${member.name} (${member.membership_number || 'Aucun #'})`;
+            select.appendChild(option);
+        }
+        select.value = member.id;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // Visual feedback
+        select.classList.add('is-valid');
+        select.classList.remove('is-invalid');
+        setTimeout(() => select.classList.remove('is-valid'), 2000);
+    }
+
+    // Toast notification helper
+    function showToast(type, message) {
+        // Create toast if not exists
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        toast.style.cssText = 'min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        `;
+        toastContainer.appendChild(toast);
+
+        // Auto remove after 4 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 4000);
+    }
+
+    // Clean up scanner when modals are hidden
+    $('#qrScannerModal').on('hidden.bs.modal', function() {
+        stopQrScanner();
+    });
+
+    $('#manualInputModal').on('hidden.bs.modal', function() {
+        const input = document.getElementById('manual_qr_code');
+        const statusDiv = document.getElementById('manual-input-status');
+        if (input) input.value = '';
+        if (statusDiv) {
+            statusDiv.style.display = 'none';
+            statusDiv.textContent = '';
+        }
+    });
+
+    // Explicit cancel button handlers (fallback for data-bs-dismiss)
+    document.querySelectorAll('#qrScannerModal .btn-secondary[data-bs-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            stopQrScanner();
+            $('#qrScannerModal').modal('hide');
+        });
+    });
+
+    document.querySelectorAll('#manualInputModal .btn-secondary[data-bs-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            $('#manualInputModal').modal('hide');
+        });
+    });
+
+    // Allow Enter key in manual input
+    document.getElementById('manual_qr_code')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchMemberByManualCode();
+        }
+    });
+
+    // ============================================
+    // TOGGLE COLLATERAL FIELDS (with null checks)
+    // ============================================
+    const hasCollateralEl = document.getElementById('has_collateral');
+    const collateralFields = document.getElementById('collateral-fields');
+
+    if (hasCollateralEl && collateralFields) {
+        hasCollateralEl.addEventListener('change', function() {
+            const isChecked = this.checked;
+            collateralFields.style.display = isChecked ? 'block' : 'none';
+
+            const collateralInputs = collateralFields.querySelectorAll('input, select, textarea');
+            collateralInputs.forEach(function(input) {
+                if (isChecked) {
+                    input.setAttribute('required', 'required');
+                } else {
+                    input.removeAttribute('required');
+                }
+            });
+        });
+
+        // Initialize on load
+        if (!hasCollateralEl.checked) {
+            collateralFields.style.display = 'none';
+        }
+    }
+
+    // ============================================
+    // GUARANTOR MANAGEMENT (with null checks)
+    // ============================================
+    let guarantorCount = 1;
+    const maxGuarantors = 3;
+    const addGuarantorBtn = document.getElementById('add-guarantor');
+    const guarantorsContainer = document.getElementById('guarantors-container');
+
+    if (addGuarantorBtn && guarantorsContainer) {
+        addGuarantorBtn.addEventListener('click', function() {
+            if (guarantorCount >= maxGuarantors) {
+                alert('Maximum de ' + maxGuarantors + ' garants autorisés');
+                return;
+            }
+
+            const template = document.querySelector('.guarantor-row');
+            if (!template) return;
+
+            const newRow = template.cloneNode(true);
+
+            // Update indices and clear values
+            newRow.querySelectorAll('input, textarea, select').forEach(element => {
+                const name = element.getAttribute('name');
+                if (name) {
+                    element.setAttribute('name', name.replace(/\[\d+\]/, `[${guarantorCount}]`));
+                    if (element.tagName === 'SELECT') {
+                        element.value = '';
+                    } else {
+                        element.value = '';
+                    }
+                }
+            });
+
+            // Show remove button
+            const removeBtn = newRow.querySelector('.remove-guarantor');
+            if (removeBtn) {
+                removeBtn.style.display = 'inline-block';
+                removeBtn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.guarantor-row').length > 1) {
+                        newRow.remove();
+                        guarantorCount--;
+                    }
+                });
+            }
+
+            guarantorsContainer.appendChild(newRow);
+            guarantorCount++;
+        });
+    }
+
+    // Initialize remove buttons for existing guarantor rows
     document.querySelectorAll('.remove-guarantor').forEach(btn => {
         btn.addEventListener('click', function() {
             if (document.querySelectorAll('.guarantor-row').length > 1) {
@@ -664,49 +1194,59 @@
         });
     });
 
-    // Document management
+    // ============================================
+    // DOCUMENT MANAGEMENT (with null checks)
+    // ============================================
     let documentCount = 1;
     const maxDocuments = 10;
+    const addDocumentBtn = document.getElementById('add-document');
+    const documentsContainer = document.getElementById('documents-container');
 
-    document.getElementById('add-document').addEventListener('click', function() {
-        if (documentCount >= maxDocuments) {
-            alert('Maximum de ' + maxDocuments + ' documents autorisés');
-            return;
-        }
+    if (addDocumentBtn && documentsContainer) {
+        addDocumentBtn.addEventListener('click', function() {
+            if (documentCount >= maxDocuments) {
+                alert('Maximum de ' + maxDocuments + ' documents autorisés');
+                return;
+            }
 
-        const container = document.getElementById('documents-container');
-        const template = document.querySelector('.document-row').cloneNode(true);
+            const template = document.querySelector('.document-row');
+            if (!template) return;
 
-        // Update indices and clear values
-        template.querySelectorAll('select, input').forEach(element => {
-            const name = element.getAttribute('name');
-            if (name) {
-                element.setAttribute('name', name.replace(/\[\d+\]/, `[${documentCount}]`));
-                if (element.tagName === 'INPUT' && element.type === 'file') {
-                    element.value = '';
-                } else if (element.tagName === 'SELECT') {
-                    element.value = '';
-                } else {
-                    element.value = '';
+            const newRow = template.cloneNode(true);
+
+            // Update indices and clear values
+            newRow.querySelectorAll('select, input').forEach(element => {
+                const name = element.getAttribute('name');
+                if (name) {
+                    element.setAttribute('name', name.replace(/\[\d+\]/, `[${documentCount}]`));
+                    if (element.tagName === 'INPUT' && element.type === 'file') {
+                        element.value = '';
+                    } else if (element.tagName === 'SELECT') {
+                        element.value = '';
+                    } else {
+                        element.value = '';
+                    }
                 }
+            });
+
+            // Show remove button
+            const removeBtn = newRow.querySelector('.remove-document');
+            if (removeBtn) {
+                removeBtn.style.display = 'inline-block';
+                removeBtn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.document-row').length > 1) {
+                        newRow.remove();
+                        documentCount--;
+                    }
+                });
             }
+
+            documentsContainer.appendChild(newRow);
+            documentCount++;
         });
+    }
 
-        // Show remove button
-        const removeBtn = template.querySelector('.remove-document');
-        removeBtn.style.display = 'inline-block';
-        removeBtn.addEventListener('click', function() {
-            if (document.querySelectorAll('.document-row').length > 1) {
-                template.remove();
-                documentCount--;
-            }
-        });
-
-        container.appendChild(template);
-        documentCount++;
-    });
-
-    // Initialize remove buttons for existing documents
+    // Initialize remove buttons for existing document rows
     document.querySelectorAll('.remove-document').forEach(btn => {
         btn.addEventListener('click', function() {
             if (document.querySelectorAll('.document-row').length > 1) {
@@ -716,7 +1256,9 @@
         });
     });
 
-    // File size validation (15MB limit)
+    // ============================================
+    // FILE SIZE VALIDATION (15MB limit)
+    // ============================================
     document.addEventListener('change', function(e) {
         if (e.target.type === 'file' && e.target.hasAttribute('data-max-size')) {
             const maxSize = parseInt(e.target.getAttribute('data-max-size'));
@@ -725,6 +1267,7 @@
                 if (fileSize > maxSize) {
                     alert('La taille du fichier dépasse la limite de 15MB. Veuillez choisir un fichier plus petit.');
                     e.target.value = '';
+                    return;
                 }
 
                 // Show file name and size
@@ -733,263 +1276,292 @@
                 const fileName = e.target.files[0].name;
 
                 // Create or update file info display
-                let infoDiv = fileRow.querySelector('.file-info');
+                let infoDiv = fileRow?.querySelector('.file-info');
                 if (!infoDiv) {
                     infoDiv = document.createElement('div');
                     infoDiv.className = 'file-info small text-muted mt-1';
-                    e.target.closest('.form-group').appendChild(infoDiv);
+                    const formGroup = e.target.closest('.form-group');
+                    if (formGroup) formGroup.appendChild(infoDiv);
                 }
-                infoDiv.innerHTML = `<i class="fas fa-file"></i> ${fileName} (${sizeInMB} MB)`;
+                if (infoDiv) {
+                    infoDiv.innerHTML = `<i class="fas fa-file"></i> ${fileName} (${sizeInMB} MB)`;
+                }
             }
         }
     });
 
-    // Loan Calculator Function with real-time validation
+    // ============================================
+    // LOAN CALCULATOR FUNCTION
+    // ============================================
     let calculatedPeriodicPayment = 0; // Store for adjusted amount calculation
 
-    document.getElementById('calculateLoan').addEventListener('click', function() {
-        const amount = parseFloat(document.getElementById('amount_applied').value);
-        const interestRate = parseFloat(document.getElementById('preview_interest_rate').value);
-        const duration = parseInt(document.getElementById('preview_duration').value);
-        const frequency = document.getElementById('preview_frequency').value;
-        const amortizationMethod = document.getElementById('preview_amortization').value;
+    const calculateLoanBtn = document.getElementById('calculateLoan');
+    if (calculateLoanBtn) {
+        calculateLoanBtn.addEventListener('click', function() {
+            const amountEl = document.getElementById('amount_applied');
+            const interestRateEl = document.getElementById('preview_interest_rate');
+            const durationEl = document.getElementById('preview_duration');
+            const frequencyEl = document.getElementById('preview_frequency');
+            const amortizationMethodEl = document.getElementById('preview_amortization');
 
-        if (!amount || amount <= 0) {
-            alert('Veuillez d\'abord entrer un montant de prêt valide');
-            document.getElementById('amount_applied').focus();
-            return;
-        }
+            // Null checks
+            if (!amountEl || !interestRateEl || !durationEl || !frequencyEl || !amortizationMethodEl) {
+                console.error('Missing calculator elements');
+                return;
+            }
 
-        if (duration < 1) {
-            alert('Veuillez entrer une durée valide');
-            return;
-        }
+            const amount = parseFloat(amountEl.value);
+            const interestRate = parseFloat(interestRateEl.value);
+            const duration = parseInt(durationEl.value);
+            const frequency = frequencyEl.value;
+            const amortizationMethod = amortizationMethodEl.value;
 
-        // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
-        // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
-        let calculatedInterestRate = interestRate;
-        let isAutoCalculatedRate = false;
+            if (!amount || amount <= 0) {
+                alert('Veuillez d\'abord entrer un montant de prêt valide');
+                amountEl.focus();
+                return;
+            }
 
-        if (frequency === 'daily' && (amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo')) {
-            calculatedInterestRate = (duration / 30) * 10;
-            // Update the UI field
-            document.getElementById('preview_interest_rate').value = calculatedInterestRate.toFixed(2);
-            isAutoCalculatedRate = true;
-        }
+            if (duration < 1) {
+                alert('Veuillez entrer une durée valide');
+                durationEl.focus();
+                return;
+            }
 
-        // Validate interest rate only if not auto-calculated
-        if (!isAutoCalculatedRate && calculatedInterestRate <= 0) {
-            alert('Veuillez entrer un taux d\'intérêt valide');
-            return;
-        }
+            // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
+            let calculatedInterestRate = interestRate;
+            let isAutoCalculatedRate = false;
 
-        // Calculate based on frequency
-        const annualRate = calculatedInterestRate / 100;
-        let periodicRate, periods, firstPaymentDate;
+            if (frequency === 'daily' && (amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo')) {
+                calculatedInterestRate = (duration / 30) * 10;
+                interestRateEl.value = calculatedInterestRate.toFixed(2);
+                isAutoCalculatedRate = true;
+            }
 
-        switch (frequency) {
-            case 'daily':
-                periodicRate = annualRate / 365;
-                periods = duration;
-                firstPaymentDate = new Date();
-                firstPaymentDate.setDate(firstPaymentDate.getDate() + 1);
-                break;
-            case 'weekly':
-                periodicRate = annualRate / 52;
-                periods = duration;
-                firstPaymentDate = new Date();
-                firstPaymentDate.setDate(firstPaymentDate.getDate() + 7);
-                break;
-            case 'monthly':
-            default:
-                periodicRate = annualRate / 12;
-                periods = duration;
-                firstPaymentDate = new Date();
-                firstPaymentDate.setMonth(firstPaymentDate.getMonth() + 1);
-                break;
-        }
+            // Validate interest rate only if not auto-calculated
+            if (!isAutoCalculatedRate && calculatedInterestRate <= 0) {
+                alert('Veuillez entrer un taux d\'intérêt valide');
+                interestRateEl.focus();
+                return;
+            }
 
-        let periodicPayment, totalInterest, totalPayment;
-        let remainingBalance = amount;
+            // Calculate based on frequency
+            const annualRate = calculatedInterestRate / 100;
+            let periodicRate, periods, firstPaymentDate;
 
-        switch (amortizationMethod) {
-            case 'flat_rate':
-            case 'pato_ndogo':
-                if (frequency === 'daily') {
-                    // DAILY FLAT RATE: Special calculation per requirements
-                    // Intérêt Total = Capital × Taux (%)
-                    // Montant Total = Capital + Intérêt Total
-                    // Paiement Journalier = Montant Total / Nombre de Jours
-                    // Part Capital journalier = Capital / Nombre de jours
-                    // Part Intérêt journalier = Intérêt Total / Nombre de jours
-                    totalInterest = amount * annualRate; // annualRate here is the full rate (e.g., 0.10 for 10%)
-                    totalPayment = amount + totalInterest;
-                    periodicPayment = totalPayment / periods;
-                } else {
-                    // Regular flat rate (weekly/monthly)
-                    const periodicPrincipal = amount / periods;
-                    const periodicInterest = amount * periodicRate;
-                    periodicPayment = periodicPrincipal + periodicInterest;
-                    totalInterest = periodicInterest * periods;
-                    totalPayment = amount + totalInterest;
-                }
-                break;
+            switch (frequency) {
+                case 'daily':
+                    periodicRate = annualRate / 365;
+                    periods = duration;
+                    firstPaymentDate = new Date();
+                    firstPaymentDate.setDate(firstPaymentDate.getDate() + 1);
+                    break;
+                case 'weekly':
+                    periodicRate = annualRate / 52;
+                    periods = duration;
+                    firstPaymentDate = new Date();
+                    firstPaymentDate.setDate(firstPaymentDate.getDate() + 7);
+                    break;
+                case 'monthly':
+                default:
+                    periodicRate = annualRate / 12;
+                    periods = duration;
+                    firstPaymentDate = new Date();
+                    firstPaymentDate.setMonth(firstPaymentDate.getMonth() + 1);
+                    break;
+            }
 
-            case 'constant_capital':
-                // Constant Capital: Fixed principal, declining interest
-                const fixedPrincipal = amount / periods;
-                periodicPayment = fixedPrincipal + (amount * periodicRate); // First payment
-                // Calculate total interest
-                totalInterest = 0;
-                remainingBalance = amount;
-                for (let i = 1; i <= periods; i++) {
-                    totalInterest += remainingBalance * periodicRate;
-                    remainingBalance -= fixedPrincipal;
-                }
-                totalPayment = amount + totalInterest;
-                break;
-
-            case 'french':
-            default:
-                // French (Standard amortization): Constant payment
-                if (periodicRate === 0) {
-                    periodicPayment = amount / periods;
-                } else {
-                    periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
-                }
-                totalPayment = periodicPayment * periods;
-                totalInterest = totalPayment - amount;
-                break;
-        }
-
-        // Store calculated periodic payment for adjusted amount feature
-        calculatedPeriodicPayment = periodicPayment;
-
-        // Show/hide adjusted amount row for Pato Ndogo daily
-        const adjustedRow = document.getElementById('adjustedAmountRow');
-        if (amortizationMethod === 'pato_ndogo' && frequency === 'daily') {
-            adjustedRow.style.display = 'flex';
-            // Pre-fill with calculated amount
-            document.getElementById('adjusted_daily_amount').value = periodicPayment.toFixed(2);
-            // Trigger surplus calculation
-            calculateSurplus();
-        } else {
-            adjustedRow.style.display = 'none';
-        }
-
-        // Show/hide late penalty row for daily flat_rate/pato_ndogo
-        const latePenaltyRow = document.getElementById('latePenaltyRow');
-        if ((amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo') && frequency === 'daily') {
-            latePenaltyRow.style.display = 'block';
-        } else {
-            latePenaltyRow.style.display = 'none';
-        }
-
-        // Update labels based on frequency
-        const frequencyLabels = {
-            'daily': { payment: 'Paiement Quotidien', period: 'jour' },
-            'weekly': { payment: 'Paiement Hebdomadaire', period: 'semaine' },
-            'monthly': { payment: 'Paiement Mensuel', period: 'mois' }
-        };
-
-        const labels = frequencyLabels[frequency] || frequencyLabels['monthly'];
-        document.getElementById('paymentLabel').textContent = labels.payment;
-        document.getElementById('paymentHeader').textContent = labels.payment;
-
-        // Display summary with formatted numbers
-        document.getElementById('monthlyPayment').textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
-        document.getElementById('totalInterest').textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
-        document.getElementById('totalPayment').textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
-
-        document.getElementById('loanSummary').style.display = 'flex';
-
-        // Sync preview calculator values to hidden loan fields
-        document.getElementById('repayment_frequency').value = frequency;
-        document.getElementById('duration_value').value = duration;
-        document.getElementById('amortization_method').value = amortizationMethod;
-        document.getElementById('interest_rate').value = calculatedInterestRate;
-
-        // Generate amortization schedule
-        remainingBalance = amount;
-        let schedule = '';
-        let paymentDate = new Date(firstPaymentDate);
-
-        for (let i = 1; i <= periods; i++) {
-            let principalPayment, interestPayment;
+            let periodicPayment, totalInterest, totalPayment;
+            let remainingBalance = amount;
 
             switch (amortizationMethod) {
                 case 'flat_rate':
-            case 'pato_ndogo':
+                case 'pato_ndogo':
                     if (frequency === 'daily') {
-                        // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
-                        principalPayment = amount / periods;
-                        interestPayment = totalInterest / periods;
+                        totalInterest = amount * annualRate;
+                        totalPayment = amount + totalInterest;
+                        periodicPayment = totalPayment / periods;
                     } else {
-                        // Regular flat rate (weekly/monthly) - constant principal and interest
-                        principalPayment = amount / periods;
-                        interestPayment = amount * periodicRate;
+                        const periodicPrincipal = amount / periods;
+                        const periodicInterest = amount * periodicRate;
+                        periodicPayment = periodicPrincipal + periodicInterest;
+                        totalInterest = periodicInterest * periods;
+                        totalPayment = amount + totalInterest;
                     }
-                    // Decrement remaining balance for flat rate methods
-                    remainingBalance -= principalPayment;
                     break;
 
                 case 'constant_capital':
-                    principalPayment = amount / periods;
-                    interestPayment = remainingBalance * periodicRate;
-                    remainingBalance -= principalPayment;
+                    const fixedPrincipal = amount / periods;
+                    periodicPayment = fixedPrincipal + (amount * periodicRate);
+                    totalInterest = 0;
+                    remainingBalance = amount;
+                    for (let i = 1; i <= periods; i++) {
+                        totalInterest += remainingBalance * periodicRate;
+                        remainingBalance -= fixedPrincipal;
+                    }
+                    totalPayment = amount + totalInterest;
                     break;
 
                 case 'french':
                 default:
-                    interestPayment = remainingBalance * periodicRate;
-                    principalPayment = periodicPayment - interestPayment;
-                    remainingBalance -= principalPayment;
+                    if (periodicRate === 0) {
+                        periodicPayment = amount / periods;
+                    } else {
+                        periodicPayment = amount * periodicRate * Math.pow(1 + periodicRate, periods) / (Math.pow(1 + periodicRate, periods) - 1);
+                    }
+                    totalPayment = periodicPayment * periods;
+                    totalInterest = totalPayment - amount;
                     break;
             }
 
-            // Format date based on frequency
-            let dateStr;
-            const currentDate = new Date(paymentDate);
-            if (frequency === 'daily') {
-                dateStr = currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
-            } else if (frequency === 'weekly') {
-                dateStr = 'Sem ' + getWeekNumber(currentDate) + ' ' + currentDate.getFullYear();
-            } else {
-                dateStr = currentDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+            // Store calculated periodic payment for adjusted amount feature
+            calculatedPeriodicPayment = periodicPayment;
+
+            // Show/hide adjusted amount row for Pato Ndogo daily
+            const adjustedRow = document.getElementById('adjustedAmountRow');
+            if (adjustedRow) {
+                if (amortizationMethod === 'pato_ndogo' && frequency === 'daily') {
+                    adjustedRow.style.display = 'flex';
+                    const adjustedAmountEl = document.getElementById('adjusted_daily_amount');
+                    if (adjustedAmountEl) adjustedAmountEl.value = periodicPayment.toFixed(2);
+                    calculateSurplus();
+                } else {
+                    adjustedRow.style.display = 'none';
+                }
             }
 
-            schedule += `<tr>
-                <td>${i}</td>
-                <td>${dateStr}</td>
-                <td>CDF ${Math.round(periodicPayment).toLocaleString()}</td>
-                <td>CDF ${Math.round(principalPayment).toLocaleString()}</td>
-                <td>CDF ${Math.round(interestPayment).toLocaleString()}</td>
-                <td>CDF ${Math.max(0, Math.round(remainingBalance)).toLocaleString()}</td>
-            </tr>`;
-
-            // Increment date for next period
-            if (frequency === 'daily') {
-                paymentDate.setDate(paymentDate.getDate() + 1);
-            } else if (frequency === 'weekly') {
-                paymentDate.setDate(paymentDate.getDate() + 7);
-            } else {
-                paymentDate.setMonth(paymentDate.getMonth() + 1);
+            // Show/hide late penalty row for daily flat_rate/pato_ndogo
+            const latePenaltyRow = document.getElementById('latePenaltyRow');
+            if (latePenaltyRow) {
+                if ((amortizationMethod === 'flat_rate' || amortizationMethod === 'pato_ndogo') && frequency === 'daily') {
+                    latePenaltyRow.style.display = 'block';
+                } else {
+                    latePenaltyRow.style.display = 'none';
+                }
             }
-        }
 
-        document.getElementById('amortizationBody').innerHTML = schedule;
-        document.getElementById('amortizationTable').style.display = 'block';
-    });
+            // Update labels based on frequency
+            const frequencyLabels = {
+                'daily': { payment: 'Paiement Quotidien', period: 'jour' },
+                'weekly': { payment: 'Paiement Hebdomadaire', period: 'semaine' },
+                'monthly': { payment: 'Paiement Mensuel', period: 'mois' }
+            };
 
-    // Surplus/Shortfall calculation for adjusted amount
+            const labels = frequencyLabels[frequency] || frequencyLabels['monthly'];
+            const paymentLabel = document.getElementById('paymentLabel');
+            const paymentHeader = document.getElementById('paymentHeader');
+            if (paymentLabel) paymentLabel.textContent = labels.payment;
+            if (paymentHeader) paymentHeader.textContent = labels.payment;
+
+            // Display summary with formatted numbers
+            const monthlyPaymentEl = document.getElementById('monthlyPayment');
+            const totalInterestEl = document.getElementById('totalInterest');
+            const totalPaymentEl = document.getElementById('totalPayment');
+            const loanSummaryEl = document.getElementById('loanSummary');
+
+            if (monthlyPaymentEl) monthlyPaymentEl.textContent = 'CDF ' + Math.round(periodicPayment).toLocaleString();
+            if (totalInterestEl) totalInterestEl.textContent = 'CDF ' + Math.round(totalInterest).toLocaleString();
+            if (totalPaymentEl) totalPaymentEl.textContent = 'CDF ' + Math.round(totalPayment).toLocaleString();
+            if (loanSummaryEl) loanSummaryEl.style.display = 'flex';
+
+            // Sync preview calculator values to hidden loan fields
+            const repaymentFrequencyEl = document.getElementById('repayment_frequency');
+            const durationValueEl = document.getElementById('duration_value');
+            const amortizationMethodHiddenEl = document.getElementById('amortization_method');
+            const interestRateHiddenEl = document.getElementById('interest_rate');
+
+            if (repaymentFrequencyEl) repaymentFrequencyEl.value = frequency;
+            if (durationValueEl) durationValueEl.value = duration;
+            if (amortizationMethodHiddenEl) amortizationMethodHiddenEl.value = amortizationMethod;
+            if (interestRateHiddenEl) interestRateHiddenEl.value = calculatedInterestRate;
+
+            // Generate amortization schedule
+            remainingBalance = amount;
+            let schedule = '';
+            let paymentDate = new Date(firstPaymentDate);
+
+            for (let i = 1; i <= periods; i++) {
+                let principalPayment, interestPayment;
+
+                switch (amortizationMethod) {
+                    case 'flat_rate':
+                case 'pato_ndogo':
+                        if (frequency === 'daily') {
+                            principalPayment = amount / periods;
+                            interestPayment = totalInterest / periods;
+                        } else {
+                            principalPayment = amount / periods;
+                            interestPayment = amount * periodicRate;
+                        }
+                        remainingBalance -= principalPayment;
+                        break;
+
+                    case 'constant_capital':
+                        principalPayment = amount / periods;
+                        interestPayment = remainingBalance * periodicRate;
+                        remainingBalance -= principalPayment;
+                        break;
+
+                    case 'french':
+                    default:
+                        interestPayment = remainingBalance * periodicRate;
+                        principalPayment = periodicPayment - interestPayment;
+                        remainingBalance -= principalPayment;
+                        break;
+                }
+
+                // Format date based on frequency
+                let dateStr;
+                const currentDate = new Date(paymentDate);
+                if (frequency === 'daily') {
+                    dateStr = currentDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+                } else if (frequency === 'weekly') {
+                    dateStr = 'Sem ' + getWeekNumber(currentDate) + ' ' + currentDate.getFullYear();
+                } else {
+                    dateStr = currentDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+                }
+
+                schedule += `<tr>
+                    <td>${i}</td>
+                    <td>${dateStr}</td>
+                    <td>CDF ${Math.round(periodicPayment).toLocaleString()}</td>
+                    <td>CDF ${Math.round(principalPayment).toLocaleString()}</td>
+                    <td>CDF ${Math.round(interestPayment).toLocaleString()}</td>
+                    <td>CDF ${Math.max(0, Math.round(remainingBalance)).toLocaleString()}</td>
+                </tr>`;
+
+                // Increment date for next period
+                if (frequency === 'daily') {
+                    paymentDate.setDate(paymentDate.getDate() + 1);
+                } else if (frequency === 'weekly') {
+                    paymentDate.setDate(paymentDate.getDate() + 7);
+                } else {
+                    paymentDate.setMonth(paymentDate.getMonth() + 1);
+                }
+            }
+
+            const amortizationBody = document.getElementById('amortizationBody');
+            const amortizationTable = document.getElementById('amortizationTable');
+            if (amortizationBody) amortizationBody.innerHTML = schedule;
+            if (amortizationTable) amortizationTable.style.display = 'block';
+        });
+    }
+
+    // ============================================
+    // SURPLUS/SHORTFALL CALCULATION
+    // ============================================
     function calculateSurplus() {
         const theoreticalAmount = calculatedPeriodicPayment;
-        const adjustedAmount = parseFloat(document.getElementById('adjusted_daily_amount').value) || 0;
+        const adjustedAmountEl = document.getElementById('adjusted_daily_amount');
+        const adjustedAmount = adjustedAmountEl ? parseFloat(adjustedAmountEl.value) || 0 : 0;
         const surplusInput = document.getElementById('surplus_amount');
         const surplusDesc = document.getElementById('surplus_description');
 
+        if (!surplusInput || !surplusDesc) return;
+
         if (adjustedAmount > 0) {
-            const duration = parseInt(document.getElementById('preview_duration').value) || 1;
+            const durationEl = document.getElementById('preview_duration');
+            const duration = durationEl ? parseInt(durationEl.value) || 1 : 1;
             const difference = (adjustedAmount - theoreticalAmount) * duration;
             const absDiff = Math.abs(difference);
 
@@ -998,73 +1570,94 @@
                 surplusInput.className = 'form-control text-success';
                 surplusDesc.textContent = 'Surplus total à rembourser au membre ou transférer à l\'épargne à la clôture';
                 surplusDesc.className = 'text-success';
-                document.getElementById('surplus_type').value = 'surplus';
+                const surplusTypeEl = document.getElementById('surplus_type');
+                if (surplusTypeEl) surplusTypeEl.value = 'surplus';
             } else if (difference < 0) {
                 surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Manquant total)';
                 surplusInput.className = 'form-control text-danger';
                 surplusDesc.textContent = 'Manquant total à collecter du membre à la clôture';
                 surplusDesc.className = 'text-danger';
-                document.getElementById('surplus_type').value = 'shortfall';
+                const surplusTypeEl = document.getElementById('surplus_type');
+                if (surplusTypeEl) surplusTypeEl.value = 'shortfall';
             } else {
                 surplusInput.value = 'CDF 0 (Équilibré)';
                 surplusInput.className = 'form-control text-info';
                 surplusDesc.textContent = 'Montant ajusté équivaut au montant théorique';
                 surplusDesc.className = 'text-info';
-                document.getElementById('surplus_type').value = 'none';
+                const surplusTypeEl = document.getElementById('surplus_type');
+                if (surplusTypeEl) surplusTypeEl.value = 'none';
             }
 
             // Populate hidden fields for form submission
-            document.getElementById('theoretical_daily_amount').value = theoreticalAmount.toFixed(2);
-            document.getElementById('total_surplus_amount').value = absDiff.toFixed(2);
+            const theoreticalDailyEl = document.getElementById('theoretical_daily_amount');
+            const totalSurplusEl = document.getElementById('total_surplus_amount');
+            if (theoreticalDailyEl) theoreticalDailyEl.value = theoreticalAmount.toFixed(2);
+            if (totalSurplusEl) totalSurplusEl.value = absDiff.toFixed(2);
         } else {
             surplusInput.value = '';
             surplusDesc.textContent = '';
-            document.getElementById('surplus_type').value = '';
-            document.getElementById('theoretical_daily_amount').value = '';
-            document.getElementById('total_surplus_amount').value = '';
+            const surplusTypeEl = document.getElementById('surplus_type');
+            const theoreticalDailyEl = document.getElementById('theoretical_daily_amount');
+            const totalSurplusEl = document.getElementById('total_surplus_amount');
+            if (surplusTypeEl) surplusTypeEl.value = '';
+            if (theoreticalDailyEl) theoreticalDailyEl.value = '';
+            if (totalSurplusEl) totalSurplusEl.value = '';
         }
     }
 
     // Event listener for adjusted amount input
-    document.getElementById('adjusted_daily_amount').addEventListener('input', calculateSurplus);
+    const adjustedDailyAmountEl = document.getElementById('adjusted_daily_amount');
+    if (adjustedDailyAmountEl) {
+        adjustedDailyAmountEl.addEventListener('input', calculateSurplus);
+    }
 
-    // Helper function to get week number
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
     function getWeekNumber(date) {
+        if (!date) return 1;
         const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
         const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
         return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
     }
 
-    // Optional: Auto-calculate when amount changes (if needed)
-    document.getElementById('amount_applied').addEventListener('change', function() {
-        if (this.value > 0) {
-            // You could auto-trigger calculation here if desired
-        }
+    // ============================================
+    // FORM SUBMISSION HANDLERS
+    // ============================================
+    const stickySubmitBtn = document.getElementById('sticky-submit-btn');
+    if (stickySubmitBtn) {
+        stickySubmitBtn.addEventListener('click', function() {
+            const form = document.getElementById('loan-form');
+            if (form) {
+                if (form.checkValidity()) {
+                    form.submit();
+                } else {
+                    form.reportValidity();
+                }
+            }
+        });
+    }
+
+    const mobileSubmitBtn = document.getElementById('mobile-submit-btn');
+    if (mobileSubmitBtn) {
+        mobileSubmitBtn.addEventListener('click', function() {
+            const form = document.getElementById('loan-form');
+            if (form) {
+                if (form.checkValidity()) {
+                    form.submit();
+                } else {
+                    form.reportValidity();
+                }
+            }
+        });
+    }
+
+    // ============================================
+    // CLEANUP ON PAGE UNLOAD
+    // ============================================
+    window.addEventListener('beforeunload', function() {
+        stopQrScanner();
     });
 
-    // Form submission handlers for sticky/mobile footer buttons
-    document.getElementById('sticky-submit-btn').addEventListener('click', function() {
-        const form = document.getElementById('loan-form');
-        if (form) {
-            // Trigger HTML5 validation first
-            if (form.checkValidity()) {
-                form.submit();
-            } else {
-                form.reportValidity();
-            }
-        }
-    });
-
-    document.getElementById('mobile-submit-btn').addEventListener('click', function() {
-        const form = document.getElementById('loan-form');
-        if (form) {
-            // Trigger HTML5 validation first
-            if (form.checkValidity()) {
-                form.submit();
-            } else {
-                form.reportValidity();
-            }
-        }
-    });
 </script>
 @endpush

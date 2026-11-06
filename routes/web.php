@@ -166,6 +166,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         // CRUD operations
         Route::get('/create', [AdminLoanController::class, 'create'])->name('create');
+        Route::post('/find-member-qr', [AdminLoanController::class, 'findMemberByQrCode'])->name('find-member-qr');
         Route::post('/', [AdminLoanController::class, 'store'])->name('store');
         Route::get('/{loan}', [AdminLoanController::class, 'show'])->name('show');
 
