@@ -422,12 +422,24 @@
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('loanStatusChart').getContext('2d');
 
+        // Translation strings
+        const labels = [
+            '{{ __('pending') }}',
+            '{{ __('under_verification') }}',
+            '{{ __('verified') }}',
+            '{{ __('approved') }}',
+            '{{ __('disbursed') }}',
+            '{{ __('completed') }}',
+            '{{ __('defaulted') }}'
+        ];
+        const datasetLabel = '{{ __('number_of_loans') }}';
+
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Pending', 'Under Verification', 'Verified', 'Approved', 'Disbursed', 'Completed', 'Defaulted'],
+                labels: labels,
                 datasets: [{
-                    label: 'Number of Loans',
+                    label: datasetLabel,
                     data: [
                         {{ $stats['pending_loans'] }},
                         {{ $stats['under_verification'] }},

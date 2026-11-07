@@ -488,14 +488,14 @@
                                         <div class="form-group">
                                             <label>Catégorie de Document <span class="text-danger">*</span></label>
                                             <select class="form-control" name="document_categories[0]" required>
-                                                <option value="">Sélectionner la Catégorie</option>
-                                                <option value="guarantor_id">Pièce d'identité du Garant</option>
-                                                <option value="collateral_photo">Photo de la Garantie</option>
-                                                <option value="collateral_document">Document de la Garantie</option>
-                                                <option value="proof_of_income">Preuve de Revenu</option>
-                                                <option value="bank_statement">Relevé Bancaire</option>
-                                                <option value="application_form">Formulaire de Demande</option>
-                                                <option value="other">Autre</option>
+                                                <option value="">{{ __('select_category') }}</option>
+                                                <option value="guarantor_id">{{ __('document_category_guarantor_id') }}</option>
+                                                <option value="collateral_photo">{{ __('document_category_collateral_photo') }}</option>
+                                                <option value="collateral_document">{{ __('document_category_collateral_document') }}</option>
+                                                <option value="proof_of_income">{{ __('document_category_proof_of_income') }}</option>
+                                                <option value="bank_statement">{{ __('document_category_bank_statement') }}</option>
+                                                <option value="application_form">{{ __('document_category_application_form') }}</option>
+                                                <option value="other">{{ __('document_category_other') }}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -503,9 +503,9 @@
                                         <div class="form-group">
                                             <label>Lier au Garant (Optionnel)</label>
                                             <select class="form-control" name="document_guarantor[0]">
-                                                <option value="">Non lié à un garant</option>
+                                                <option value="">{{ __('not_linked_to_guarantor') }}</option>
                                                 @for($i = 0; $i < 3; $i++)
-                                                    <option value="guarantor_{{ $i }}">Garant {{ $i + 1 }}</option>
+                                                    <option value="guarantor_{{ $i }}">{{ __('guarantor_number') }} {{ $i + 1 }}</option>
                                                 @endfor
                                             </select>
                                         </div>

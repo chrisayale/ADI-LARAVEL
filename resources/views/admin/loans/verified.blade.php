@@ -237,7 +237,7 @@
                                             $verifiedDocCount = $loan->documents->where('verification_status', 'verified')->count();
                                         @endphp
                                         <span class="badge bg-{{ $docCount > 0 ? 'success' : 'secondary' }}">
-                                            {{ $docCount }} {{ __('files') }}
+                                            {{ $docCount }} {{ \Illuminate\Support\Str::plural(__('file'), $docCount) }}
                                         </span>
                                         @if($docCount > 0)
                                             <br>

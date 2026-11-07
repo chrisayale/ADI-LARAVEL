@@ -141,7 +141,7 @@
                                     <th>{{ __('status') }}:</th>
                                     <td>
                                         <span class="badge badge-{{ $loan->user->status === 'active' ? 'success' : 'warning' }}">
-                                            {{ ucfirst($loan->user->status ?? 'active') }}
+                                            {{ __($loan->user->status ?? 'active') }}
                                         </span>
                                     </td>
                                 </tr>
@@ -150,7 +150,7 @@
                                     <td>
                                         @if($loan->user->roles && $loan->user->roles->count() > 0)
                                             @foreach($loan->user->roles as $role)
-                                                <span class="badge badge-info">{{ ucfirst($role->name) }}</span>
+                                                <span class="badge badge-info">{{ __($role->name) }}</span>
                                             @endforeach
                                         @else
                                             <span class="badge badge-secondary">{{ __('member') }}</span>
@@ -227,7 +227,7 @@
                                             @elseif($loan->amortization_method == 'constant_capital')
                                                 {{ __('constant_capital_method') }}
                                             @else
-                                                {{ ucfirst($loan->amortization_method) }}
+                                                {{ __('amortization_method_' . $loan->amortization_method) }}
                                             @endif
                                         </span>
                                     </td>
@@ -392,7 +392,7 @@
                                             $statusColor = $statusColors[$guarantor->status] ?? 'secondary';
                                         @endphp
                                         <span class="badge badge-{{ $statusColor }}">
-                                            {{ ucfirst($guarantor->status ?? 'pending') }}
+                                            {{ __($guarantor->status ?? 'pending') }}
                                         </span>
                                         @if($guarantor->verified_at)
                                             <br><small class="text-muted">{{ __('verified') }}: {{ $guarantor->verified_at->format('d M Y') }}</small>
@@ -403,7 +403,7 @@
                                             $guarantorDocs = $loan->documents ? $loan->documents->where('guarantor_id', $guarantor->id) : collect();
                                         @endphp
                                         @if($guarantorDocs->count() > 0)
-                                            <span class="badge badge-info">{{ $guarantorDocs->count() }} {{ __('files') }}</span>
+                                            <span class="badge badge-info">{{ $guarantorDocs->count() }} {{ \Illuminate\Support\Str::plural(__('file'), $guarantorDocs->count()) }}</span>
                                         @else
                                             <span class="badge badge-secondary">{{ __('no_docs') }}</span>
                                         @endif
@@ -445,7 +445,7 @@
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">{{ __('supporting_documents') }}</h6>
                     @if($loan->documents && $loan->documents->count() > 0)
-                        <span class="badge badge-info">{{ $loan->documents->count() }} {{ __('files') }}</span>
+                        <span class="badge badge-info">{{ $loan->documents->count() }} {{ \Illuminate\Support\Str::plural(__('file'), $loan->documents->count()) }}</span>
                     @endif
                 </div>
                 <div class="card-body">
@@ -474,7 +474,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge badge-info">{{ str_replace('_', ' ', ucfirst($document->category)) }}</span>
+                                            <span class="badge badge-info">{{ __('document_category.' . $document->category) }}</span>
                                         </td>
                                         <td>{{ $document->formatted_size }}</td>
                                         <td>
@@ -487,7 +487,7 @@
                                                 $docStatusColor = $docStatusColors[$document->verification_status] ?? 'secondary';
                                             @endphp
                                             <span class="badge badge-{{ $docStatusColor }}">
-                                                {{ ucfirst($document->verification_status) }}
+                                                {{ __($document->verification_status) }}
                                             </span>
                                             @if($document->verified_at)
                                                 <br><small>{{ $document->verified_at->format('d M Y') }}</small>
