@@ -104,7 +104,7 @@
                                     </th>
                                     <th>Installment</th>
                                     <th>Due Date</th>
-                                    <th>Theoretical Amount</th>
+                                    <th>Montant dû</th>
                                     <th>Adjusted Amount</th>
                                     <th>Amount Paid</th>
                                     <th>Penalty</th>
@@ -129,14 +129,14 @@
                                                    class="repayment-checkbox loan-{{ $loan->id }}"
                                                    value="{{ $repayment->id }}"
                                                    data-amount="{{ $balance }}"
-                                                   data-theoretical="{{ $repayment->amount_due }}"
+                                                   data-theoretical="{{ $effectiveDue }}"
                                                    data-adjusted="{{ $repayment->adjusted_amount ?? $repayment->amount_due }}"
                                                    data-penalty="{{ $repayment->penalty_amount ?? 0 }}"
                                                    data-loan="{{ $loan->id }}">
                                         </td>
                                         <td>{{ $repayment->installment_number }}</td>
                                         <td>{{ $repayment->due_date->format('d/m/Y') }}</td>
-                                        <td>CDF {{ number_format($repayment->amount_due, 2) }}</td>
+                                        <td class="font-weight-bold">CDF {{ number_format($effectiveDue, 2) }}</td>
                                         <td>
                                             <input type="number"
                                                    class="form-control form-control-sm adjusted-amount-input"
@@ -225,7 +225,7 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Total Theoretical Due</label>
+                                    <label>Total Due (Adjusted)</label>
                                     <div class="form-control bg-light font-weight-bold text-primary" id="totalTheoreticalAmount">0.00</div>
                                 </div>
                             </div>
@@ -355,11 +355,11 @@ $(document).ready(function() {
     // Handle adjusted amount input changes
     $(document).on('change', '.adjusted-amount-input', function() {
         const repaymentId = $(this).data('repayment-id');
-        const theoreticalAmount = parseFloat($(this).closest('tr').find('input.repayment-checkbox').data('theoretical'));
+        const currentEffectiveDue = parseFloat($(this).closest('tr').find('input.repayment-checkbox').data('theoretical'));
         const adjustedAmount = parseFloat($(this).val()) || 0;
 
-        // Update the difference display
-        const difference = adjustedAmount - theoreticalAmount;
+        // Update the difference display (difference between new adjusted and current effective due)
+        const difference = adjustedAmount - currentEffectiveDue;
         const diffCell = $(this).closest('tr').find('td:nth-child(9)');
 
         if (difference > 0) {
@@ -376,12 +376,15 @@ $(document).ready(function() {
         // Update the checkbox data-amount to use adjusted amount
         $(this).closest('tr').find('input.repayment-checkbox').data('amount', adjustedAmount.toFixed(2));
         $(this).closest('tr').find('input.repayment-checkbox').data('adjusted', adjustedAmount.toFixed(2));
+        // Update the theoretical/effective due to the new adjusted amount
+        $(this).closest('tr').find('input.repayment-checkbox').data('theoretical', adjustedAmount.toFixed(2));
 
         // Recalculate totals if this repayment is selected
         if (selectedRepayments.has(repaymentId)) {
             selectedRepayments.set(repaymentId, {
                 ...selectedRepayments.get(repaymentId),
-                amount: adjustedAmount
+                amount: adjustedAmount,
+                theoreticalAmount: adjustedAmount
             });
             updateTotals();
         }
@@ -391,7 +394,7 @@ $(document).ready(function() {
     $(document).on('change', '.repayment-checkbox', function() {
         const repaymentId = $(this).val();
         const amount = parseFloat($(this).data('amount'));
-        const theoreticalAmount = parseFloat($(this).data('theoretical'));
+        const effectiveDue = parseFloat($(this).data('theoretical'));
         const penaltyAmount = parseFloat($(this).data('penalty') || 0);
         const loanId = $(this).data('loan');
 
@@ -405,7 +408,7 @@ $(document).ready(function() {
             selectedRepayments.set(repaymentId, {
                 id: repaymentId,
                 amount: parseFloat(amount.toFixed(2)),
-                theoreticalAmount: theoreticalAmount,
+                theoreticalAmount: effectiveDue,
                 penaltyAmount: penaltyAmount,
                 loanId: loanId
             });
