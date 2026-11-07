@@ -572,6 +572,31 @@ public function createRepaymentSchedule()
     }
 
     /**
+     * Get the payment frequency label (translated) based on repayment_frequency
+     */
+    public function getPaymentFrequencyLabelAttribute()
+    {
+        return match ($this->repayment_frequency) {
+            'daily' => __('daily_payment'),
+            'weekly' => __('weekly_payment'),
+            'monthly' => __('monthly_payment'),
+            default => __('monthly_payment')
+        };
+    }
+
+    /**
+     * Get the effective periodic payment (adjusted for Pato Ndongo daily loans)
+     */
+    public function getEffectivePeriodicPaymentAttribute()
+    {
+        // For Pato Ndongo daily loans, use the adjusted daily amount
+        if ($this->repayment_frequency === 'daily' && $this->amortization_method === 'pato_ndogo') {
+            return $this->adjusted_daily_amount ?? $this->monthly_repayment;
+        }
+        return $this->monthly_repayment;
+    }
+
+    /**
      * Get the full interest rate label with dynamic period
      */
     public function getInterestRateLabelAttribute()

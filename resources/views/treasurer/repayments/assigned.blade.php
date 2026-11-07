@@ -53,7 +53,7 @@
                             <th>{{ __('application_no') }}</th>
                             <th>{{ __('member') }}</th>
                             <th>{{ __('amount_approved') }}</th>
-                            <th>{{ __('monthly_payment') }}</th>
+                            <th>{{ __('periodic_payment') }}</th>
                             <th>{{ __('balance') }}</th>
                             <th>{{ __('progress') }}</th>
                             <th>{{ __('status') }}</th>
@@ -87,7 +87,10 @@
                             <td class="text-right">
                                 <strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong>
                             </td>
-                            <td class="text-right">CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
+                            <td class="text-right">
+                                CDF {{ number_format($loan->effective_periodic_payment, 2) }}
+                                <br><small class="text-muted">{{ $loan->payment_frequency_label }}</small>
+                            </td>
                             <td class="text-right {{ $loan->balance > 0 ? 'text-danger' : 'text-success' }}">
                                 <strong>CDF {{ number_format($loan->balance, 2) }}</strong>
                             </td>
