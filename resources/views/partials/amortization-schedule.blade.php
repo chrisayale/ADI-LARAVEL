@@ -1,11 +1,34 @@
 @if($loan->repayments && $loan->repayments->count() > 0)
+    @php
+        $periodCount = $loan->repayments->count();
+        $isPatoNdogoDaily = ($loan->amortization_method === 'pato_ndogo' && $loan->repayment_frequency === 'daily');
+        $adjustedAmount = $loan->adjusted_daily_amount ?? ($isPatoNdogoDaily ? ceil($loan->monthly_repayment / 100) * 100 : $loan->monthly_repayment);
+        $constantPrincipal = $loan->amount_approved / $periodCount;
+        $totalAdjustedDue = $adjustedAmount * $periodCount;
+        $totalPaid = $loan->repayments->sum('amount_paid');
+        $globalBalance = $totalAdjustedDue - $totalPaid;
+        if ($globalBalance < 0) $globalBalance = 0;
+
+        // Theoretical components for Pato Ndogo daily: EXACT simple division
+        if ($isPatoNdogoDaily) {
+            $theoreticalRate = (($periodCount / 30) * 10) / 100; // e.g., 0.10
+            $theoreticalTotalInterest = $loan->amount_approved * $theoreticalRate;
+            $constantInterest = $theoreticalTotalInterest / $periodCount; // Constant per day
+            $theoreticalAmount = $constantPrincipal + $constantInterest; // Exact: 3666.6666...
+        } else {
+            $theoreticalAnnualRate = $loan->interest_rate / 100;
+            $theoreticalPeriodicRate = $theoreticalAnnualRate /
+                ($loan->repayment_frequency === 'daily' ? 365 :
+                ($loan->repayment_frequency === 'weekly' ? 52 : 12));
+        }
+    @endphp
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Tableau d'amortissement du prêt</h6>
         <div>
-            <span class="badge badge-info mr-2">Total : CDF {{ number_format($loan->total_repayable, 2) }}</span>
-            <span class="badge badge-success">Payé : CDF {{ number_format($loan->repayments->sum('amount_paid'), 2) }}</span>
-            <span class="badge badge-warning">Solde : CDF {{ number_format($loan->balance, 2) }}</span>
+            <span class="badge badge-info mr-2">Total dû (Ajusté) : CDF {{ number_format($totalAdjustedDue, 2) }}</span>
+            <span class="badge badge-success">Total payé : CDF {{ number_format($totalPaid, 2) }}</span>
+            <span class="badge badge-warning">Solde global : CDF {{ number_format($globalBalance, 2) }}</span>
         </div>
     </div>
     <div class="card-body">
@@ -32,7 +55,7 @@
                         <th style="width: 140px;" class="text-end">Montant théorique (Exact)</th>
                         <th style="width: 100px;" class="text-end">Écart</th>
                         <th style="width: 100px;" class="text-end">Montant payé</th>
-                        <th style="width: 90px;" class="text-end">Solde</th>
+                        <th style="width: 90px;" class="text-end">Solde global</th>
                         <th style="width: 100px;" class="text-center">Statut</th>
                         <th style="width: 110px;" class="text-center">Date de paiement</th>
                         <th style="width: 80px;" class="text-center">Reçu</th>
@@ -40,25 +63,8 @@
                 </thead>
                 <tbody>
                     @php
-                        $periodCount = $loan->repayments->count();
-                        $isPatoNdogoDaily = ($loan->amortization_method === 'pato_ndogo' && $loan->repayment_frequency === 'daily');
-                        $adjustedAmount = $loan->adjusted_daily_amount ?? ($isPatoNdogoDaily ? ceil($loan->monthly_repayment / 100) * 100 : $loan->monthly_repayment);
-                        $constantPrincipal = $loan->amount_approved / $periodCount;
-
-                        // Theoretical components for Pato Ndogo daily: EXACT simple division
-                        if ($isPatoNdogoDaily) {
-                            $theoreticalRate = (($periodCount / 30) * 10) / 100; // e.g., 0.10
-                            $theoreticalTotalInterest = $loan->amount_approved * $theoreticalRate;
-                            $constantInterest = $theoreticalTotalInterest / $periodCount; // Constant per day
-                            $theoreticalAmount = $constantPrincipal + $constantInterest; // Exact: 3666.6666...
-                        } else {
-                            $theoreticalAnnualRate = $loan->interest_rate / 100;
-                            $theoreticalPeriodicRate = $theoreticalAnnualRate /
-                                ($loan->repayment_frequency === 'daily' ? 365 :
-                                ($loan->repayment_frequency === 'weekly' ? 52 : 12));
-                        }
-
-                        $remainingBalance = $loan->amount_approved;
+                        // For new balance logic: cumulative paid tracking
+                        $cumulativePaid = 0;
                     @endphp
 
                     @foreach($loan->repayments as $repayment)
@@ -69,6 +75,9 @@
                                 $theoreticalAmt = $theoreticalAmount; // 3666.666666...
                             } else {
                                 // Standard declining balance for other methods
+                                if (!isset($remainingBalance)) {
+                                    $remainingBalance = $loan->amount_approved;
+                                }
                                 $theoreticalInterest = $remainingBalance * $theoreticalPeriodicRate;
                                 $theoreticalAmt = $constantPrincipal + $theoreticalInterest;
                                 $remainingBalance -= $constantPrincipal;
@@ -77,10 +86,12 @@
                             // Gap = Adjusted - Theoretical (exact)
                             $gap = $adjustedAmount - $theoreticalAmt;
 
-                            // For Pato Ndogo daily, balance decreases by constant principal
-                            if ($isPatoNdogoDaily) {
-                                $remainingBalance -= $constantPrincipal;
-                            }
+                            // Update cumulative paid
+                            $cumulativePaid += $repayment->amount_paid ?? 0;
+
+                            // NEW BALANCE LOGIC: Solde global = Total Adjusted Due - Cumulative Paid
+                            $rowGlobalBalance = $totalAdjustedDue - $cumulativePaid;
+                            if ($rowGlobalBalance < 0) $rowGlobalBalance = 0;
 
                             $statusColor = match($repayment->status) {
                                 'paid' => 'success',
@@ -104,7 +115,7 @@
                                 <span class="{{ $gapClass }}">{{ $gapSign }}CDF {{ number_format($gap, 6, ',', ' ') }}</span>
                             </td>
                             <td class="text-end">CDF {{ number_format($repayment->amount_paid ?? 0, 2, ',', ' ') }}</td>
-                            <td class="text-end">CDF {{ number_format(max(0, $remainingBalance), 2, ',', ' ') }}</td>
+                            <td class="text-end"><strong>CDF {{ number_format($rowGlobalBalance, 2, ',', ' ') }}</strong></td>
                             <td class="text-center">
                                 <span class="badge badge-{{ $statusColor }} px-3 py-2">
                                     {{ $repayment->status === 'paid' ? 'Payé' : ($repayment->status === 'partial' ? 'Partiel' : ($repayment->status === 'overdue' ? 'En retard' : 'En attente')) }}
@@ -126,6 +137,10 @@
                 <tfoot class="thead-light">
                     @php
                         // Calculate totals for footer
+                        $totalPaidFooter = $loan->repayments->sum('amount_paid');
+                        $finalGlobalBalance = $totalAdjustedDue - $totalPaidFooter;
+                        if ($finalGlobalBalance < 0) $finalGlobalBalance = 0;
+
                         if ($isPatoNdogoDaily) {
                             $totalTheoreticalInterest = $constantInterest * $periodCount;
                             $totalTheoreticalAmount = $theoreticalAmount * $periodCount;
@@ -145,7 +160,7 @@
                     @endphp
                     <tr>
                         <th colspan="2" class="text-right">Total :</th>
-                        <th class="text-end"><strong>CDF {{ number_format($adjustedAmount * $periodCount, 2, ',', ' ') }}</strong></th>
+                        <th class="text-end"><strong>CDF {{ number_format($totalAdjustedDue, 2, ',', ' ') }}</strong></th>
                         <th class="text-end"><strong>CDF {{ number_format($loan->amount_approved, 2, ',', ' ') }}</strong></th>
                         <th class="text-end"><strong>CDF {{ number_format($totalTheoreticalInterest, 6, ',', ' ') }}</strong></th>
                         <th class="text-end"><small>CDF {{ number_format($totalTheoreticalAmount, 6, ',', ' ') }}</small></th>
@@ -156,8 +171,8 @@
                             @endphp
                             <span class="{{ $gapClass }}">{{ $gapSign }}CDF {{ number_format($totalGap, 6, ',', ' ') }}</span>
                         </th>
-                        <th class="text-end">CDF {{ number_format($loan->repayments->sum('amount_paid'), 2, ',', ' ') }}</th>
-                        <th class="text-end">CDF {{ number_format(max(0, $loan->balance), 2, ',', ' ') }}</th>
+                        <th class="text-end">CDF {{ number_format($totalPaidFooter, 2, ',', ' ') }}</th>
+                        <th class="text-end"><strong>CDF {{ number_format($finalGlobalBalance, 2, ',', ' ') }}</strong></th>
                         <th colspan="3"></th>
                     </tr>
                 </tfoot>
