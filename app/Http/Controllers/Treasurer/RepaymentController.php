@@ -146,6 +146,7 @@ class RepaymentController extends Controller
             'notes' => 'nullable|string|max:500',
             'adjusted_amounts' => 'nullable|array',
             'adjusted_amounts.*' => 'nullable|numeric|min:0',
+            'penalty_amount' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -194,6 +195,7 @@ class RepaymentController extends Controller
             }
 
             $remainingAmount = $request->amount;
+            $penaltyAmount = $request->penalty_amount ?? 0;
 
             // Generate receipt number
             $receiptNumber = 'RCT-' . date('Ymd') . '-' . str_pad(PaymentTransaction::max('id') + 1, 6, '0', STR_PAD_LEFT);
@@ -215,7 +217,7 @@ class RepaymentController extends Controller
             ]);
 
             // Distribute payment across selected repayments
-            foreach ($repayments as $repayment) {
+            foreach ($repayments as $index => $repayment) {
                 if ($remainingAmount <= 0) break;
 
                 // Use effective amount due (adjusted if set, otherwise theoretical)
@@ -226,6 +228,11 @@ class RepaymentController extends Controller
                 if ($paymentToApply > 0) {
                     $repayment->amount_paid += $paymentToApply;
                     $repayment->total_paid += $paymentToApply;
+
+                    // Apply penalty to the first repayment if provided
+                    if ($index === 0 && $penaltyAmount > 0) {
+                        $repayment->penalty_amount += $penaltyAmount;
+                    }
 
                     if ($repayment->amount_paid >= $effectiveDue) {
                         $repayment->status = 'paid';

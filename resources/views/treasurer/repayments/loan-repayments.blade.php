@@ -141,6 +141,31 @@
         </div>
     </div>
 
+    <!-- Total Penalties Card -->
+    @php
+        $totalPenalties = $loan->repayments->sum('penalty_amount');
+    @endphp
+    @if($totalPenalties > 0)
+    <div class="row mb-4">
+        <div class="col-xl-12">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Total Penalties</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalPenalties, 2) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Repayment Schedule Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
@@ -156,6 +181,7 @@
                             <th>Theoretical Amount</th>
                             <th>Adjusted Amount</th>
                             <th>Amount Paid</th>
+                            <th>Penalty</th>
                             <th>Balance</th>
                             <th>Difference</th>
                             <th>Status</th>
@@ -194,6 +220,13 @@
                                 @endif
                             </td>
                             <td class="text-right">CDF {{ number_format($repayment->amount_paid, 2) }}</td>
+                            <td class="text-right">
+                                @if($repayment->penalty_amount > 0)
+                                    <span class="text-danger font-weight-bold">CDF {{ number_format($repayment->penalty_amount, 2) }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td class="text-right">
                                 <strong>CDF {{ number_format($balance, 2) }}</strong>
                             </td>

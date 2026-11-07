@@ -6,7 +6,8 @@
         $constantPrincipal = $loan->amount_approved / $periodCount;
         $totalAdjustedDue = $adjustedAmount * $periodCount;
         $totalPaid = $loan->repayments->sum('amount_paid');
-        $globalBalance = $totalAdjustedDue - $totalPaid;
+        $totalPenalties = $loan->repayments->sum('penalty_amount');
+        $globalBalance = $totalAdjustedDue + $totalPenalties - $totalPaid;
         if ($globalBalance < 0) $globalBalance = 0;
 
         // Theoretical components for Pato Ndogo daily: EXACT simple division
@@ -27,6 +28,7 @@
         <h6 class="m-0 font-weight-bold text-primary">Tableau d'amortissement du prêt</h6>
         <div>
             <span class="badge badge-info mr-2">Total dû (Ajusté) : CDF {{ number_format($totalAdjustedDue, 2) }}</span>
+            <span class="badge badge-warning mr-2">Pénalités : CDF {{ number_format($totalPenalties, 2) }}</span>
             <span class="badge badge-success">Total payé : CDF {{ number_format($totalPaid, 2) }}</span>
             <span class="badge badge-warning">Solde global : CDF {{ number_format($globalBalance, 2) }}</span>
         </div>
@@ -55,6 +57,7 @@
                         <th style="width: 140px;" class="text-end">Montant théorique (Exact)</th>
                         <th style="width: 100px;" class="text-end">Écart</th>
                         <th style="width: 100px;" class="text-end">Montant payé</th>
+                        <th style="width: 90px;" class="text-end">Pénalité</th>
                         <th style="width: 90px;" class="text-end">Solde global</th>
                         <th style="width: 100px;" class="text-center">Statut</th>
                         <th style="width: 110px;" class="text-center">Date de paiement</th>
@@ -65,6 +68,7 @@
                     @php
                         // For new balance logic: cumulative paid tracking
                         $cumulativePaid = 0;
+                        $cumulativePenalties = 0;
                     @endphp
 
                     @foreach($loan->repayments as $repayment)
@@ -86,11 +90,12 @@
                             // Gap = Adjusted - Theoretical (exact)
                             $gap = $adjustedAmount - $theoreticalAmt;
 
-                            // Update cumulative paid
+                            // Update cumulative paid and penalties
                             $cumulativePaid += $repayment->amount_paid ?? 0;
+                            $cumulativePenalties += $repayment->penalty_amount ?? 0;
 
-                            // NEW BALANCE LOGIC: Solde global = Total Adjusted Due - Cumulative Paid
-                            $rowGlobalBalance = $totalAdjustedDue - $cumulativePaid;
+                            // NEW BALANCE LOGIC: Solde global = Total Adjusted Due + Total Penalties - Cumulative Paid
+                            $rowGlobalBalance = $totalAdjustedDue + $cumulativePenalties - $cumulativePaid;
                             if ($rowGlobalBalance < 0) $rowGlobalBalance = 0;
 
                             $statusColor = match($repayment->status) {
@@ -115,6 +120,7 @@
                                 <span class="{{ $gapClass }}">{{ $gapSign }}CDF {{ number_format($gap, 6, ',', ' ') }}</span>
                             </td>
                             <td class="text-end">CDF {{ number_format($repayment->amount_paid ?? 0, 2, ',', ' ') }}</td>
+                            <td class="text-end">{{ $repayment->penalty_amount > 0 ? '<span class="text-danger fw-bold">CDF ' . number_format($repayment->penalty_amount, 2, ',', ' ') . '</span>' : 'CDF 0,00' }}</td>
                             <td class="text-end"><strong>CDF {{ number_format($rowGlobalBalance, 2, ',', ' ') }}</strong></td>
                             <td class="text-center">
                                 <span class="badge badge-{{ $statusColor }} px-3 py-2">
@@ -138,7 +144,8 @@
                     @php
                         // Calculate totals for footer
                         $totalPaidFooter = $loan->repayments->sum('amount_paid');
-                        $finalGlobalBalance = $totalAdjustedDue - $totalPaidFooter;
+                        $totalPenaltiesFooter = $loan->repayments->sum('penalty_amount');
+                        $finalGlobalBalance = $totalAdjustedDue + $totalPenaltiesFooter - $totalPaidFooter;
                         if ($finalGlobalBalance < 0) $finalGlobalBalance = 0;
 
                         if ($isPatoNdogoDaily) {
@@ -172,6 +179,7 @@
                             <span class="{{ $gapClass }}">{{ $gapSign }}CDF {{ number_format($totalGap, 6, ',', ' ') }}</span>
                         </th>
                         <th class="text-end">CDF {{ number_format($totalPaidFooter, 2, ',', ' ') }}</th>
+                        <th class="text-end"><strong>CDF {{ number_format($totalPenaltiesFooter, 2, ',', ' ') }}</strong></th>
                         <th class="text-end"><strong>CDF {{ number_format($finalGlobalBalance, 2, ',', ' ') }}</strong></th>
                         <th colspan="3"></th>
                     </tr>

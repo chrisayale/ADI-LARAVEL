@@ -107,6 +107,7 @@
                                     <th>Theoretical Amount</th>
                                     <th>Adjusted Amount</th>
                                     <th>Amount Paid</th>
+                                    <th>Penalty</th>
                                     <th>Balance</th>
                                     <th>Difference</th>
                                     <th>Status</th>
@@ -130,6 +131,7 @@
                                                    data-amount="{{ $balance }}"
                                                    data-theoretical="{{ $repayment->amount_due }}"
                                                    data-adjusted="{{ $repayment->adjusted_amount ?? $repayment->amount_due }}"
+                                                   data-penalty="{{ $repayment->penalty_amount ?? 0 }}"
                                                    data-loan="{{ $loan->id }}">
                                         </td>
                                         <td>{{ $repayment->installment_number }}</td>
@@ -145,6 +147,13 @@
                                                    style="width: 100px;">
                                         </td>
                                         <td>CDF {{ number_format($repayment->amount_paid, 2) }}</td>
+                                        <td>
+                                            @if($repayment->penalty_amount > 0)
+                                                <span class="text-danger font-weight-bold">CDF {{ number_format($repayment->penalty_amount, 2) }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
                                         <td class="font-weight-bold">CDF {{ number_format($balance, 2) }}</td>
                                         <td class="{{ $differenceClass }} font-weight-bold">
                                             @if($repayment->has_adjustment)
@@ -208,34 +217,40 @@
                         <div id="selectedRepayments"></div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Selected Installments</label>
                                     <div class="form-control bg-light font-weight-bold" id="selectedCount">0</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Total Theoretical Due</label>
                                     <div class="form-control bg-light font-weight-bold text-primary" id="totalTheoreticalAmount">0.00</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Total Adjusted Due</label>
                                     <div class="form-control bg-light font-weight-bold" id="totalAdjustedAmount">0.00</div>
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Total Penalties</label>
+                                    <div class="form-control bg-light font-weight-bold text-danger" id="totalPenaltyAmount">0.00</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Total Difference</label>
                                     <div class="form-control bg-light font-weight-bold text-info" id="totalDifferenceAmount">0.00</div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="amount">Payment Amount *</label>
                                     <div class="input-group">
@@ -252,7 +267,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="penalty_amount">Penalty Amount</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">CDF</span>
+                                        </div>
+                                        <input type="number"
+                                               name="penalty_amount"
+                                               id="penalty_amount"
+                                               class="form-control form-control-lg"
+                                               step="0.01"
+                                               min="0"
+                                               value="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="payment_method">Payment Method *</label>
                                     <select name="payment_method" id="payment_method" class="form-control form-control-lg" required>
@@ -328,7 +360,7 @@ $(document).ready(function() {
 
         // Update the difference display
         const difference = adjustedAmount - theoreticalAmount;
-        const diffCell = $(this).closest('tr').find('td:nth-child(8)');
+        const diffCell = $(this).closest('tr').find('td:nth-child(9)');
 
         if (difference > 0) {
             diffCell.html('<i class="fas fa-arrow-up text-success"></i> CDF ' + difference.toFixed(2));
@@ -360,6 +392,7 @@ $(document).ready(function() {
         const repaymentId = $(this).val();
         const amount = parseFloat($(this).data('amount'));
         const theoreticalAmount = parseFloat($(this).data('theoretical'));
+        const penaltyAmount = parseFloat($(this).data('penalty') || 0);
         const loanId = $(this).data('loan');
 
         if ($(this).is(':checked')) {
@@ -373,6 +406,7 @@ $(document).ready(function() {
                 id: repaymentId,
                 amount: parseFloat(amount.toFixed(2)),
                 theoreticalAmount: theoreticalAmount,
+                penaltyAmount: penaltyAmount,
                 loanId: loanId
             });
 
@@ -419,16 +453,19 @@ $(document).ready(function() {
     function updateTotals() {
         let totalTheoretical = 0;
         let totalAdjusted = 0;
+        let totalPenalty = 0;
         let totalDifference = 0;
 
         selectedRepayments.forEach((value) => {
             totalTheoretical = parseFloat((totalTheoretical + value.theoreticalAmount).toFixed(2));
             totalAdjusted = parseFloat((totalAdjusted + value.amount).toFixed(2));
+            totalPenalty = parseFloat((totalPenalty + (value.penaltyAmount || 0)).toFixed(2));
             totalDifference = parseFloat((totalDifference + (value.amount - value.theoreticalAmount)).toFixed(2));
         });
 
         $('#totalTheoreticalAmount').text(totalTheoretical.toFixed(2));
         $('#totalAdjustedAmount').text(totalAdjusted.toFixed(2));
+        $('#totalPenaltyAmount').text(totalPenalty.toFixed(2));
         $('#totalDifferenceAmount').text(totalDifference.toFixed(2));
         $('#totalAmount').text(totalAdjusted.toFixed(2));
         $('#amount').attr('max', totalAdjusted.toFixed(2));
@@ -513,6 +550,13 @@ $(document).ready(function() {
         Object.keys(adjustedAmounts).forEach(function(key) {
             $('#paymentForm').append(`<input type="hidden" name="adjusted_amounts[${key}]" value="${adjustedAmounts[key]}">`);
         });
+
+        // Add penalty amount to form data
+        const penaltyAmount = parseFloat($('#penalty_amount').val()) || 0;
+        $('input[name="penalty_amount"]').remove();
+        if (penaltyAmount > 0) {
+            $('#paymentForm').append(`<input type="hidden" name="penalty_amount" value="${penaltyAmount}">`);
+        }
 
         return true;
     });
