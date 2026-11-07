@@ -482,6 +482,12 @@
                             <h6>{{ __('loan_summary_calculated') }}</h6>
                             <div class="row">
                                 <div class="col-6">
+                                    <span id="durationLabel{{ $loan->id }}">{{ __('duration') }}:</span>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <strong id="durationDisplay{{ $loan->id }}">-</strong>
+                                </div>
+                                <div class="col-6">
                                     <span id="paymentLabel{{ $loan->id }}">{{ __('periodic_payment') }}:</span>
                                 </div>
                                 <div class="col-6 text-right">
@@ -523,6 +529,10 @@
                                         </div>
                                         <div class="col-6 text-right">
                                             <strong class="text-info" id="gapDisplay{{ $loan->id }}">-</strong>
+                                        </div>
+                                        <div class="col-6">{{ __('total_gap_amount') }}:</div>
+                                        <div class="col-6 text-right">
+                                            <strong class="text-info" id="totalGapDisplay{{ $loan->id }}">-</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -628,12 +638,14 @@ $(document).ready(function() {
                 principal = maxAmount;
             }
 
-            // Update duration label based on frequency
+            // Update duration label and display
             const freqLabels = {
                 'daily': translations.days,
                 'weekly': translations.weeks,
                 'monthly': translations.months
             };
+            $('#durationLabel' + loanId).text(translations.duration + ':');
+            $('#durationDisplay' + loanId).text(duration + ' ' + freqLabels[frequency]);
             $('#paymentLabel' + loanId).text(freqLabels[frequency] + ': ');
 
             // Update rate period label
@@ -658,6 +670,21 @@ $(document).ready(function() {
             let totalRepayable = 0;
             let periodicPayment = 0;
 
+            // Pato Ndogo daily exact theoretical calculation (matches PHP model)
+            function calculatePatoNdogoTheoretical(principal, duration) {
+                // Theoretical rate = (duration / 30) * 10%
+                const theoreticalRate = (duration / 30) * 0.10;
+                const theoreticalTotalInterest = principal * theoreticalRate;
+                const theoreticalTotalRepayable = principal + theoreticalTotalInterest;
+                const theoreticalPeriodicPayment = theoreticalTotalRepayable / duration;
+                return {
+                    periodicPayment: theoreticalPeriodicPayment,
+                    totalInterest: theoreticalTotalInterest,
+                    totalRepayable: theoreticalTotalRepayable,
+                    theoreticalRate: theoreticalRate
+                };
+            }
+
             if (frequency === 'daily' && (method === 'flat_rate' || method === 'pato_ndogo')) {
                 // For daily flat rate / pato_ndogo: rate is per 30 days
                 // Check if adjusted amount is provided
@@ -669,10 +696,10 @@ $(document).ready(function() {
                     totalRepayable = periodicPayment * duration;
                     totalInterest = totalRepayable - principal;
 
-                    // Calculate theoretical amount for comparison
-                    const dailyRate = rate / 100 / 30; // rate per day
-                    const theoreticalDaily = principal * dailyRate + (principal / duration);
-                    $('#theoretical_daily_amount' + loanId).val(theoreticalDaily.toFixed(2));
+                    // Calculate EXACT theoretical amount (Pato Ndogo formula)
+                    const theoretical = calculatePatoNdogoTheoretical(principal, duration);
+                    const theoreticalDaily = theoretical.periodicPayment;
+                    $('#theoretical_daily_amount' + loanId).val(theoreticalDaily.toFixed(6));
 
                     // Calculate surplus/shortfall
                     const difference = adjustedAmount - theoreticalDaily;
@@ -680,13 +707,13 @@ $(document).ready(function() {
                     $('#total_surplus_amount' + loanId).val(Math.abs(totalSurplus).toFixed(2));
                     $('#surplus_type' + loanId).val(difference >= 0 ? 'surplus' : 'shortfall');
                 } else {
-                    // Auto-calculate with standard formula
-                    const dailyRate = rate / 100 / 30; // rate per day
-                    periodicPayment = principal * dailyRate + (principal / duration);
-                    totalRepayable = periodicPayment * duration;
-                    totalInterest = totalRepayable - principal;
+                    // Auto-calculate with EXACT Pato Ndogo theoretical formula
+                    const theoretical = calculatePatoNdogoTheoretical(principal, duration);
+                    periodicPayment = theoretical.periodicPayment;
+                    totalInterest = theoretical.totalInterest;
+                    totalRepayable = theoretical.totalRepayable;
 
-                    $('#theoretical_daily_amount' + loanId).val(periodicPayment.toFixed(2));
+                    $('#theoretical_daily_amount' + loanId).val(periodicPayment.toFixed(6));
                     $('#total_surplus_amount' + loanId).val('0');
                     $('#surplus_type' + loanId).val('none');
                 }
@@ -732,6 +759,7 @@ $(document).ready(function() {
             }
 
             // Update display
+            $('#durationDisplay' + loanId).text(duration + ' ' + freqLabels[frequency]);
             $('#monthly' + loanId).text(periodicPayment.toFixed(2));
             $('#interest' + loanId).text(totalInterest.toFixed(2));
             $('#total' + loanId).text(totalRepayable.toFixed(2));
@@ -753,6 +781,7 @@ $(document).ready(function() {
                     const totalSurplus = difference * duration;
                     const gapLabel = difference >= 0 ? ' (+) ' : ' (-) ';
                     $('#gapDisplay' + loanId).text(gapLabel + Math.abs(totalSurplus).toFixed(2));
+                    $('#totalGapDisplay' + loanId).text(Math.abs(totalSurplus).toFixed(2));
                     $('#gapLabel' + loanId).text(difference >= 0 ? '{{ __('surplus') }}:' : '{{ __('shortfall') }}:');
                     $('#adjustedSummaryRow' + loanId).show();
                 } else {
