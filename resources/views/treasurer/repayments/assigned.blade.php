@@ -1,19 +1,19 @@
 {{-- resources/views/treasurer/repayments/assigned.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Assigned Loans')
+@section('title', __('assigned_loans'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Assigned Loans</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('assigned_loans') }}</h1>
         <div>
             <a href="{{ route('treasurer.repayments.collect') }}" class="btn btn-success">
-                <i class="fas fa-hand-holding-usd"></i> Collect Payment
+                <i class="fas fa-hand-holding-usd"></i> {{ __('collect_payment') }}
             </a>
             <a href="{{ route('treasurer.repayments.index') }}" class="btn btn-info">
-                <i class="fas fa-history"></i> Payment History
+                <i class="fas fa-history"></i> {{ __('payment_history') }}
             </a>
         </div>
     </div>
@@ -21,18 +21,18 @@
     <!-- Search Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Loans</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_loans') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('treasurer.repayments.assigned') }}" class="row">
                 <div class="col-md-8 mb-3">
-                    <label for="search">Search by Member Name or Membership Number</label>
+                    <label for="search">{{ __('search_member_name_membership') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Enter name or membership number...">
+                           value="{{ request('search') }}" placeholder="{{ __('enter_name_or_membership_number') }}">
                 </div>
                 <div class="col-md-4 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-search"></i> Search
+                        <i class="fas fa-search"></i> {{ __('search') }}
                     </button>
                 </div>
             </form>
@@ -42,7 +42,7 @@
     <!-- Loans Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Loans Assigned to You</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('loans_assigned_to_you') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -50,14 +50,14 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Application #</th>
-                            <th>Member</th>
-                            <th>Amount Approved</th>
-                            <th>Monthly Payment</th>
-                            <th>Balance</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>{{ __('application_no') }}</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('amount_approved') }}</th>
+                            <th>{{ __('monthly_payment') }}</th>
+                            <th>{{ __('balance') }}</th>
+                            <th>{{ __('progress') }}</th>
+                            <th>{{ __('status') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,7 +80,7 @@
                                     @endif
                                     <div>
                                         <strong>{{ $loan->user->name }}</strong>
-                                        <br><small class="text-muted">{{ $loan->user->membership_number ?? 'N/A' }}</small>
+                                        <br><small class="text-muted">{{ $loan->user->membership_number ?? __('n_a') }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -96,7 +96,7 @@
                                     <div class="progress-bar bg-success" role="progressbar"
                                          style="width: {{ $loan->progress_percentage }}%"></div>
                                 </div>
-                                <small class="text-muted">{{ $loan->progress_percentage }}% paid</small>
+                                <small class="text-muted">{{ $loan->progress_percentage }}% {{ __('paid') }}</small>
                             </td>
                             <td>
                                 <span class="badge badge-{{ $loan->status == 'disbursed' ? 'primary' : 'warning' }} p-2">
@@ -105,8 +105,8 @@
                             </td>
                             <td>
                                 <a href="{{ route('treasurer.repayments.loan-repayments', $loan) }}"
-                                   class="btn btn-sm btn-info" title="View Repayments">
-                                    <i class="fas fa-calendar-alt"></i> Schedule
+                                   class="btn btn-sm btn-info" title="{{ __('view_schedule') }}">
+                                    <i class="fas fa-calendar-alt"></i> {{ __('schedule') }}
                                 </a>
                             </td>
                         </tr>
@@ -114,7 +114,7 @@
                         <tr>
                             <td colspan="9" class="text-center py-4">
                                 <i class="fas fa-hand-holding-usd fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No loans assigned to you</p>
+                                <p class="text-muted">{{ __('no_loans_assigned_to_you') }}</p>
                             </td>
                         </tr>
                         @endforelse
