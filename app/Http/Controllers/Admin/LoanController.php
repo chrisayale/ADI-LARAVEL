@@ -202,8 +202,9 @@ class LoanController extends Controller
         $totalInterest = LoanApplication::where('status', 'approved')
             ->select(DB::raw('SUM(total_repayable - amount_approved) as total'))
             ->first()->total ?? 0;
+        $awaitingDisbursement = LoanApplication::where('status', 'approved')->count();
 
-        return view('admin.loans.approved', compact('approvedLoans', 'totalApproved', 'totalApprovedAmount', 'totalInterest'));
+        return view('admin.loans.approved', compact('approvedLoans', 'totalApproved', 'totalApprovedAmount', 'totalInterest', 'awaitingDisbursement'));
     }
 
     /**
