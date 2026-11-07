@@ -8,6 +8,7 @@ use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
 use App\Models\PaymentTransaction;
 use App\Models\User;
+use App\Services\LoanPenaltyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -69,7 +70,21 @@ public function collect(Request $request)
             return response()->json(['error' => 'Loan not found'], 404);
         }
 
-        $totalDue = $loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid');
+        // Sync penalties before returning data
+        LoanPenaltyService::syncPenaltiesForLoan($loan);
+
+        // Reload loan with updated penalties
+        $loan->load(['repayments' => function($query) {
+            $query->whereIn('status', ['pending', 'partial', 'overdue'])
+                ->orderBy('due_date');
+        }]);
+
+        $totalDue = $loan->repayments->sum(function($r) {
+            return $r->effective_amount_due + $r->penalty_amount;
+        }) - $loan->repayments->sum('amount_paid');
+
+        $totalPenalties = $loan->repayments->sum('penalty_amount');
+
         $overdueCount = $loan->repayments->filter(function($repayment) {
             return $repayment->due_date < now() && $repayment->status != 'paid';
         })->count();
@@ -77,7 +92,8 @@ public function collect(Request $request)
         return response()->json([
             'loan' => $loan,
             'repayments' => $loan->repayments,
-            'total_due' => $totalDue,
+            'total_due' => max(0, $totalDue),
+            'total_penalties' => $totalPenalties,
             'overdue_count' => $overdueCount
         ]);
     }
@@ -116,6 +132,15 @@ public function collect(Request $request)
             }
 
             $loan = $repayments->first()->loanApplication;
+
+            // Sync penalties for all overdue repayments before processing
+            LoanPenaltyService::syncPenaltiesForLoan($loan);
+
+            // Reload repayments to get updated penalty amounts
+            $repayments = $loan->repayments()->whereIn('id', $request->repayment_ids)
+                ->orderBy('due_date')
+                ->get();
+
             $remainingAmount = $request->amount;
 
             // Generate receipt number
@@ -142,7 +167,18 @@ public function collect(Request $request)
             foreach ($repayments as $repayment) {
                 if ($remainingAmount <= 0) break;
 
-                $balance = $repayment->effective_amount_due - $repayment->amount_paid;
+                // Calculate total due including penalty for this repayment
+                $effectiveDue = $repayment->effective_amount_due;
+                $penalty = $repayment->penalty_amount;
+
+                // If overdue and penalty not yet calculated, calculate it
+                if ($repayment->is_overdue && $penalty == 0) {
+                    $penalty = LoanPenaltyService::applyPenalty($repayment);
+                    $repayment->refresh();
+                }
+
+                $totalDue = $effectiveDue + $penalty;
+                $balance = $totalDue - $repayment->amount_paid;
                 $paymentToApply = min($remainingAmount, $balance);
 
                 if ($paymentToApply > 0) {
@@ -150,8 +186,8 @@ public function collect(Request $request)
                     $repayment->amount_paid += $paymentToApply;
                     $repayment->total_paid += $paymentToApply;
 
-                    // Update status
-                    if ($repayment->amount_paid >= $repayment->effective_amount_due) {
+                    // Update status based on total due (including penalty)
+                    if ($repayment->amount_paid >= $totalDue) {
                         $repayment->status = 'paid';
                         $repayment->paid_date = now();
                     } elseif ($repayment->amount_paid > 0) {
@@ -161,14 +197,13 @@ public function collect(Request $request)
                     $repayment->save();
 
                     $remainingAmount -= $paymentToApply;
-
-                    // Create transaction record for this repayment (optional - you might want a pivot table)
-                    // For now, we'll just update the main transaction's notes
                 }
             }
 
-            // Check if loan is fully paid
-            $totalDue = $loan->repayments->sum('effective_amount_due');
+            // Check if loan is fully paid (including penalties)
+            $totalDue = $loan->repayments->sum(function($r) {
+                return $r->effective_amount_due + $r->penalty_amount;
+            });
             $totalPaid = $loan->repayments->sum('amount_paid');
 
             if ($totalPaid >= $totalDue) {

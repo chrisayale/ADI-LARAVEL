@@ -1120,5 +1120,16 @@
     "view_receipt": "Voir le reçu",
     "repayment_progress": "Progression du remboursement",
     "partial": "Partiel",
-    "penalty": "Pénalité"
+    "penalty": "Pénalité",
+    "late_penalty": "Pénalité de retard",
+    "penalty_applied": "Pénalité appliquée",
+    "penalty_calculated": "Pénalité calculée",
+    "days_overdue": "Jours de retard",
+    "overdue_payment": "Paiement en retard",
+    "partial_payment_penalty": "Pénalité pour paiement partiel",
+    "penalty_included": "Pénalité incluse",
+    "total_with_penalty": "Total avec pénalité",
+    "penalty_amount_per_period": "Montant de pénalité par période",
+    "apply_late_penalty": "Appliquer pénalité de retard",
+    "late_penalty_amount": "Montant de la pénalité de retard"
 }

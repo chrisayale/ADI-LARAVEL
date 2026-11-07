@@ -1120,5 +1120,16 @@
     "view_receipt": "View Receipt",
     "repayment_progress": "Repayment Progress",
     "partial": "Partial",
-    "penalty": "Penalty"
+    "penalty": "Penalty",
+    "late_penalty": "Late Penalty",
+    "penalty_applied": "Penalty Applied",
+    "penalty_calculated": "Penalty Calculated",
+    "days_overdue": "Days Overdue",
+    "overdue_payment": "Overdue Payment",
+    "partial_payment_penalty": "Partial Payment Penalty",
+    "penalty_included": "Penalty Included",
+    "total_with_penalty": "Total with Penalty",
+    "penalty_amount_per_period": "Penalty Amount Per Period",
+    "apply_late_penalty": "Apply Late Penalty",
+    "late_penalty_amount": "Late Penalty Amount"
 }

@@ -8,6 +8,7 @@ use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
 use App\Models\PaymentTransaction;
 use App\Models\User;
+use App\Services\LoanPenaltyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -117,7 +118,21 @@ class RepaymentController extends Controller
             return response()->json(['error' => 'Loan not found or not assigned to you'], 404);
         }
 
-        $totalDue = $loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid');
+        // Sync penalties before returning data
+        LoanPenaltyService::syncPenaltiesForLoan($loan);
+
+        // Reload loan with updated penalties
+        $loan->load(['repayments' => function($query) {
+            $query->whereIn('status', ['pending', 'partial', 'overdue'])
+                ->orderBy('due_date');
+        }]);
+
+        $totalDue = $loan->repayments->sum(function($r) {
+            return $r->effective_amount_due + $r->penalty_amount;
+        }) - $loan->repayments->sum('amount_paid');
+
+        $totalPenalties = $loan->repayments->sum('penalty_amount');
+
         $overdueCount = $loan->repayments->filter(function($repayment) {
             return $repayment->due_date < now() && $repayment->status != 'paid';
         })->count();
@@ -125,7 +140,8 @@ class RepaymentController extends Controller
         return response()->json([
             'loan' => $loan,
             'repayments' => $loan->repayments,
-            'total_due' => $totalDue,
+            'total_due' => max(0, $totalDue),
+            'total_penalties' => $totalPenalties,
             'overdue_count' => $overdueCount
         ]);
     }
@@ -194,6 +210,14 @@ class RepaymentController extends Controller
                 }
             }
 
+            // Sync penalties for all overdue repayments before processing
+            LoanPenaltyService::syncPenaltiesForLoan($loan);
+
+            // Reload repayments to get updated penalty amounts
+            $repayments = $loan->repayments()->whereIn('id', $request->repayment_ids)
+                ->orderBy('due_date')
+                ->get();
+
             $remainingAmount = $request->amount;
             $penaltyAmount = $request->penalty_amount ?? 0;
 
@@ -221,21 +245,31 @@ class RepaymentController extends Controller
             foreach ($repayments as $index => $repayment) {
                 if ($remainingAmount <= 0) break;
 
-                // Use effective amount due (adjusted if set, otherwise theoretical)
+                // Calculate total due including penalty for this repayment
                 $effectiveDue = $repayment->effective_amount_due;
-                $balance = $effectiveDue - $repayment->amount_paid;
+                $penalty = $repayment->penalty_amount;
+
+                // If overdue and penalty not yet calculated, calculate it
+                if ($repayment->is_overdue && $penalty == 0) {
+                    $penalty = LoanPenaltyService::applyPenalty($repayment);
+                    $repayment->refresh();
+                }
+
+                $totalDue = $effectiveDue + $penalty;
+                $balance = $totalDue - $repayment->amount_paid;
                 $paymentToApply = min($remainingAmount, $balance);
 
                 if ($paymentToApply > 0) {
                     $repayment->amount_paid += $paymentToApply;
                     $repayment->total_paid += $paymentToApply;
 
-                    // Apply penalty to the first repayment if provided
-                    if ($index === 0 && $penaltyAmount > 0) {
+                    // Apply manual penalty to the first repayment if provided (legacy support)
+                    if ($index === 0 && $penaltyAmount > 0 && $penalty == 0) {
                         $repayment->penalty_amount += $penaltyAmount;
                     }
 
-                    if ($repayment->amount_paid >= $effectiveDue) {
+                    // Update status based on total due (including penalty)
+                    if ($repayment->amount_paid >= $totalDue) {
                         $repayment->status = 'paid';
                         $repayment->paid_date = now();
                     } elseif ($repayment->amount_paid > 0) {
@@ -247,8 +281,10 @@ class RepaymentController extends Controller
                 }
             }
 
-            // Check if loan is fully paid
-            $totalDue = $loan->repayments->sum('effective_amount_due');
+            // Check if loan is fully paid (including penalties)
+            $totalDue = $loan->repayments->sum(function($r) {
+                return $r->effective_amount_due + $r->penalty_amount;
+            });
             $totalPaid = $loan->repayments->sum('amount_paid');
 
             if ($totalPaid >= $totalDue) {

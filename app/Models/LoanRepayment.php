@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\LoanPenaltyService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -83,6 +84,38 @@ class LoanRepayment extends Model
     {
         // Return adjusted_amount if set, otherwise amount_due
         return $this->adjusted_amount ?? $this->amount_due;
+    }
+
+    /**
+     * Get total amount due including penalties
+     */
+    public function getTotalAmountDueAttribute()
+    {
+        return $this->effective_amount_due + $this->penalty_amount;
+    }
+
+    /**
+     * Get remaining balance including penalties
+     */
+    public function getRemainingBalanceAttribute()
+    {
+        return max(0, $this->total_amount_due - $this->amount_paid);
+    }
+
+    /**
+     * Calculate and return the current late penalty based on days overdue
+     */
+    public function getCalculatedPenaltyAttribute()
+    {
+        if (!$this->loanApplication || !$this->loanApplication->apply_late_penalty) {
+            return 0;
+        }
+
+        if (!$this->is_overdue) {
+            return 0;
+        }
+
+        return LoanPenaltyService::calculatePenalty($this);
     }
 
     public function getSurplusBalanceAttribute()
