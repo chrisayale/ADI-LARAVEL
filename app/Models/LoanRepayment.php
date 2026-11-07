@@ -87,19 +87,11 @@ class LoanRepayment extends Model
     }
 
     /**
-     * Get total amount due including penalties
+     * Get remaining principal balance (excluding penalties)
      */
-    public function getTotalAmountDueAttribute()
+    public function getPrincipalBalanceAttribute()
     {
-        return $this->effective_amount_due + $this->penalty_amount;
-    }
-
-    /**
-     * Get remaining balance including penalties
-     */
-    public function getRemainingBalanceAttribute()
-    {
-        return max(0, $this->total_amount_due - $this->amount_paid);
+        return max(0, $this->effective_amount_due - $this->amount_paid);
     }
 
     /**

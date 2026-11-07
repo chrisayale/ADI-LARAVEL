@@ -127,10 +127,10 @@ class RepaymentController extends Controller
                 ->orderBy('due_date');
         }]);
 
-        $totalDue = $loan->repayments->sum(function($r) {
-            return $r->effective_amount_due + $r->penalty_amount;
-        }) - $loan->repayments->sum('amount_paid');
+        // Total principal due (excluding penalties)
+        $totalPrincipalDue = $loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid');
 
+        // Total penalties outstanding
         $totalPenalties = $loan->repayments->sum('penalty_amount');
 
         $overdueCount = $loan->repayments->filter(function($repayment) {
@@ -140,8 +140,9 @@ class RepaymentController extends Controller
         return response()->json([
             'loan' => $loan,
             'repayments' => $loan->repayments,
-            'total_due' => max(0, $totalDue),
-            'total_penalties' => $totalPenalties,
+            'total_due' => max(0, $totalPrincipalDue), // Principal only
+            'total_penalties' => $totalPenalties,       // Penalties shown separately
+            'total_with_penalties' => max(0, $totalPrincipalDue) + $totalPenalties, // Combined for reference
             'overdue_count' => $overdueCount
         ]);
     }
@@ -242,34 +243,32 @@ class RepaymentController extends Controller
             ]);
 
             // Distribute payment across selected repayments
+            // IMPORTANT: Payment goes ONLY to principal/interest (effective_amount_due)
+            // Penalty is tracked separately and NOT automatically deducted from payment
             foreach ($repayments as $index => $repayment) {
                 if ($remainingAmount <= 0) break;
 
-                // Calculate total due including penalty for this repayment
-                $effectiveDue = $repayment->effective_amount_due;
-                $penalty = $repayment->penalty_amount;
-
-                // If overdue and penalty not yet calculated, calculate it
-                if ($repayment->is_overdue && $penalty == 0) {
-                    $penalty = LoanPenaltyService::applyPenalty($repayment);
+                // Ensure penalty is calculated for overdue repayments
+                if ($repayment->is_overdue && $repayment->penalty_amount == 0) {
+                    LoanPenaltyService::applyPenalty($repayment);
                     $repayment->refresh();
                 }
 
-                $totalDue = $effectiveDue + $penalty;
-                $balance = $totalDue - $repayment->amount_paid;
-                $paymentToApply = min($remainingAmount, $balance);
+                // Principal/interest balance only (EXCLUDING penalty)
+                $principalBalance = $repayment->effective_amount_due - $repayment->amount_paid;
+                $paymentToApply = min($remainingAmount, $principalBalance);
 
                 if ($paymentToApply > 0) {
                     $repayment->amount_paid += $paymentToApply;
                     $repayment->total_paid += $paymentToApply;
 
                     // Apply manual penalty to the first repayment if provided (legacy support)
-                    if ($index === 0 && $penaltyAmount > 0 && $penalty == 0) {
+                    if ($index === 0 && $penaltyAmount > 0 && $repayment->penalty_amount == 0) {
                         $repayment->penalty_amount += $penaltyAmount;
                     }
 
-                    // Update status based on total due (including penalty)
-                    if ($repayment->amount_paid >= $totalDue) {
+                    // Update status based on PRINCIPAL only (penalty is separate)
+                    if ($repayment->amount_paid >= $repayment->effective_amount_due) {
                         $repayment->status = 'paid';
                         $repayment->paid_date = now();
                     } elseif ($repayment->amount_paid > 0) {
@@ -281,13 +280,11 @@ class RepaymentController extends Controller
                 }
             }
 
-            // Check if loan is fully paid (including penalties)
-            $totalDue = $loan->repayments->sum(function($r) {
-                return $r->effective_amount_due + $r->penalty_amount;
-            });
-            $totalPaid = $loan->repayments->sum('amount_paid');
+            // Check if loan is fully paid (principal only - penalties are separate)
+            $totalPrincipalDue = $loan->repayments->sum('effective_amount_due');
+            $totalPrincipalPaid = $loan->repayments->sum('amount_paid');
 
-            if ($totalPaid >= $totalDue) {
+            if ($totalPrincipalPaid >= $totalPrincipalDue) {
                 $loan->status = 'completed';
                 $loan->save();
             }
