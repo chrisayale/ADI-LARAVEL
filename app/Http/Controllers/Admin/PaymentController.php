@@ -126,6 +126,7 @@ public function collect(Request $request)
                 'transaction_number' => 'TXN-' . date('Y') . '-' . str_pad(PaymentTransaction::max('id') + 1, 6, '0', STR_PAD_LEFT),
                 'user_id' => $request->user_id,
                 'loan_repayment_id' => $repayments->first()->id, // Link to first repayment
+                'sacco_id' => $repayments->first()->loanApplication->sacco_id, // Get SACCO from loan
                 'amount' => $request->amount,
                 'payment_type' => 'loan_repayment',
                 'payment_method' => $request->payment_method,

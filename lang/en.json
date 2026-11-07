@@ -976,6 +976,8 @@
     "total_savings_short": "Total Savings",
     "total_size": "Total Size",
     "total_surplus": "Total Surplus",
+    "total_surplus_to_refund": "Total surplus to be refunded or rolled into savings at loan closure.",
+    "total_shortfall_to_collect": "Total shortfall to be collected.",
     "total_transactions": "Total Transactions",
     "total_verified_applications": "Total Verified Applications",
     "total_withdrawals": "Total Withdrawals",
