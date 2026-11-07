@@ -492,7 +492,7 @@
                                     <span id="paymentLabel{{ $loan->id }}">{{ __('periodic_payment') }}:</span>
                                 </div>
                                 <div class="col-6 text-right">
-                                    <strong id="monthly{{ $loan->id }}">-</strong>
+                                    <strong id="periodicPaymentDisplay{{ $loan->id }}">-</strong>
                                 </div>
                                 <div class="col-6">{{ __('total_interest') }}:</div>
                                 <div class="col-6 text-right">
@@ -640,23 +640,35 @@ $(document).ready(function() {
                 principal = maxAmount;
             }
 
+            // Number formatting helper - French format with CDF
+            function formatCDF(value) {
+                if (isNaN(value)) return '-';
+                return value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' CDF';
+            }
+
             // Update duration label and display
             const freqLabels = {
                 'daily': translations.days,
                 'weekly': translations.weeks,
                 'monthly': translations.months
             };
+            const paymentLabels = {
+                'daily': translations.daily_payment,
+                'weekly': translations.weekly_payment,
+                'monthly': translations.monthly_payment
+            };
             $('#durationLabel' + loanId).text(translations.duration + ':');
             $('#durationDisplay' + loanId).text(duration + ' ' + freqLabels[frequency]);
-            $('#paymentLabel' + loanId).text(freqLabels[frequency] + ': ');
+            $('#paymentLabel' + loanId).text(paymentLabels[frequency] + ' :');
 
-            // Update rate period label
+            // Update rate period label - show full rate description
             const ratePeriodLabels = {
                 'daily': translations.per30days,
                 'weekly': translations.per30days,
                 'monthly': translations.perAnnum
             };
             $('#ratePeriodLabel' + loanId).text(ratePeriodLabels[frequency]);
+            $('#rateDisplay' + loanId).text(rate + ' % ' + ratePeriodLabels[frequency].toLowerCase());
 
             // Update amortization method display
             const methodLabels = {
@@ -762,10 +774,10 @@ $(document).ready(function() {
 
             // Update display
             $('#durationDisplay' + loanId).text(duration + ' ' + freqLabels[frequency]);
-            $('#monthly' + loanId).text(periodicPayment.toFixed(2));
-            $('#interest' + loanId).text(totalInterest.toFixed(2));
-            $('#total' + loanId).text(totalRepayable.toFixed(2));
-            $('#rateDisplay' + loanId).text(rate + ' %');
+            $('#periodicPaymentDisplay' + loanId).text(formatCDF(periodicPayment));
+            $('#interest' + loanId).text(formatCDF(totalInterest));
+            $('#total' + loanId).text(formatCDF(totalRepayable));
+            $('#rateDisplay' + loanId).text(rate + ' % ' + ratePeriodLabels[frequency].toLowerCase());
 
             // Show/hide adjusted amount row for pato_ndogo daily
             if (frequency === 'daily' && method === 'pato_ndogo') {
@@ -776,14 +788,14 @@ $(document).ready(function() {
                 const theoreticalAmount = parseFloat($('#theoretical_daily_amount' + loanId).val());
 
                 if (!isNaN(adjustedAmount) && adjustedAmount > 0 && !isNaN(theoreticalAmount)) {
-                    $('#adjustedDisplay' + loanId).text(adjustedAmount.toFixed(2));
-                    $('#theoreticalDisplay' + loanId).text(theoreticalAmount.toFixed(2));
+                    $('#adjustedDisplay' + loanId).text(formatCDF(adjustedAmount));
+                    $('#theoreticalDisplay' + loanId).text(formatCDF(theoreticalAmount));
 
                     const difference = adjustedAmount - theoreticalAmount;
                     const totalSurplus = difference * duration;
-                    const gapLabel = difference >= 0 ? ' (+) ' : ' (-) ';
-                    $('#gapDisplay' + loanId).text(gapLabel + Math.abs(totalSurplus).toFixed(2));
-                    $('#totalGapDisplay' + loanId).text(Math.abs(totalSurplus).toFixed(2));
+                    const gapLabel = difference >= 0 ? '(+) ' : '(-) ';
+                    $('#gapDisplay' + loanId).text(gapLabel + formatCDF(Math.abs(totalSurplus)).replace(' CDF', ''));
+                    $('#totalGapDisplay' + loanId).text(formatCDF(Math.abs(totalSurplus)));
                     $('#gapLabel' + loanId).text(difference >= 0 ? '{{ __('surplus') }}:' : '{{ __('shortfall') }}:');
                     $('#adjustedSummaryRow' + loanId).show();
                 } else {
