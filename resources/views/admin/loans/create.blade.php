@@ -163,9 +163,9 @@
                                 <div class="form-group">
                                     <label for="preview_frequency">Fréquence de remboursement</label>
                                     <select class="form-control" id="preview_frequency" name="preview_frequency">
-                                        <option value="daily" selected>Quotidien</option>
-                                        <option value="weekly">Hebdomadaire</option>
-                                        <option value="monthly">Mensuel</option>
+                                        <option value="daily" selected>{{ __('daily') }}</option>
+                                        <option value="weekly">{{ __('weekly') }}</option>
+                                        <option value="monthly">{{ __('monthly') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -173,10 +173,10 @@
                                 <div class="form-group">
                                     <label for="preview_amortization">Méthode d'amortissement</label>
                                     <select class="form-control" id="preview_amortization" name="preview_amortization">
-                                        <option value="pato_ndogo" selected>Pato Ndogo</option>
-                                        <option value="french">Système Français / Dégressif</option>
-                                        <option value="flat_rate">Taux Fixe / Plat</option>
-                                        <option value="constant_capital">Capital Constant / Amortissable</option>
+                                        <option value="pato_ndogo" selected>{{ __('pato_ndogo_method') }}</option>
+                                        <option value="french">{{ __('french_method') }}</option>
+                                        <option value="flat_rate">{{ __('flat_rate_method') }}</option>
+                                        <option value="constant_capital">{{ __('constant_capital_method') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -1442,9 +1442,9 @@
 
             // Update labels based on frequency
             const frequencyLabels = {
-                'daily': { payment: 'Paiement Quotidien', period: 'jour' },
-                'weekly': { payment: 'Paiement Hebdomadaire', period: 'semaine' },
-                'monthly': { payment: 'Paiement Mensuel', period: 'mois' }
+                'daily': { payment: '{{ __("daily_payment") }}', period: '{{ __("day") }}' },
+                'weekly': { payment: '{{ __("weekly_payment") }}', period: '{{ __("week") }}' },
+                'monthly': { payment: '{{ __("monthly_payment") }}', period: '{{ __("month") }}' }
             };
 
             const labels = frequencyLabels[frequency] || frequencyLabels['monthly'];
@@ -1566,23 +1566,23 @@
             const absDiff = Math.abs(difference);
 
             if (difference > 0) {
-                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Surplus total)';
+                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ({{ __("surplus_total") }})';
                 surplusInput.className = 'form-control text-success';
-                surplusDesc.textContent = 'Surplus total à rembourser au membre ou transférer à l\'épargne à la clôture';
+                surplusDesc.textContent = '{{ __("surplus_description") }}';
                 surplusDesc.className = 'text-success';
                 const surplusTypeEl = document.getElementById('surplus_type');
                 if (surplusTypeEl) surplusTypeEl.value = 'surplus';
             } else if (difference < 0) {
-                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (Manquant total)';
+                surplusInput.value = 'CDF ' + absDiff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ({{ __("shortfall_total") }})';
                 surplusInput.className = 'form-control text-danger';
-                surplusDesc.textContent = 'Manquant total à collecter du membre à la clôture';
+                surplusDesc.textContent = '{{ __("shortfall_description") }}';
                 surplusDesc.className = 'text-danger';
                 const surplusTypeEl = document.getElementById('surplus_type');
                 if (surplusTypeEl) surplusTypeEl.value = 'shortfall';
             } else {
-                surplusInput.value = 'CDF 0 (Équilibré)';
+                surplusInput.value = 'CDF 0 ({{ __("balanced") }})';
                 surplusInput.className = 'form-control text-info';
-                surplusDesc.textContent = 'Montant ajusté équivaut au montant théorique';
+                surplusDesc.textContent = '{{ __("balanced_description") }}';
                 surplusDesc.className = 'text-info';
                 const surplusTypeEl = document.getElementById('surplus_type');
                 if (surplusTypeEl) surplusTypeEl.value = 'none';

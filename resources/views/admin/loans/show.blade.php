@@ -426,7 +426,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <strong>{{ __('type') }}:</strong> {{ ucfirst($loan->collateral_type) }}
+                            <strong>{{ __('type') }}:</strong> {{ __('collateral_type_' . $loan->collateral_type) }}
                         </div>
                         <div class="col-md-4">
                             <strong>{{ __('value') }}:</strong> CDF {{ number_format($loan->collateral_value, 2) }}

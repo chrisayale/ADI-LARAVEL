@@ -90,7 +90,7 @@
                                 @if($loan->amount_approved)
                                     CDF {{ number_format($loan->amount_approved, 2) }}
                                 @else
-                                    <span class="text-muted">En attente</span>
+                                    <span class="text-muted">{{ __('pending') }}</span>
                                 @endif
                             </td>
                             <td>{{ $loan->verified_at ? $loan->verified_at->format('d M Y H:i') : 'N/A' }}</td>

@@ -194,7 +194,7 @@
                                                 {{ __('n_a') }}
                                             @endif
                                             <br>
-                                            <span class="badge bg-success">{{ translate_status('verified') }}</span>
+                                            <span class="badge bg-success">{{ __('verified') }}</span>
                                         </small>
                                     </td>
                                     <td>
@@ -217,7 +217,7 @@
                                             $allVerified = $totalCount > 0 && $verifiedCount == $totalCount;
                                         @endphp
                                         <span class="badge bg-{{ $allVerified ? 'success' : 'warning' }}">
-                                            {{ $verifiedCount }}/{{ $totalCount }} {{ __('verified') }}
+                                            {{ $verifiedCount }}/{{ $totalCount }} {{ \Illuminate\Support\Str::plural(__('verified'), $verifiedCount) }}
                                         </span>
                                         <br>
                                         <small class="text-muted">
@@ -242,7 +242,7 @@
                                         @if($docCount > 0)
                                             <br>
                                             <small class="text-muted">
-                                                {{ $verifiedDocCount }} {{ __('verified') }}
+                                                {{ $verifiedDocCount }} {{ \Illuminate\Support\Str::plural(__('verified'), $verifiedDocCount) }}
                                             </small>
                                         @endif
                                     </td>

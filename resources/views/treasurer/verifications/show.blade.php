@@ -92,7 +92,7 @@
                                 </tr>
                                 <tr>
                                     <th>Objet :</th>
-                                    <td>{{ $loan->purpose ?? 'Non spécifié' }}</td>
+                                    <td>{{ $loan->purpose ?? __('not_specified') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Date de demande :</th>
@@ -111,14 +111,8 @@
                                 <tr>
                                     <th>Fréquence de remboursement :</th>
                                     <td>
-                                        <span class="badge badge-info">
-                                            @if($loan->repayment_frequency == 'daily')
-                                                Quotidien
-                                            @elseif($loan->repayment_frequency == 'weekly')
-                                                Hebdomadaire
-                                            @else
-                                                Mensuel
-                                            @endif
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ __($loan->repayment_frequency) }}
                                         </span>
                                     </td>
                                 </tr>
@@ -128,34 +122,24 @@
                                         @if($loan->duration_value)
                                             {{ $loan->duration_value }}
                                             @if($loan->repayment_frequency == 'daily')
-                                                jour(s)
+                                                {{ __('day') }}
                                             @elseif($loan->repayment_frequency == 'weekly')
-                                                semaine(s)
+                                                {{ __('week') }}
                                             @else
-                                                mois
+                                                {{ __('month') }}
                                             @endif
                                         @elseif($loan->duration_months)
-                                            {{ $loan->duration_months }} mois
+                                            {{ $loan->duration_months }} {{ __('month') }}
                                         @else
-                                            Non spécifié
+                                            {{ __('not_specified') }}
                                         @endif
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Méthode d'amortissement :</th>
                                     <td>
-                                        <span class="badge badge-info">
-                                            @if($loan->amortization_method == 'pato_ndogo')
-                                                Pato Ndogo
-                                            @elseif($loan->amortization_method == 'french')
-                                                Française (Standard)
-                                            @elseif($loan->amortization_method == 'flat_rate')
-                                                Taux fixe
-                                            @elseif($loan->amortization_method == 'constant_capital')
-                                                Capital constant
-                                            @else
-                                                {{ ucfirst($loan->amortization_method) }}
-                                            @endif
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            {{ __($loan->amortization_method) }}
                                         </span>
                                     </td>
                                 </tr>
@@ -180,7 +164,7 @@
                                 @endif
                                 @if($loan->monthly_repayment)
                                 <tr>
-                                    <th>Paiement {{ $loan->repayment_frequency == 'daily' ? 'journalier' : ($loan->repayment_frequency == 'weekly' ? 'hebdomadaire' : 'mensuel') }} :</th>
+                                    <th>{{ __('monthly_repayment_label') }} :</th>
                                     <td><strong>CDF {{ number_format($loan->monthly_repayment, 2) }}</strong></td>
                                 </tr>
                                 @endif
@@ -198,16 +182,20 @@
                                     <th>Garantie :</th>
                                     <td>
                                         @if($loan->has_collateral)
-                                            <span class="badge badge-success">Avec garantie</span>
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1.5"></i> {{ __('with_collateral') }}
+                                            </span>
                                         @else
-                                            <span class="badge badge-secondary">Sans garantie</span>
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="fas fa-times-circle mr-1.5"></i> {{ __('without_collateral') }}
+                                            </span>
                                         @endif
                                     </td>
                                 </tr>
                                 @if($loan->has_collateral)
                                 <tr>
-                                    <th>Type de garantie :</th>
-                                    <td>{{ ucfirst($loan->collateral_type) }}</td>
+                                    <th>{{ __('type') }}:</th>
+                                    <td>{{ __('collateral_type_' . $loan->collateral_type) }}</td>
                                 </tr>
                                 <tr>
                                     <th>Valeur de la garantie :</th>
@@ -218,9 +206,15 @@
                                 <tr>
                                     <th>Pénalité de retard :</th>
                                     <td>
-                                        <span class="badge badge-{{ $loan->apply_late_penalty ? 'success' : 'secondary' }}">
-                                            {{ $loan->apply_late_penalty ? 'Oui' : 'Non' }}
-                                        </span>
+                                        @if($loan->apply_late_penalty)
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1.5"></i> {{ __('yes') }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <i class="fas fa-times-circle mr-1.5"></i> {{ __('no') }}
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endif
@@ -268,7 +262,14 @@
                                 </div>
                                 <div class="col-md-4 text-right">
                                     <div class="mb-2">
-                                        <span class="badge badge-{{ $guarantor->status == 'approved' ? 'success' : ($guarantor->status == 'rejected' ? 'danger' : 'warning') }} p-2"
+                                        @php
+                                            $guarStatusColor = match($guarantor->status) {
+                                                'approved' => 'success',
+                                                'rejected' => 'danger',
+                                                default => 'warning'
+                                            };
+                                        @endphp
+                                        <span class="badge badge-{{ $guarStatusColor }}"
                                               id="guarantor-status-{{ $guarantor->id }}">
                                             {{ translate_status($guarantor->status ?? 'pending') }}
                                         </span>
@@ -329,11 +330,20 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge badge-info">{{ str_replace('_', ' ', ucfirst($document->category)) }}</span>
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                {{ __('document_category_' . $document->category) }}
+                                            </span>
                                         </td>
                                         <td>{{ $document->formatted_size }}</td>
                                         <td>
-                                            <span class="badge badge-{{ $document->verification_status == 'verified' ? 'success' : ($document->verification_status == 'rejected' ? 'danger' : 'warning') }}"
+                                            @php
+                                                $docStatusColor = match($document->verification_status) {
+                                                    'verified' => 'success',
+                                                    'rejected' => 'danger',
+                                                    default => 'warning'
+                                                };
+                                            @endphp
+                                            <span class="badge badge-{{ $docStatusColor }}"
                                                   id="document-status-{{ $document->id }}">
                                                 {{ translate_status($document->verification_status) }}
                                             </span>
@@ -504,8 +514,23 @@
 
 @push('scripts')
 <script>
+    // Pre-translated status labels for JavaScript
+    const statusLabels = {
+        guarantor: {
+            approved: '{{ __("approved") }}',
+            rejected: '{{ __("rejected") }}',
+            pending: '{{ __("pending") }}'
+        },
+        document: {
+            verified: '{{ __("verified") }}',
+            rejected: '{{ __("rejected") }}',
+            pending: '{{ __("pending") }}'
+        }
+    };
+
     function verifyGuarantor(guarantorId, status) {
-        if (!confirm('Êtes-vous sûr de vouloir ' + status + ' ce garant ?')) {
+        const label = statusLabels.guarantor[status] || status;
+        if (!confirm('Êtes-vous sûr de vouloir ' + label + ' ce garant ?')) {
             return;
         }
 
@@ -524,8 +549,9 @@
         .then(data => {
             if (data.success) {
                 const statusBadge = document.getElementById('guarantor-status-' + guarantorId);
-                statusBadge.className = 'badge badge-' + (status === 'approved' ? 'success' : 'danger') + ' p-2';
-                statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                const newClass = status === 'approved' ? 'badge-success' : 'badge-danger';
+                statusBadge.className = 'badge ' + newClass;
+                statusBadge.textContent = statusLabels.guarantor[status];
 
                 // Update progress bar
                 updateProgress();
@@ -542,7 +568,8 @@
     }
 
     function verifyDocument(documentId, status) {
-        if (!confirm('Êtes-vous sûr de vouloir ' + status + ' ce document ?')) {
+        const label = statusLabels.document[status] || status;
+        if (!confirm('Êtes-vous sûr de vouloir ' + label + ' ce document ?')) {
             return;
         }
 
@@ -561,8 +588,9 @@
         .then(data => {
             if (data.success) {
                 const statusBadge = document.getElementById('document-status-' + documentId);
-                statusBadge.className = 'badge badge-' + (status === 'verified' ? 'success' : 'danger');
-                statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                const newClass = status === 'verified' ? 'badge-success' : 'badge-danger';
+                statusBadge.className = 'badge ' + newClass;
+                statusBadge.textContent = statusLabels.document[status];
 
                 // Update progress
                 updateProgress();

@@ -146,12 +146,14 @@
                             <td>{{ $loan->created_at->format('d M Y') }}</td>
                             <td class="text-center">
                                 @if($loan->has_collateral)
-                                    <span class="badge badge-info p-2">
-                                        <i class="fas fa-check-circle mr-1"></i> Oui
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1.5"></i> {{ __('yes') }}
                                     </span>
-                                    <br><small class="text-muted">{{ ucfirst($loan->collateral_type) }}</small>
+                                    <br><small class="text-muted">{{ __($loan->collateral_type) }}</small>
                                 @else
-                                    <span class="badge badge-secondary p-2">Non</span>
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <i class="fas fa-times-circle mr-1.5"></i> {{ __('no') }}
+                                    </span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -160,14 +162,16 @@
                                     $verifiedCount = $loan->guarantors->where('status', 'approved')->count();
                                 @endphp
                                 @if($guarantorCount > 0)
-                                    <span class="badge badge-info p-2">
-                                        {{ $guarantorCount }} total
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ $guarantorCount }} {{ \Illuminate\Support\Str::plural(__('guarantor'), $guarantorCount) }}
                                     </span>
                                     @if($verifiedCount > 0)
-                                        <br><small class="text-success">{{ $verifiedCount }} vérifiés</small>
+                                        <br><small class="text-success">{{ $verifiedCount }} {{ \Illuminate\Support\Str::plural(__('verified'), $verifiedCount) }}</small>
                                     @endif
                                 @else
-                                    <span class="badge badge-secondary p-2">Aucun</span>
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ __('no_guarantors') }}
+                                    </span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -176,14 +180,16 @@
                                     $verifiedDocCount = $loan->documents->where('verification_status', 'verified')->count();
                                 @endphp
                                 @if($docCount > 0)
-                                    <span class="badge badge-info p-2">
-                                        {{ $docCount }} fichiers
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        {{ $docCount }} {{ \Illuminate\Support\Str::plural(__('file'), $docCount) }}
                                     </span>
                                     @if($verifiedDocCount > 0)
-                                        <br><small class="text-success">{{ $verifiedDocCount }} vérifiés</small>
+                                        <br><small class="text-success">{{ $verifiedDocCount }} {{ \Illuminate\Support\Str::plural(__('verified'), $verifiedDocCount) }}</small>
                                     @endif
                                 @else
-                                    <span class="badge badge-secondary p-2">Aucun</span>
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ __('no_documents') }}
+                                    </span>
                                 @endif
                             </td>
                             <td>
