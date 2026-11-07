@@ -3,6 +3,34 @@
 
 @section('title', __('collect_loan_payment'))
 
+@section('styles')
+<style>
+    /* QR Scanner Modal Styles */
+    #qr-reader {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    #qr-reader video {
+        width: 100% !important;
+        border-radius: 8px;
+    }
+    .qr-scanner-overlay {
+        position: relative;
+    }
+    .qr-scanner-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border: 3px solid rgba(78, 115, 223, 0.8);
+        border-radius: 8px;
+        box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+        pointer-events: none;
+        z-index: 10;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -19,13 +47,22 @@
                                 <div class="input-group input-group-lg">
                                     <input type="text"
                                            name="search"
+                                           id="search-input"
                                            class="form-control"
                                            placeholder="{{ __('search_payment_member_placeholder') }}"
                                            value="{{ $search }}"
                                            autofocus>
-                                    <button class="btn btn-success" type="submit">
-                                        <i class="fas fa-search"></i> {{ __('find_member') }}
-                                    </button>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-center px-4" id="btn-qr-scanner"
+                                                title="Scanner le QR Code du membre" data-toggle="tooltip"
+                                                style="min-width: 56px; height: 100%;">
+                                            <i class="fas fa-qrcode fa-lg"></i>
+                                        </button>
+                                        <button class="btn btn-success d-flex align-items-center px-4" type="submit"
+                                                style="height: 100%;">
+                                            <i class="fas fa-search mr-2"></i> {{ __('find_member') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -238,8 +275,514 @@
 
 @push('scripts')
 <script>
+// ============================================
+// QR CODE / MANUAL MEMBER SELECTION HANDLERS
+// Global functions - must be defined outside document.ready for inline onclick handlers
+// ============================================
+let html5QrCodeScanner = null;
+let isScanning = false;
+
+// QR Code Scanner Modal HTML
+const qrScannerModalHtml = `
+    <div class="modal fade" id="qrScannerModal" tabindex="-1" role="dialog" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0 rounded-lg">
+                <div class="modal-header bg-primary text-white border-0 rounded-top-lg py-3 px-4">
+                    <h5 class="modal-title mb-0" id="qrScannerModalLabel"><i class="fas fa-qrcode mr-2"></i>{{ __('scan_member_qr_code') }}</h5>
+                    <button type="button" class="close text-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close" onclick="stopQrScanner(); $('#qrScannerModal').modal('hide');" style="font-size: 1.5rem; line-height: 1;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="qr-reader" class="mx-auto" style="width: 100%; max-width: 360px;"></div>
+                    <div class="mt-4 text-center">
+                        <div class="alert alert-info" id="qr-scanner-status" style="display: none;"></div>
+                        <div class="alert alert-warning" id="https-warning" style="display: none;">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> <strong>HTTPS requis :</strong> La caméra nécessite une connexion sécurisée (HTTPS).
+                            <br>Sur localhost, utilisez <a href="#" onclick="showManualInputModal(); return false;" class="alert-link font-weight-bold">{{ __('manual_input') }}</a> ou configurez HTTPS local.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light rounded-bottom-lg py-3 px-4">
+                    <div class="w-100 d-flex justify-content-between gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4 py-2 rounded-pill shadow-sm" data-bs-dismiss="modal" onclick="stopQrScanner(); $('#qrScannerModal').modal('hide');">
+                            <i class="fas fa-times mr-2"></i>{{ __('cancel') }}
+                        </button>
+                        <button type="button" class="btn btn-primary btn-lg px-4 py-2 rounded-pill shadow-sm" onclick="showManualInputModal(); stopQrScanner();">
+                            <i class="fas fa-keyboard mr-2"></i>{{ __('manual_input') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// Manual Input Modal HTML
+const manualInputModalHtml = `
+    <div class="modal fade" id="manualInputModal" tabindex="-1" role="dialog" aria-labelledby="manualInputModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0 rounded-lg">
+                <div class="modal-header bg-secondary text-white border-0 rounded-top-lg py-3 px-4">
+                    <h5 class="modal-title mb-0" id="manualInputModalLabel"><i class="fas fa-keyboard mr-2"></i>{{ __('manual_qr_code_entry') }}</h5>
+                    <button type="button" class="close text-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close" onclick="$('#manualInputModal').modal('hide');" style="font-size: 1.5rem; line-height: 1;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="form-group">
+                        <label for="manual_qr_code" class="font-weight-bold text-gray-700 mb-2">{{ __('membership_number_or_qr') }}</label>
+                        <input type="text" class="form-control form-control-lg text-center border-0 shadow-sm rounded-lg py-3" id="manual_qr_code"
+                               placeholder="Ex: MEM-2024-001" autocomplete="off" autofocus
+                               style="font-size: 1.25rem; letter-spacing: 0.1em;">
+                        <small class="text-muted d-block mt-2">{{ __('enter_member_number_or_qr') }}</small>
+                    </div>
+                    <div class="alert alert-info mt-3" id="manual-input-status" style="display: none;"></div>
+                </div>
+                <div class="modal-footer border-0 bg-light rounded-bottom-lg py-3 px-4">
+                    <div class="w-100 d-flex justify-content-between gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4 py-2 rounded-pill shadow-sm" data-bs-dismiss="modal" onclick="$('#manualInputModal').modal('hide');">
+                            <i class="fas fa-times mr-2"></i>{{ __('cancel') }}
+                        </button>
+                        <button type="button" class="btn btn-primary btn-lg px-4 py-2 rounded-pill shadow-sm" onclick="searchMemberByManualCode()">
+                            <i class="fas fa-search mr-2"></i>{{ __('search') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// Global function: Show manual input modal
+function showManualInputModal() {
+    $('#manualInputModal').modal('show');
+    setTimeout(() => {
+        const input = document.getElementById('manual_qr_code');
+        if (input) input.focus();
+    }, 300);
+}
+
+// Global function: Stop QR scanner
+function stopQrScanner() {
+    if (html5QrCodeScanner && isScanning) {
+        html5QrCodeScanner.clear().catch(err => console.warn('QR Scanner clear error:', err));
+        isScanning = false;
+    }
+    $('#qrScannerModal').modal('hide');
+}
+
+// Global function: Search member by manual code input
+function searchMemberByManualCode() {
+    const input = document.getElementById('manual_qr_code');
+    const statusDiv = document.getElementById('manual-input-status');
+    const qrCode = input?.value?.trim();
+
+    if (!qrCode) {
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('enter_member_code') }}';
+            statusDiv.className = 'alert alert-warning';
+            statusDiv.style.display = 'block';
+        }
+        input?.focus();
+        return;
+    }
+
+    if (statusDiv) {
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ __('searching_member') }}...';
+        statusDiv.className = 'alert alert-info';
+        statusDiv.style.display = 'block';
+    }
+
+    fetch('{{ route("admin.loans.find-member-qr") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ qr_code: qrCode })
+    })
+    .then(response => {
+        if (!response.ok) {
+            let errorMsg = '';
+            switch (response.status) {
+                case 404:
+                    errorMsg = '{{ __('route_not_found') }}';
+                    break;
+                case 422:
+                    errorMsg = '{{ __('invalid_data_sent') }}';
+                    break;
+                case 500:
+                    errorMsg = '{{ __('server_error') }}';
+                    break;
+                case 419:
+                    errorMsg = '{{ __('session_expired') }}';
+                    break;
+                default:
+                    errorMsg = '{{ __('server_communication_error') }} (' + response.status + ').';
+            }
+            return response.json().catch(() => ({})).then(err => {
+                throw new Error(errorMsg + (err.message ? ' - ' + err.message : ''));
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success && data.member) {
+            selectMember(data.member);
+            $('#manualInputModal').modal('hide');
+            showToast('success', '{{ __('member_found') }} ' + data.member.name);
+        } else {
+            throw new Error(data.message || '{{ __('member_not_found') }}');
+        }
+    })
+    .catch(error => {
+        console.error('Manual Search error:', error);
+        let msg = error.message || '{{ __('search_error') }}';
+
+        if (msg.includes('{{ __('no_member_found_with_search') }}')) {
+            msg = '{{ __('no_member_found_verify') }}';
+        }
+
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+            statusDiv.className = 'alert alert-danger';
+            statusDiv.style.display = 'block';
+        }
+    });
+}
+
+// Global function: Check camera permission and HTTPS requirement
+function checkCameraPermission() {
+    const statusDiv = document.getElementById('qr-scanner-status');
+    const httpsWarning = document.getElementById('https-warning');
+    const readerDiv = document.getElementById('qr-reader');
+
+    // If elements don't exist, fail silently (modal not ready or not our modal)
+    if (!statusDiv || !httpsWarning || !readerDiv) {
+        console.debug('QR scanner modal elements not found');
+        return;
+    }
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isSecureContext = window.isSecureContext || window.location.protocol === 'https:';
+
+    if (!isSecureContext && isLocalhost) {
+        // Show HTTPS warning
+        httpsWarning.style.display = 'block';
+        readerDiv.style.display = 'none';
+        statusDiv.style.display = 'none';
+        return;
+    } else {
+        httpsWarning.style.display = 'none';
+        readerDiv.style.display = 'block';
+    }
+
+    // Try to start scanner
+    startQrScanner();
+}
+
+// Global function: Start QR Code Scanner using html5-qrcode library
+function startQrScanner() {
+    if (isScanning) return;
+
+    // Check if html5-qrcode is available
+    if (typeof Html5QrcodeScanner === 'undefined') {
+        // Load the library dynamically
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js';
+        script.onload = () => initQrScanner();
+        script.onerror = () => {
+            const statusDiv = document.getElementById('qr-scanner-status');
+            const readerDiv = document.getElementById('qr-reader');
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('scanner_load_error') }}';
+                statusDiv.style.display = 'block';
+            }
+            if (readerDiv) {
+                readerDiv.style.display = 'none';
+            }
+        };
+        document.head.appendChild(script);
+    } else {
+        initQrScanner();
+    }
+}
+
+// Global function: Initialize QR Scanner
+function initQrScanner() {
+    const readerDiv = document.getElementById('qr-reader');
+    const statusDiv = document.getElementById('qr-scanner-status');
+
+    if (!readerDiv) return;
+
+    // Check camera permission before initializing
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
+                // Stop the test stream
+                stream.getTracks().forEach(track => track.stop());
+                initHtml5QrCodeScanner();
+            })
+            .catch(err => {
+                console.error('Camera access error:', err);
+                if (statusDiv) {
+                    let msg = '{{ __('camera_access_error') }} ';
+                    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                        msg += '{{ __('camera_permission_denied') }}';
+                    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                        msg += '{{ __('no_camera_detected') }}';
+                    } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                        msg += '{{ __('camera_in_use') }}';
+                    } else if (err.name === 'OverconstrainedError') {
+                        msg += '{{ __('camera_config_error') }}';
+                    } else {
+                        msg += '{{ __('error') }}: ' + err.message;
+                    }
+                    msg += ' <button type="button" class="btn btn-sm btn-outline-primary ml-2" onclick="showManualInputModal(); stopQrScanner();"><i class="fas fa-keyboard"></i> {{ __('manual_input') }}</button>';
+                    statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                    statusDiv.className = 'alert alert-danger';
+                    statusDiv.style.display = 'block';
+                }
+                if (readerDiv) {
+                    readerDiv.style.display = 'none';
+                }
+            });
+    } else {
+        // Fallback if getUserMedia not available
+        initHtml5QrCodeScanner();
+    }
+
+    function initHtml5QrCodeScanner() {
+        html5QrCodeScanner = new Html5QrcodeScanner(
+            "qr-reader",
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                rememberLastUsedCamera: true,
+                showTorchButtonIfSupported: true,
+                showZoomSliderIfSupported: true
+            },
+            false
+        );
+
+        html5QrCodeScanner.render(
+            onQrScanSuccess,
+            onQrScanFailure
+        );
+
+        isScanning = true;
+        if (statusDiv) statusDiv.style.display = 'none';
+        readerDiv.style.display = 'block';
+    }
+}
+
+// Global function: QR Scan Success Callback
+function onQrScanSuccess(decodedText, decodedResult) {
+    // Stop scanner after successful scan
+    stopQrScanner();
+
+    // Search for member
+    searchMemberByQrCode(decodedText);
+}
+
+// Global function: QR Scan Failure Callback
+function onQrScanFailure(error) {
+    // Silently handle scan failures (continuous scanning)
+    // Only show if it's a permission error
+    if (error && error.name === 'NotAllowedError') {
+        const statusDiv = document.getElementById('qr-scanner-status');
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('camera_access_denied') }}';
+            statusDiv.className = 'alert alert-danger';
+            statusDiv.style.display = 'block';
+        }
+        stopQrScanner();
+    }
+}
+
+// Global function: Search member by QR code (AJAX)
+function searchMemberByQrCode(qrCode) {
+    const statusDiv = document.getElementById('qr-scanner-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ __('searching_member') }}...';
+        statusDiv.className = 'alert alert-info';
+        statusDiv.style.display = 'block';
+    }
+
+    fetch('{{ route("admin.loans.find-member-qr") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ qr_code: qrCode })
+    })
+    .then(response => {
+        // Handle HTTP errors (404, 500, etc.) with user-friendly messages
+        if (!response.ok) {
+            let errorMsg = '';
+            switch (response.status) {
+                case 404:
+                    errorMsg = '{{ __('route_not_found') }}';
+                    break;
+                case 422:
+                    errorMsg = '{{ __('invalid_data_sent') }}';
+                    break;
+                case 500:
+                    errorMsg = '{{ __('server_error') }}';
+                    break;
+                case 419:
+                    errorMsg = '{{ __('session_expired') }}';
+                    break;
+                default:
+                    errorMsg = '{{ __('server_communication_error') }} (' + response.status + ').';
+            }
+            return response.json().catch(() => ({})).then(err => {
+                throw new Error(errorMsg + (err.message ? ' - ' + err.message : ''));
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success && data.member) {
+            selectMember(data.member);
+            $('#qrScannerModal').modal('hide');
+            showToast('success', '{{ __('member_found') }} ' + data.member.name);
+        } else {
+            throw new Error(data.message || '{{ __('member_not_found') }}');
+        }
+    })
+    .catch(error => {
+        console.error('QR Search error:', error);
+        let msg = error.message || '{{ __('search_error') }}';
+
+        // Don't show technical 404 message for "member not found" (that's expected)
+        if (msg.includes('{{ __('no_member_found_with_search') }}')) {
+            msg = '{{ __('no_member_found_verify') }}';
+        }
+
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+            statusDiv.className = 'alert alert-danger';
+            statusDiv.style.display = 'block';
+        }
+        // Don't hide modal, let user retry or switch to manual
+    });
+}
+
+// Global function: Fill search input and submit form
+function selectMember(member) {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    // Fill the search input with membership number
+    searchInput.value = member.membership_number || member.id;
+
+    // Visual feedback
+    searchInput.classList.add('is-valid');
+    searchInput.classList.remove('is-invalid');
+    setTimeout(() => searchInput.classList.remove('is-valid'), 2000);
+
+    // Submit the form
+    const form = searchInput.closest('form');
+    if (form) {
+        form.submit();
+    }
+}
+
+// Global function: Toast notification helper
+function showToast(type, message) {
+    // Create toast if not exists
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+        document.body.appendChild(toastContainer);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    toast.style.cssText = 'min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    `;
+    toastContainer.appendChild(toast);
+
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 4000);
+}
+
 $(document).ready(function() {
 
+    // Check if we're on localhost (insecure context for camera)
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isSecureContext = window.isSecureContext || window.location.protocol === 'https:';
+
+    // Inject modals into DOM
+    document.body.insertAdjacentHTML('beforeend', qrScannerModalHtml);
+    document.body.insertAdjacentHTML('beforeend', manualInputModalHtml);
+
+    // Open QR Scanner Modal
+    document.getElementById('btn-qr-scanner')?.addEventListener('click', function() {
+        $('#qrScannerModal').modal('show');
+    });
+
+    // Check camera permission and HTTPS requirement - called when modal is fully shown
+    $('#qrScannerModal').on('shown.bs.modal', function() {
+        checkCameraPermission();
+    });
+
+    // Clean up scanner when modals are hidden
+    $('#qrScannerModal').on('hidden.bs.modal', function() {
+        stopQrScanner();
+    });
+
+    $('#manualInputModal').on('hidden.bs.modal', function() {
+        const input = document.getElementById('manual_qr_code');
+        const statusDiv = document.getElementById('manual-input-status');
+        if (input) input.value = '';
+        if (statusDiv) {
+            statusDiv.style.display = 'none';
+            statusDiv.textContent = '';
+        }
+    });
+
+    // Explicit cancel button handlers (fallback for data-bs-dismiss)
+    document.querySelectorAll('#qrScannerModal .btn-secondary[data-bs-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            stopQrScanner();
+            $('#qrScannerModal').modal('hide');
+        });
+    });
+
+    document.querySelectorAll('#manualInputModal .btn-secondary[data-bs-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            $('#manualInputModal').modal('hide');
+        });
+    });
+
+    // Allow Enter key in manual input
+    document.getElementById('manual_qr_code')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchMemberByManualCode();
+        }
+    });
+
+    // ============================================
+    // PAYMENT COLLECTION LOGIC
+    // ============================================
     let selectedRepayments = new Map();
 
     // ===============================
