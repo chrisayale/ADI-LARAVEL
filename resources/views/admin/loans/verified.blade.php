@@ -311,6 +311,7 @@
                         {{ __('amount_applied') }}: <strong>{{ number_format($loan->amount_applied, 2) }}</strong>
                     </div>
 
+                    <!-- Approved Amount -->
                     <div class="form-group">
                         <label for="amount_approved{{ $loan->id }}">{{ __('approved_amount') }} *</label>
                         <div class="input-group">
@@ -330,37 +331,123 @@
                         <small class="text-muted">{{ __('maximum_amount') }}: {{ number_format($loan->amount_applied, 2) }}</small>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="interest_rate{{ $loan->id }}">{{ __('interest_rate') }} (%) *</label>
-                                <div class="input-group">
-                                    <input type="number"
-                                           name="interest_rate"
-                                           id="interest_rate{{ $loan->id }}"
-                                           class="form-control"
-                                           required
-                                           step="0.1"
-                                           min="0"
-                                           max="100"
-                                           value="12">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                </div>
+                    <!-- Interest Rate -->
+                    <div class="form-group">
+                        <label for="interest_rate{{ $loan->id }}">{{ __('interest_rate') }} (%) *</label>
+                        <div class="input-group">
+                            <input type="number"
+                                   name="interest_rate"
+                                   id="interest_rate{{ $loan->id }}"
+                                   class="form-control"
+                                   required
+                                   step="0.1"
+                                   min="0"
+                                   max="100"
+                                   value="{{ $loan->interest_rate ?? 12 }}">
+                            <div class="input-group-append">
+                                <span class="input-group-text">%</span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <small class="text-muted" id="ratePeriodLabel{{ $loan->id }}">{{ __('per_annum') }}</small>
+                    </div>
+
+                    <!-- Duration & Frequency & Amortization Method -->
+                    <div class="row">
+                        <div class="col-md-4">
                             <div class="form-group">
-                                <label for="duration_months{{ $loan->id }}">{{ __('duration_months') }} *</label>
+                                <label for="duration_value{{ $loan->id }}">
+                                    {{ __('duration') }} ({{ $loan->repayment_frequency == 'daily' ? __('days') : ($loan->repayment_frequency == 'weekly' ? __('weeks') : __('months')) }})
+                                </label>
                                 <input type="number"
-                                       name="duration_months"
-                                       id="duration_months{{ $loan->id }}"
+                                       name="duration_value"
+                                       id="duration_value{{ $loan->id }}"
                                        class="form-control"
-                                       required
-                                       min="1"
-                                       max="60"
-                                       value="12">
+                                   required
+                                   min="1"
+                                   max="365"
+                                   value="{{ $loan->duration_value ?? ($loan->duration_months ?? 12) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="repayment_frequency{{ $loan->id }}">{{ __('repayment_frequency') }} *</label>
+                                <select name="repayment_frequency"
+                                        id="repayment_frequency{{ $loan->id }}"
+                                        class="form-control"
+                                        required
+                                        data-days="{{ __('days') }}"
+                                        data-weeks="{{ __('weeks') }}"
+                                        data-months="{{ __('months') }}"
+                                        data-per30days="{{ __('per_30_days') }}"
+                                        data-perannum="{{ __('per_annum') }}">
+                                    <option value="daily" {{ ($loan->repayment_frequency ?? 'daily') == 'daily' ? 'selected' : '' }}>{{ __('daily') }}</option>
+                                    <option value="weekly" {{ ($loan->repayment_frequency ?? 'daily') == 'weekly' ? 'selected' : '' }}>{{ __('weekly') }}</option>
+                                    <option value="monthly" {{ ($loan->repayment_frequency ?? 'daily') == 'monthly' ? 'selected' : '' }}>{{ __('monthly') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="amortization_method{{ $loan->id }}">{{ __('amortization_method') }} *</label>
+                                <select name="amortization_method"
+                                        id="amortization_method{{ $loan->id }}"
+                                        class="form-control"
+                                        required
+                                        data-pato-ndogo="{{ __('pato_ndogo_method') }}"
+                                        data-french="{{ __('french_method') }}"
+                                        data-flat-rate="{{ __('flat_rate_method') }}"
+                                        data-constant-capital="{{ __('constant_capital_method') }}">
+                                    <option value="pato_ndogo" {{ ($loan->amortization_method ?? 'pato_ndogo') == 'pato_ndogo' ? 'selected' : '' }}>{{ __('pato_ndogo_method') }}</option>
+                                    <option value="french" {{ ($loan->amortization_method ?? 'pato_ndogo') == 'french' ? 'selected' : '' }}>{{ __('french_method') }}</option>
+                                    <option value="flat_rate" {{ ($loan->amortization_method ?? 'pato_ndogo') == 'flat_rate' ? 'selected' : '' }}>{{ __('flat_rate_method') }}</option>
+                                    <option value="constant_capital" {{ ($loan->amortization_method ?? 'pato_ndogo') == 'constant_capital' ? 'selected' : '' }}>{{ __('constant_capital_method') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adjusted Amount (Pato Ndogo Daily) -->
+                    <div class="form-group" id="adjustedAmountRow{{ $loan->id }}" style="display: none;">
+                        <label for="adjusted_daily_amount{{ $loan->id }}">{{ __('adjusted_periodic_amount') }} <span class="text-info">*</span></label>
+                        <input type="number"
+                               name="adjusted_daily_amount"
+                               id="adjusted_daily_amount{{ $loan->id }}"
+                               class="form-control"
+                               step="0.01"
+                               min="1"
+                               value="{{ $loan->adjusted_daily_amount ?? '' }}"
+                               placeholder="{{ __('enter_adjusted_amount_placeholder') }}">
+                        <small class="text-muted">{{ __('adjust_periodic_amount_hint') }}</small>
+                        <!-- Hidden fields for form submission -->
+                        <input type="hidden" id="theoretical_daily_amount{{ $loan->id }}" name="theoretical_daily_amount" value="{{ $loan->theoretical_daily_amount ?? '' }}">
+                        <input type="hidden" id="total_surplus_amount{{ $loan->id }}" name="total_surplus_amount" value="{{ $loan->total_surplus_amount ?? '' }}">
+                        <input type="hidden" id="surplus_type{{ $loan->id }}" name="surplus_type" value="{{ $loan->surplus_type ?? '' }}">
+                    </div>
+
+                    <!-- Late Penalty Settings -->
+                    <div class="form-group" id="latePenaltyRow{{ $loan->id }}" style="display: none;">
+                        <div class="card border-warning">
+                            <div class="card-header bg-warning text-dark py-2">
+                                <h6 class="m-0 font-weight-bold"><i class="fas fa-exclamation-triangle"></i> {{ __('late_penalty_settings') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="apply_late_penalty{{ $loan->id }}" name="apply_late_penalty" value="1" {{ old('apply_late_penalty', true) ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="apply_late_penalty{{ $loan->id }}">
+                                                <strong>{{ __('apply_late_penalty') }}</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="late_penalty_amount{{ $loan->id }}">{{ __('late_penalty_amount') }} (CDF)</label>
+                                            <input type="number" step="1" class="form-control" id="late_penalty_amount{{ $loan->id }}" name="late_penalty_amount" value="{{ $loan->late_penalty_amount ?? 2000 }}" min="0">
+                                            <small class="text-muted">{{ __('late_penalty_hint') }}</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -379,7 +466,9 @@
                         <div class="card-body">
                             <h6>{{ __('loan_summary_calculated') }}</h6>
                             <div class="row">
-                                <div class="col-6">{{ __('monthly_payment') }}:</div>
+                                <div class="col-6">
+                                    <span id="paymentLabel{{ $loan->id }}">{{ __('periodic_payment') }}:</span>
+                                </div>
                                 <div class="col-6 text-right">
                                     <strong id="monthly{{ $loan->id }}">-</strong>
                                 </div>
@@ -390,6 +479,37 @@
                                 <div class="col-6">{{ __('total_repayable') }}:</div>
                                 <div class="col-6 text-right">
                                     <strong id="total{{ $loan->id }}">-</strong>
+                                </div>
+                                <div class="col-6">{{ __('interest_rate_label') }}:</div>
+                                <div class="col-6 text-right">
+                                    <strong id="rateDisplay{{ $loan->id }}">-</strong>
+                                </div>
+                                <div class="col-6">{{ __('amortization_method_label') }}:</div>
+                                <div class="col-6 text-right">
+                                    <strong id="methodDisplay{{ $loan->id }}">-</strong>
+                                </div>
+                            </div>
+
+                            <!-- Adjusted Amount & Gap (Pato Ndogo Daily) -->
+                            <div class="row mt-2" id="adjustedSummaryRow{{ $loan->id }}" style="display: none;">
+                                <div class="col-12">
+                                    <hr class="my-2">
+                                    <div class="row">
+                                        <div class="col-6">{{ __('adjusted_periodic_amount') }}:</div>
+                                        <div class="col-6 text-right">
+                                            <strong id="adjustedDisplay{{ $loan->id }}">-</strong>
+                                        </div>
+                                        <div class="col-6">{{ __('theoretical_periodic_amount') }}:</div>
+                                        <div class="col-6 text-right">
+                                            <strong id="theoreticalDisplay{{ $loan->id }}">-</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="text-muted" id="gapLabel{{ $loan->id }}">{{ __('gap') }}:</span>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <strong class="text-info" id="gapDisplay{{ $loan->id }}">-</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -458,14 +578,34 @@ $(document).ready(function() {
     // Auto-calculate loan summary for each modal
     @foreach($loans as $loan)
     (function(loanId, maxAmount) {
-        $('#amount_approved' + loanId + ', #interest_rate' + loanId + ', #duration_months' + loanId).on('input', function() {
+        // Get translation strings from data attributes
+        const translations = {
+            days: $('#repayment_frequency' + loanId).data('days'),
+            weeks: $('#repayment_frequency' + loanId).data('weeks'),
+            months: $('#repayment_frequency' + loanId).data('months'),
+            per30days: $('#repayment_frequency' + loanId).data('per30days'),
+            perAnnum: $('#repayment_frequency' + loanId).data('perannum'),
+            patoNdogoMethod: $('#amortization_method' + loanId).data('pato-ndogo'),
+            frenchMethod: $('#amortization_method' + loanId).data('french'),
+            flatRateMethod: $('#amortization_method' + loanId).data('flat-rate'),
+            constantCapitalMethod: $('#amortization_method' + loanId).data('constant-capital')
+        };
+
+        $('#amount_approved' + loanId + ', #interest_rate' + loanId + ', #duration_value' + loanId + ', #repayment_frequency' + loanId + ', #amortization_method' + loanId).on('input change', function() {
+            calculateLoan(loanId);
+        });
+
+        // Handle adjusted amount change
+        $('#adjusted_daily_amount' + loanId).on('input', function() {
             calculateLoan(loanId);
         });
 
         function calculateLoan(loanId) {
             let principal = parseFloat($('#amount_approved' + loanId).val()) || 0;
             let rate = parseFloat($('#interest_rate' + loanId).val()) || 0;
-            let months = parseInt($('#duration_months' + loanId).val()) || 1;
+            let duration = parseInt($('#duration_value' + loanId).val()) || 1;
+            let frequency = $('#repayment_frequency' + loanId).val() || 'monthly';
+            let method = $('#amortization_method' + loanId).val() || 'pato_ndogo';
 
             // Validate amount doesn't exceed max
             if (principal > maxAmount) {
@@ -473,16 +613,147 @@ $(document).ready(function() {
                 principal = maxAmount;
             }
 
-            // Calculate using simple interest (adjust formula as needed)
-            let annualRate = rate / 100;
-            let totalInterest = principal * annualRate * (months / 12);
-            let totalRepayable = principal + totalInterest;
-            let monthlyPayment = totalRepayable / months;
+            // Update duration label based on frequency
+            const freqLabels = {
+                'daily': translations.days,
+                'weekly': translations.weeks,
+                'monthly': translations.months
+            };
+            $('#paymentLabel' + loanId).text(freqLabels[frequency] + ': ');
+
+            // Update rate period label
+            const ratePeriodLabels = {
+                'daily': translations.per30days,
+                'weekly': translations.per30days,
+                'monthly': translations.perAnnum
+            };
+            $('#ratePeriodLabel' + loanId).text(ratePeriodLabels[frequency]);
+
+            // Update amortization method display
+            const methodLabels = {
+                'pato_ndogo': translations.patoNdogoMethod,
+                'french': translations.frenchMethod,
+                'flat_rate': translations.flatRateMethod,
+                'constant_capital': translations.constantCapitalMethod
+            };
+            $('#methodDisplay' + loanId).text(methodLabels[method]);
+
+            // Calculate based on method and frequency
+            let totalInterest = 0;
+            let totalRepayable = 0;
+            let periodicPayment = 0;
+
+            if (frequency === 'daily' && (method === 'flat_rate' || method === 'pato_ndogo')) {
+                // For daily flat rate / pato_ndogo: rate is per 30 days
+                // Check if adjusted amount is provided
+                const adjustedAmount = parseFloat($('#adjusted_daily_amount' + loanId).val());
+
+                if (!isNaN(adjustedAmount) && adjustedAmount > 0) {
+                    // Use adjusted daily amount
+                    periodicPayment = adjustedAmount;
+                    totalRepayable = periodicPayment * duration;
+                    totalInterest = totalRepayable - principal;
+
+                    // Calculate theoretical amount for comparison
+                    const dailyRate = rate / 100 / 30; // rate per day
+                    const theoreticalDaily = principal * dailyRate + (principal / duration);
+                    $('#theoretical_daily_amount' + loanId).val(theoreticalDaily.toFixed(2));
+
+                    // Calculate surplus/shortfall
+                    const difference = adjustedAmount - theoreticalDaily;
+                    const totalSurplus = difference * duration;
+                    $('#total_surplus_amount' + loanId).val(Math.abs(totalSurplus).toFixed(2));
+                    $('#surplus_type' + loanId).val(difference >= 0 ? 'surplus' : 'shortfall');
+                } else {
+                    // Auto-calculate with standard formula
+                    const dailyRate = rate / 100 / 30; // rate per day
+                    periodicPayment = principal * dailyRate + (principal / duration);
+                    totalRepayable = periodicPayment * duration;
+                    totalInterest = totalRepayable - principal;
+
+                    $('#theoretical_daily_amount' + loanId).val(periodicPayment.toFixed(2));
+                    $('#total_surplus_amount' + loanId).val('0');
+                    $('#surplus_type' + loanId).val('none');
+                }
+            } else {
+                // For weekly/monthly or French method
+                let periodsPerYear = frequency === 'monthly' ? 12 : (frequency === 'weekly' ? 52 : 365);
+                let ratePerPeriod = rate / 100 / (periodsPerYear / 12); // Convert to per period
+                let totalPeriods = frequency === 'monthly' ? duration : (frequency === 'weekly' ? duration : duration);
+
+                if (method === 'french') {
+                    // French method (amortizing)
+                    if (ratePerPeriod > 0) {
+                        periodicPayment = principal * (ratePerPeriod * Math.pow(1 + ratePerPeriod, totalPeriods)) / (Math.pow(1 + ratePerPeriod, totalPeriods) - 1);
+                    } else {
+                        periodicPayment = principal / totalPeriods;
+                    }
+                    totalRepayable = periodicPayment * totalPeriods;
+                    totalInterest = totalRepayable - principal;
+                } else if (method === 'flat_rate') {
+                    // Flat rate
+                    totalInterest = principal * (rate / 100) * (totalPeriods / periodsPerYear);
+                    totalRepayable = principal + totalInterest;
+                    periodicPayment = totalRepayable / totalPeriods;
+                } else if (method === 'constant_capital') {
+                    // Constant capital (decreasing payments)
+                    const capitalPerPeriod = principal / totalPeriods;
+                    // Average payment for display
+                    const firstPayment = capitalPerPeriod + principal * ratePerPeriod;
+                    const lastPayment = capitalPerPeriod + capitalPerPeriod * ratePerPeriod;
+                    periodicPayment = (firstPayment + lastPayment) / 2;
+                    totalRepayable = (firstPayment + lastPayment) * totalPeriods / 2;
+                    totalInterest = totalRepayable - principal;
+                } else {
+                    // Default: pato_ndogo for non-daily
+                    if (ratePerPeriod > 0) {
+                        periodicPayment = principal * (ratePerPeriod * Math.pow(1 + ratePerPeriod, totalPeriods)) / (Math.pow(1 + ratePerPeriod, totalPeriods) - 1);
+                    } else {
+                        periodicPayment = principal / totalPeriods;
+                    }
+                    totalRepayable = periodicPayment * totalPeriods;
+                    totalInterest = totalRepayable - principal;
+                }
+            }
 
             // Update display
-            $('#monthly' + loanId).text(monthlyPayment.toFixed(2));
+            $('#monthly' + loanId).text(periodicPayment.toFixed(2));
             $('#interest' + loanId).text(totalInterest.toFixed(2));
             $('#total' + loanId).text(totalRepayable.toFixed(2));
+            $('#rateDisplay' + loanId).text(rate + ' %');
+
+            // Show/hide adjusted amount row for pato_ndogo daily
+            if (frequency === 'daily' && method === 'pato_ndogo') {
+                $('#adjustedAmountRow' + loanId).show();
+
+                // Update adjusted amount summary
+                const adjustedAmount = parseFloat($('#adjusted_daily_amount' + loanId).val());
+                const theoreticalAmount = parseFloat($('#theoretical_daily_amount' + loanId).val());
+
+                if (!isNaN(adjustedAmount) && adjustedAmount > 0 && !isNaN(theoreticalAmount)) {
+                    $('#adjustedDisplay' + loanId).text(adjustedAmount.toFixed(2));
+                    $('#theoreticalDisplay' + loanId).text(theoreticalAmount.toFixed(2));
+
+                    const difference = adjustedAmount - theoreticalAmount;
+                    const totalSurplus = difference * duration;
+                    const gapLabel = difference >= 0 ? ' (+) ' : ' (-) ';
+                    $('#gapDisplay' + loanId).text(gapLabel + Math.abs(totalSurplus).toFixed(2));
+                    $('#gapLabel' + loanId).text(difference >= 0 ? '{{ __('surplus') }}:' : '{{ __('shortfall') }}:');
+                    $('#adjustedSummaryRow' + loanId).show();
+                } else {
+                    $('#adjustedSummaryRow' + loanId).hide();
+                }
+            } else {
+                $('#adjustedAmountRow' + loanId).hide();
+                $('#adjustedSummaryRow' + loanId).hide();
+            }
+
+            // Show/hide late penalty row for daily flat_rate or pato_ndogo
+            if (frequency === 'daily' && (method === 'flat_rate' || method === 'pato_ndogo')) {
+                $('#latePenaltyRow' + loanId).show();
+            } else {
+                $('#latePenaltyRow' + loanId).hide();
+            }
         }
 
         // Initial calculation

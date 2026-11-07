@@ -1012,5 +1012,16 @@
     "card_back_text": "This card is the property of the ADI AVEC DIGITALE network. If found, please return to the nearest branch or contact us.",
     "card_back_contact": "Tel: +256 XXX XXX XXX | Email: info@capitalinvestment.club",
     "only_members_can_have_pvc_card": "Only members can have PVC cards",
-    "no_membership_number": "Member has no membership number assigned"
+    "no_membership_number": "Member has no membership number assigned",
+    "scanner_active": "Scanner active - Point at QR code",
+    "scanner_error": "Error",
+    "searching_member": "Searching for member...",
+    "member_found": "Member found",
+    "member_not_found": "No member found with this QR code",
+    "manual_qr_input": "Enter QR code / member number manually",
+    "camera_starting": "Starting camera...",
+    "camera_denied": "Camera access denied",
+    "camera_not_supported": "Camera not available or not supported",
+    "barcode_api_unavailable": "Barcode scanning not supported by this browser",
+    "switch_camera": "Switch camera"
 }

@@ -10,6 +10,8 @@ class LoanRepayment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'principal_due',
+        'interest_due',
         'repayment_number',
         'loan_application_id',
         'sacco_id',

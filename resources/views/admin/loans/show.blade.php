@@ -805,9 +805,9 @@
                             <div class="form-group">
                                 <label for="repayment_frequency">{{ __('repayment_frequency') }}</label>
                                 <select class="form-control" id="repayment_frequency" name="repayment_frequency" required>
-                                    <option value="monthly">{{ __('monthly') }}</option>
-                                    <option value="weekly">{{ __('weekly') }}</option>
                                     <option value="daily">{{ __('daily') }}</option>
+                                    <option value="weekly">{{ __('weekly') }}</option>
+                                    <option value="monthly">{{ __('monthly') }}</option>
                                 </select>
                             </div>
                         </div>

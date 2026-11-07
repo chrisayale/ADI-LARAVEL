@@ -131,27 +131,27 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
+                <table class="table table-bordered table-hover align-middle" width="100%" cellspacing="0">
+                    <thead class="thead-light">
                         <tr>
-                            <th>#</th>
-                            <th>{{ __('application_no') }}</th>
-                            <th>{{ __('member') }}</th>
-                            <th>{{ __('membership_no') }}</th>
-                            <th>{{ __('amount_approved') }}</th>
-                            <th>{{ __('interest_rate') }}</th>
-                            <th>{{ __('duration') }}</th>
-                            <th>{{ __('monthly_payment') }}</th>
-                            <th>{{ __('total_repayable') }}</th>
-                            <th>{{ __('approved_date') }}</th>
-                            <th>{{ __('approved_by') }}</th>
-                            <th>{{ __('actions') }}</th>
+                            <th style="width: 40px;">#</th>
+                            <th style="width: 130px;">{{ __('application_no') }}</th>
+                            <th style="width: 180px;">{{ __('member') }}</th>
+                            <th style="width: 120px;">{{ __('membership_no') }}</th>
+                            <th style="width: 110px;" class="text-end">{{ __('amount_approved') }}</th>
+                            <th style="width: 110px;" class="text-center">{{ __('interest_rate') }}</th>
+                            <th style="width: 100px;" class="text-center">{{ __('duration') }}</th>
+                            <th style="width: 150px;" class="text-end">{{ __('periodic_payment') }}</th>
+                            <th style="width: 130px;" class="text-end">{{ __('total_repayable') }}</th>
+                            <th style="width: 100px;" class="text-center">{{ __('approved_date') }}</th>
+                            <th style="width: 120px;">{{ __('approved_by') }}</th>
+                            <th style="width: 80px;" class="text-center">{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($approvedLoans as $index => $loan)
                         <tr>
-                            <td>{{ $approvedLoans->firstItem() + $index }}</td>
+                            <td class="text-center">{{ $approvedLoans->firstItem() + $index }}</td>
                             <td>
                                 <strong>{{ $loan->application_number }}</strong>
                             </td>
@@ -159,9 +159,9 @@
                                 <div class="d-flex align-items-center">
                                     @if($loan->user->profile_photo)
                                         <img src="{{ asset('storage/' . $loan->user->profile_photo) }}"
-                                             class="rounded-circle mr-2" width="40" height="40" alt="Profile">
+                                             class="rounded-circle me-2" width="40" height="40" alt="Profile">
                                     @else
-                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-2"
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
                                              style="width: 40px; height: 40px;">
                                             {{ strtoupper(substr($loan->user->name, 0, 2)) }}
                                         </div>
@@ -173,15 +173,15 @@
                                 </div>
                             </td>
                             <td>{{ $loan->user->membership_number ?? __('n_a') }}</td>
-                            <td><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
-                            <td>
+                            <td class="text-end"><strong>CDF {{ number_format($loan->amount_approved, 2) }}</strong></td>
+                            <td class="text-center">
                                 @if($loan->interest_rate_label)
                                     {{ $loan->interest_rate_label }}
                                 @else
                                     {{ number_format($loan->interest_rate, 2) }}%
                                 @endif
                             </td>
-                            <td>
+                            <td class="text-center">
                                 @if($loan->duration_value && $loan->duration_period_label)
                                     {{ $loan->duration_value }} {{ $loan->duration_period_label }}
                                 @elseif($loan->duration_months)
@@ -190,24 +190,40 @@
                                     {{ __('n_a') }}
                                 @endif
                             </td>
-                            <td>CDF {{ number_format($loan->monthly_repayment, 2) }}</td>
-                            <td>CDF {{ number_format($loan->total_repayable, 2) }}</td>
-                            <td>{{ $loan->approved_at->format('d M Y') }}</td>
+                            <td class="text-end">
+                                @php
+                                    $paymentLabel = match($loan->repayment_frequency) {
+                                        'daily' => __('daily_payment'),
+                                        'weekly' => __('weekly_payment'),
+                                        default => __('monthly_payment')
+                                    };
+                                    $paymentAmount = $loan->monthly_repayment;
+                                @endphp
+                                <span class="fw-bold">{{ $paymentLabel }}</span>
+                                <span class="text-muted small ms-1">:</span>
+                                <span class="ms-1"><strong>CDF {{ number_format($paymentAmount, 2) }}</strong></span>
+                            </td>
+                            <td class="text-end">
+                                <strong>CDF {{ number_format($loan->total_repayable, 2) }}</strong>
+                            </td>
+                            <td class="text-center">{{ $loan->approved_at->format('d M Y') }}</td>
                             <td>{{ $loan->approver->name ?? __('n_a') }}</td>
-                            <td>
-                                <a href="{{ route('admin.loans.show', $loan) }}" class="btn btn-info btn-sm" title="{{ __('view_details') }}">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ route('admin.loans.show', $loan) }}" class="btn btn-info" title="{{ __('view_details') }}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
 
-                                @if($loan->status == 'approved')
-                                <form action="{{ route('admin.loans.disburse', $loan) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success btn-sm" title="{{ __('disburse_loan') }}"
-                                            onclick="return confirm('{{ __('confirm_disburse') }}')">
-                                        <i class="fas fa-hand-holding-usd"></i>
-                                    </button>
-                                </form>
-                                @endif
+                                    @if($loan->status == 'approved')
+                                    <form action="{{ route('admin.loans.disburse', $loan) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success" title="{{ __('disburse_loan') }}"
+                                                onclick="return confirm('{{ __('confirm_disburse') }}')">
+                                            <i class="fas fa-hand-holding-usd"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('loan_applications', function (Blueprint $table) {
-            $table->enum('amortization_method', ['french', 'flat_rate', 'constant_capital'])->default('french')->after('repayment_frequency');
+            $table->enum('amortization_method', ['french', 'flat_rate', 'constant_capital', 'pato_ndogo'])->default('french')->after('repayment_frequency');
         });
     }
 

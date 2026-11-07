@@ -216,6 +216,12 @@ class SavingsController extends Controller
         }
 
         // Create transaction
+        $saccoId = $request->sacco_id ?? auth()->user()->sacco_id ?? \App\Models\Sacco::value('id');
+
+        if (!$saccoId) {
+            throw new \Exception('Impossible de déterminer le SACCO pour cette transaction. Aucun SACCO configuré.');
+        }
+
         $transaction = SavingsTransaction::create([
             'transaction_number' => 'TXN-' . date('Ymd') . '-' . str_pad($nextId, 6, '0', STR_PAD_LEFT),
             'user_id' => $request->user_id,
@@ -226,7 +232,8 @@ class SavingsController extends Controller
             'notes' => $request->notes,
             'recorded_by' => auth()->id(),
             'status' => $request->status,
-            'balance_after' => $balanceAfter
+            'balance_after' => $balanceAfter,
+            'sacco_id' => $saccoId
         ]);
 
         DB::commit();

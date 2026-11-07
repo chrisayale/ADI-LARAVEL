@@ -688,7 +688,8 @@ class LoanController extends Controller
         // Handle adjusted daily amount for pato_ndogo daily
         $isDailyPatoNdogo = ($request->repayment_frequency === 'daily' && $request->amortization_method === 'pato_ndogo');
         $adjustedDailyAmount = $request->adjusted_daily_amount ?? null;
-        $theoreticalDailyAmount = $request->theoretical_daily_amount ?? null;
+        // Use EXACT theoretical value from calculation, not rounded form value
+        $theoreticalDailyAmount = $isDailyPatoNdogo ? $calculation['periodic_payment'] : null;
         $totalSurplusAmount = $request->total_surplus_amount ?? 0;
         $surplusType = $request->surplus_type ?? 'none';
 

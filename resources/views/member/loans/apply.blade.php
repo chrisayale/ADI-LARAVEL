@@ -57,9 +57,9 @@
                     <div class="col-md-3 mb-3">
                         <label for="repayment_frequency">Repayment Frequency <span class="text-danger">*</span></label>
                         <select class="form-control" id="repayment_frequency" name="repayment_frequency" required>
-                            <option value="monthly" selected>Monthly</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="daily">Daily</option>
+                            <option value="daily" selected>{{ __('daily') }}</option>
+                            <option value="weekly">{{ __('weekly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
                         </select>
                     </div>
                     <div class="col-md-3 mb-3">

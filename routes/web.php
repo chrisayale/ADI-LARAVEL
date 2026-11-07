@@ -173,6 +173,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         // Loan processing actions
         Route::post('/{loan}/assign-treasurer', [AdminLoanController::class, 'assignTreasurer'])->name('assign-treasurer');
         Route::post('/{loan}/verify', [AdminLoanController::class, 'verify'])->name('verify');
+        Route::get('/{loan}/approve', function ($loan) {
+            return redirect()->route('admin.loans.verified')
+                ->with('error', 'Accès direct non autorisé. Utilisez le formulaire d\'approbation.');
+        })->name('approve-get');
         Route::post('/{loan}/approve', [AdminLoanController::class, 'approve'])->name('approve');
         Route::post('/{loan}/reject', [AdminLoanController::class, 'reject'])->name('reject');
         Route::post('/{loan}/disburse', [AdminLoanController::class, 'disburse'])->name('disburse');

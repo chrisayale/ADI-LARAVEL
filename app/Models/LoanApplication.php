@@ -42,7 +42,11 @@ class LoanApplication extends Model
         'first_payment_date',
         'maturity_date',
         'apply_late_penalty',
-        'late_penalty_amount'
+        'late_penalty_amount',
+        'adjusted_daily_amount',
+        'theoretical_daily_amount',
+        'total_surplus_amount',
+        'surplus_type'
     ];
 
     protected $casts = [
@@ -52,6 +56,9 @@ class LoanApplication extends Model
         'monthly_repayment' => 'decimal:2',
         'total_repayable' => 'decimal:2',
         'collateral_value' => 'decimal:2',
+        'adjusted_daily_amount' => 'decimal:2',
+        'theoretical_daily_amount' => 'decimal:2',
+        'total_surplus_amount' => 'decimal:2',
         'has_collateral' => 'boolean',
         'verified_at' => 'datetime',
         'approved_at' => 'datetime',
@@ -110,11 +117,18 @@ public function approve($data)
 
 public function calculateRepayment($principal, $annualRate, $frequency, $durationValue, $amortizationMethod = 'french')
 {
+    // Cast numeric parameters to ensure correct types for PHP 8.4 / Carbon
+    $principal = (float) $principal;
+    $annualRate = (float) $annualRate;
+    $durationValue = (int) $durationValue;
+
     // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
     // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
-    $isDailyFlatRate = ($frequency === 'daily' && ($amortizationMethod === 'flat_rate' || $amortizationMethod === 'pato_ndogo'));
-    if ($isDailyFlatRate) {
-        // Override annualRate based on duration in days
+    // For Pato Ndogo daily: same rate auto-calculation but with French amortization
+    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    $isPatoNdogoDaily = ($frequency === 'daily' && $amortizationMethod === 'pato_ndogo');
+    if ($isDailyFlatRate || $isPatoNdogoDaily) {
+        // Override annualRate based on duration in days: Taux (%) = (Durée en jours / 30) * 10%
         $annualRate = (($durationValue / 30) * 10) / 100;
     }
 
@@ -143,7 +157,6 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
 
     switch ($amortizationMethod) {
         case 'flat_rate':
-        case 'pato_ndogo':
             if ($isDailyFlatRate) {
                 // DAILY FLAT RATE: Special calculation per requirements
                 // Intérêt Total = Capital × Taux (%)
@@ -167,6 +180,40 @@ public function calculateRepayment($principal, $annualRate, $frequency, $duratio
                 $totalInterest = $periodicInterest * $periods;
                 $totalRepayable = $principal + $totalInterest;
             }
+            break;
+
+        case 'pato_ndogo':
+            // Pato Ndogo: Exact Theoretical Calculation (No Compounding)
+            // For daily: auto-calculates rate as (Duration in days / 30) * 10%
+            // THEORETICAL (Exact, no rounding):
+            //   Total with interest = Principal * (1 + Rate) where Rate = (Days/30) * 10%
+            //   Daily Theoretical = Total / Days (exact division, all decimals preserved)
+            //   Daily Constant Principal = Principal / Days
+            //   Daily Constant Interest = Total Interest / Days
+            // ADJUSTED: Practical rounded amount (e.g., 4000 CDF/day)
+            // GAP = Adjusted - Theoretical
+
+            // Auto-calculate theoretical rate for daily Pato Ndogo
+            if ($isPatoNdogoDaily) {
+                $annualRate = (($durationValue / 30) * 10) / 100;
+                $periodicRate = $annualRate / 365;
+            }
+
+            // Theoretical calculation: Simple interest over period, divided equally
+            $theoreticalRate = ($durationValue / 30) * 10 / 100; // e.g., 0.10 for 30 days
+            $theoreticalTotalInterest = $principal * $theoreticalRate; // Exact: 100000 * 0.10 = 10000
+            $theoreticalTotalRepayable = $principal + $theoreticalTotalInterest; // Exact: 110000
+            $theoreticalPeriodicPayment = $theoreticalTotalRepayable / $periods; // Exact: 110000/30 = 3666.6666...
+
+            // Constant components (exact, no rounding)
+            $periodicPrincipal = $principal / $periods; // 100000/30 = 3333.3333...
+            $periodicInterest = $theoreticalTotalInterest / $periods; // 10000/30 = 333.3333...
+            $theoreticalPeriodicPayment = $periodicPrincipal + $periodicInterest; // 3666.6666...
+
+            // For calculateRepayment, return theoretical values (exact)
+            $periodicPayment = $theoreticalPeriodicPayment;
+            $totalInterest = $theoreticalTotalInterest;
+            $totalRepayable = $theoreticalTotalRepayable;
             break;
 
         case 'constant_capital':
@@ -225,8 +272,11 @@ public function createRepaymentSchedule()
     $annualRate = $this->interest_rate / 100;
 
     // AUTO-CALCULATE INTEREST RATE for Daily Flat Rate
-    $isDailyFlatRate = ($frequency === 'daily' && ($amortizationMethod === 'flat_rate' || $amortizationMethod === 'pato_ndogo'));
-    if ($isDailyFlatRate) {
+    // When frequency is daily AND amortization is flat_rate: Taux (%) = (Durée en jours / 30) * 10%
+    // For Pato Ndogo daily: same rate auto-calculation but with Flat Rate amortization
+    $isDailyFlatRate = ($frequency === 'daily' && $amortizationMethod === 'flat_rate');
+    $isPatoNdogoDaily = ($frequency === 'daily' && $amortizationMethod === 'pato_ndogo');
+    if ($isDailyFlatRate || $isPatoNdogoDaily) {
         // Override annualRate based on duration in days: Taux (%) = (Durée en jours / 30) * 10%
         $annualRate = (($durationValue / 30) * 10) / 100;
     }
@@ -263,6 +313,23 @@ public function createRepaymentSchedule()
         $dailyInterest = $totalInterest / $durationValue;
     }
 
+    // Pre-calculate for Pato Ndogo daily (Exact Theoretical - Simple Division)
+    if ($isPatoNdogoDaily) {
+        // Constant components - EXACT (no rounding)
+        $dailyPrincipal = $principal / $durationValue; // Constant principal per day
+        $theoreticalRate = (($durationValue / 30) * 10) / 100; // e.g., 0.10
+        $theoreticalTotalInterest = $principal * $theoreticalRate; // Total interest
+        $dailyInterest = $theoreticalTotalInterest / $durationValue; // Constant interest per day
+        $theoreticalDailyPayment = $dailyPrincipal + $dailyInterest; // Exact theoretical (3666.6666...)
+
+        // Adjusted amount (from loan model, set during approval)
+        $adjustedDailyAmount = $this->adjusted_daily_amount ?? ceil($theoreticalDailyPayment / 100) * 100;
+
+        // Store exact theoretical components for view calculations
+        $theoreticalAnnualRate = $theoreticalRate;
+        $theoreticalPeriodicRate = $theoreticalRate / $durationValue; // Not used, kept for compatibility
+    }
+
     for ($i = 1; $i <= $durationValue; $i++) {
         $amountDue = 0;
         $principalDue = 0;
@@ -270,7 +337,6 @@ public function createRepaymentSchedule()
 
         switch ($amortizationMethod) {
             case 'flat_rate':
-        case 'pato_ndogo':
                 if ($isDailyFlatRate) {
                     // DAILY FLAT RATE: Equal daily payments with equal principal and interest portions
                     $amountDue = $dailyPayment;
@@ -282,6 +348,34 @@ public function createRepaymentSchedule()
                     $interestDue = $principal * $periodicRate;
                     $amountDue = $principalDue + $interestDue;
                 }
+                break;
+
+            case 'pato_ndogo':
+                // Pato Ndogo: Exact Theoretical (Simple Division) - No Compounding
+                // Constant Principal = Principal / Periods
+                // Constant Interest = Total Interest / Periods
+                // Theoretical Amount = Constant Principal + Constant Interest (EXACT, all decimals)
+                // Adjusted Amount = Practical rounded (stored in loan->adjusted_daily_amount)
+                // Gap = Adjusted - Theoretical
+                // Stored amount_due = Theoretical Amount EXACT
+
+                $principalDue = $principal / $durationValue; // Constant principal
+
+                if ($isPatoNdogoDaily) {
+                    // Theoretical interest: CONSTANT per day (Total Interest / Days)
+                    $theoreticalRate = (($durationValue / 30) * 10) / 100;
+                    $theoreticalTotalInterest = $principal * $theoreticalRate;
+                    $interestDue = $theoreticalTotalInterest / $durationValue; // Constant interest
+                    $theoreticalAmount = $principalDue + $interestDue; // EXACT theoretical
+
+                    // Store EXACT theoretical amount in database
+                    $amountDue = $theoreticalAmount;
+                } else {
+                    // Weekly/Monthly Pato Ndogo: standard declining balance
+                    $interestDue = $remainingBalance * $periodicRate;
+                    $amountDue = $principalDue + $interestDue;
+                }
+                $remainingBalance -= $principalDue;
                 break;
 
             case 'constant_capital':
@@ -311,6 +405,8 @@ public function createRepaymentSchedule()
             'sacco_id' => $this->sacco_id,
             'installment_number' => $i,
             'amount_due' => round($amountDue, 2),
+            'principal_due' => isset($principalDue) ? round($principalDue, 6) : null,
+            'interest_due' => isset($interestDue) ? round($interestDue, 6) : null,
             'due_date' => $dueDate->copy(),
             'status' => 'pending'
         ]);

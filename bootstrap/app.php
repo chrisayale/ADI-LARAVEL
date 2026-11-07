@@ -32,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
             users: '/dashboard'
         );
 
+        // Configure CSRF token validation exceptions for AJAX endpoints
+        $middleware->validateCsrfTokens(except: [
+            'admin/loans/find-member-qr',
+        ]);
+
         // Add middleware to groups if needed
         $middleware->group('web', [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
