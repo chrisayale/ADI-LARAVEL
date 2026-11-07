@@ -1,22 +1,22 @@
 {{-- resources/views/treasurer/savings/deposits.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Deposits')
+@section('title', __('deposits'))
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Deposits</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ __('deposits') }}</h1>
         <div>
             <a href="{{ route('treasurer.savings.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Deposit
+                <i class="fas fa-plus"></i> {{ __('new_deposit') }}
             </a>
             <a href="{{ route('treasurer.savings.transactions') }}" class="btn btn-secondary">
-                <i class="fas fa-list"></i> All Transactions
+                <i class="fas fa-list"></i> {{ __('all_transactions') }}
             </a>
             <a href="{{ route('treasurer.savings.withdrawals') }}" class="btn btn-info">
-                <i class="fas fa-arrow-up"></i> Withdrawals
+                <i class="fas fa-arrow-up"></i> {{ __('withdrawals') }}
             </a>
         </div>
     </div>
@@ -29,7 +29,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Deposits</div>
+                                {{ __('total_deposits') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">CDF {{ number_format($totalDeposits, 2) }}</div>
                         </div>
                         <div class="col-auto">
@@ -44,26 +44,26 @@
     <!-- Filter Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Deposits</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('filter_deposits') }}</h6>
         </div>
         <div class="card-body">
             <form method="GET" action="{{ route('treasurer.savings.deposits') }}" class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="search">Search Member</label>
+                    <label for="search">{{ __('search_member') }}</label>
                     <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Name or Membership #">
+                           value="{{ request('search') }}" placeholder="{{ __('name_or_membership_number') }}">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="date_from">Date From</label>
+                    <label for="date_from">{{ __('date_from') }}</label>
                     <input type="date" class="form-control" id="date_from" name="date_from" value="{{ request('date_from') }}">
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="date_to">Date To</label>
+                    <label for="date_to">{{ __('date_to') }}</label>
                     <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request('date_to') }}">
                 </div>
                 <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> {{ __('filter') }}
                     </button>
                 </div>
             </form>
@@ -73,7 +73,7 @@
     <!-- Deposits Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Deposit Transactions</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('deposit_transactions') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -81,12 +81,12 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Receipt #</th>
-                            <th>Member</th>
-                            <th>Amount</th>
-                            <th>Balance After</th>
-                            <th>Date</th>
-                            <th>Actions</th>
+                            <th>{{ __('receipt_number') }}</th>
+                            <th>{{ __('member') }}</th>
+                            <th>{{ __('amount') }}</th>
+                            <th>{{ __('balance_after') }}</th>
+                            <th>{{ __('date') }}</th>
+                            <th>{{ __('actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,7 +137,7 @@
                         <tr>
                             <td colspan="7" class="text-center py-4">
                                 <i class="fas fa-arrow-down fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No deposits found</p>
+                                <p class="text-muted">{{ __('no_deposits_found') }}</p>
                             </td>
                         </tr>
                         @endforelse
