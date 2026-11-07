@@ -185,7 +185,14 @@
                                         <strong class="text-primary">{{ number_format($loan->amount_applied, 2) }}</strong>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-calendar"></i> {{ $loan->duration_months ?? __('n_a') }} {{ __('months') }}
+                                            <i class="fas fa-calendar"></i>
+                                            @if($loan->duration_value)
+                                                {{ $loan->duration_value }} {{ $loan->duration_period_label }}
+                                            @elseif($loan->duration_months)
+                                                {{ $loan->duration_months }} {{ __('months') }}
+                                            @else
+                                                {{ __('n_a') }}
+                                            @endif
                                             <br>
                                             <span class="badge bg-success">{{ translate_status('verified') }}</span>
                                         </small>
@@ -207,13 +214,21 @@
                                         @php
                                             $verifiedCount = $loan->guarantors->where('status', 'verified')->count();
                                             $totalCount = $loan->guarantors->count();
+                                            $allVerified = $totalCount > 0 && $verifiedCount == $totalCount;
                                         @endphp
-                                        <span class="badge bg-{{ $verifiedCount == $totalCount ? 'success' : 'warning' }}">
+                                        <span class="badge bg-{{ $allVerified ? 'success' : 'warning' }}">
                                             {{ $verifiedCount }}/{{ $totalCount }} {{ __('verified') }}
                                         </span>
                                         <br>
                                         <small class="text-muted">
-                                            <i class="fas fa-user-check"></i> {{ __('all_verified') }}
+                                            <i class="fas fa-user-check"></i>
+                                            @if($totalCount == 0)
+                                                {{ __('no_guarantors') }}
+                                            @elseif($allVerified)
+                                                {{ __('all_verified') }}
+                                            @else
+                                                {{ __('partially_verified') }}
+                                            @endif
                                         </small>
                                     </td>
                                     <td>
