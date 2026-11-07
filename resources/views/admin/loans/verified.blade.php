@@ -394,7 +394,8 @@
                                         data-weeks="{{ __('weeks') }}"
                                         data-months="{{ __('months') }}"
                                         data-per30days="{{ __('per_30_days') }}"
-                                        data-perannum="{{ __('per_annum') }}">
+                                        data-perannum="{{ __('per_annum') }}"
+                                        data-duration="{{ __('duration') }}">
                                     <option value="daily" {{ ($loan->repayment_frequency ?? 'daily') == 'daily' ? 'selected' : '' }}>{{ __('daily') }}</option>
                                     <option value="weekly" {{ ($loan->repayment_frequency ?? 'daily') == 'weekly' ? 'selected' : '' }}>{{ __('weekly') }}</option>
                                     <option value="monthly" {{ ($loan->repayment_frequency ?? 'daily') == 'monthly' ? 'selected' : '' }}>{{ __('monthly') }}</option>
@@ -610,6 +611,7 @@ $(document).ready(function() {
             months: $('#repayment_frequency' + loanId).data('months'),
             per30days: $('#repayment_frequency' + loanId).data('per30days'),
             perAnnum: $('#repayment_frequency' + loanId).data('perannum'),
+            duration: $('#repayment_frequency' + loanId).data('duration'),
             patoNdogoMethod: $('#amortization_method' + loanId).data('pato-ndogo'),
             frenchMethod: $('#amortization_method' + loanId).data('french'),
             flatRateMethod: $('#amortization_method' + loanId).data('flat-rate'),
