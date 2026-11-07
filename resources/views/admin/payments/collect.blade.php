@@ -64,7 +64,7 @@
                                                 {{ __('loan') }} #{{ $loan->application_number }}
                                             </h5>
                                             <span class="badge bg-light text-dark">
-                                                {{ __('balance') }}: {{ number_format($loan->balance, 2) }}
+                                                {{ __('balance') }}: {{ number_format($loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid'), 2) }}
                                             </span>
                                         </div>
                                     </div>
@@ -88,7 +88,8 @@
                                             <tbody>
                                                 @foreach($loan->repayments as $repayment)
                                                     @php
-                                                        $balance = $repayment->amount_due - $repayment->amount_paid;
+                                                        $effectiveDue = $repayment->effective_amount_due;
+                                                        $balance = $effectiveDue - $repayment->amount_paid;
                                                         $isOverdue = $repayment->due_date < now() && $repayment->status != 'paid';
                                                     @endphp
                                                     @if($balance > 0)
@@ -103,7 +104,7 @@
                                                         </td>
                                                         <td>{{ $repayment->installment_number }}</td>
                                                         <td>{{ $repayment->due_date->format('d/m/Y') }}</td>
-                                                        <td>{{ number_format($repayment->amount_due, 2) }}</td>
+                                                        <td>{{ number_format($effectiveDue, 2) }}</td>
                                                         <td>{{ number_format($repayment->amount_paid, 2) }}</td>
                                                         <td class="font-weight-bold">{{ number_format($balance, 2) }}</td>
                                                         <td>

@@ -117,7 +117,7 @@ class RepaymentController extends Controller
             return response()->json(['error' => 'Loan not found or not assigned to you'], 404);
         }
 
-        $totalDue = $loan->repayments->sum('amount_due') - $loan->repayments->sum('amount_paid');
+        $totalDue = $loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid');
         $overdueCount = $loan->repayments->filter(function($repayment) {
             return $repayment->due_date < now() && $repayment->status != 'paid';
         })->count();
@@ -349,7 +349,7 @@ public function loanRepayments(LoanApplication $loan)
 
     // Calculate summary
     $totalPaid = $loan->repayments->sum('amount_paid');
-    $totalDue = $loan->repayments->sum('amount_due');
+    $totalDue = $loan->repayments->sum('effective_amount_due');
     $nextPayment = $loan->repayments()
         ->whereIn('status', ['pending', 'partial'])
         ->orderBy('due_date')
@@ -393,7 +393,8 @@ public function loanRepayments(LoanApplication $loan)
 
         foreach ($activeLoans as $loan) {
             foreach ($loan->repayments as $repayment) {
-                $balance = $repayment->amount_due - $repayment->amount_paid;
+                // Use effective_amount_due which includes adjusted amount for Pato Ndogo
+                $balance = $repayment->effective_amount_due - $repayment->amount_paid;
                 $totalDue += $balance;
 
                 if ($repayment->due_date < now()) {
@@ -412,7 +413,7 @@ public function loanRepayments(LoanApplication $loan)
             'overdue_amount' => $overdueAmount,
             'next_payment' => $nextPayment ? [
                 'due_date' => $nextPayment->due_date->format('Y-m-d'),
-                'amount' => $nextPayment->amount_due - $nextPayment->amount_paid,
+                'amount' => $nextPayment->effective_amount_due - $nextPayment->amount_paid,
                 'installment' => $nextPayment->installment_number
             ] : null
         ]);

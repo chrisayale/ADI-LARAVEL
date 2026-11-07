@@ -89,7 +89,7 @@
                                 Loan #{{ $loan->application_number }}
                             </h5>
                             <span class="badge bg-light text-dark">
-                                Balance: CDF {{ number_format($loan->balance, 2) }}
+                                Balance: CDF {{ number_format($loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid'), 2) }}
                             </span>
                         </div>
                     </div>

@@ -328,6 +328,9 @@ public function createRepaymentSchedule()
         // Store exact theoretical components for view calculations
         $theoreticalAnnualRate = $theoreticalRate;
         $theoreticalPeriodicRate = $theoreticalRate / $durationValue; // Not used, kept for compatibility
+    } else {
+        // For non-Pato Ndogo daily loans, ensure adjustedDailyAmount is defined
+        $adjustedDailyAmount = null;
     }
 
     for ($i = 1; $i <= $durationValue; $i++) {
@@ -400,7 +403,8 @@ public function createRepaymentSchedule()
                 break;
         }
 
-        $this->repayments()->create([
+        // Prepare repayment data
+        $repaymentData = [
             'repayment_number' => 'RPT-' . $this->id . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
             'sacco_id' => $this->sacco_id,
             'installment_number' => $i,
@@ -409,7 +413,18 @@ public function createRepaymentSchedule()
             'interest_due' => isset($interestDue) ? round($interestDue, 6) : null,
             'due_date' => $dueDate->copy(),
             'status' => 'pending'
-        ]);
+        ];
+
+        // For Pato Ndogo daily loans, set the adjusted_amount to the practical daily amount
+        if ($isPatoNdogoDaily && isset($adjustedDailyAmount)) {
+            $repaymentData['adjusted_amount'] = round($adjustedDailyAmount, 2);
+            // Also set difference_amount and difference_type to track the gap
+            $difference = round($adjustedDailyAmount - $amountDue, 2);
+            $repaymentData['difference_amount'] = $difference;
+            $repaymentData['difference_type'] = $difference > 0 ? 'surplus' : ($difference < 0 ? 'shortfall' : 'none');
+        }
+
+        $this->repayments()->create($repaymentData);
 
         $dueDate = match ($frequency) {
             'daily' => $dueDate->copy()->addDay(),
@@ -512,14 +527,16 @@ public function createRepaymentSchedule()
     public function getBalanceAttribute()
     {
         $totalPaid = $this->repayments->sum('amount_paid');
-        return $this->total_repayable - $totalPaid;
+        $totalDue = $this->repayments->sum('effective_amount_due');
+        return max(0, $totalDue - $totalPaid);
     }
 
     public function getProgressPercentageAttribute()
     {
-        if ($this->total_repayable == 0) return 0;
         $totalPaid = $this->repayments->sum('amount_paid');
-        return round(($totalPaid / $this->total_repayable) * 100, 2);
+        $totalDue = $this->repayments->sum('effective_amount_due');
+        if ($totalDue == 0) return 0;
+        return round(($totalPaid / $totalDue) * 100, 2);
     }
 
     public function getIsOverdueAttribute()

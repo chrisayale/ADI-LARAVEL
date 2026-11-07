@@ -69,7 +69,7 @@ public function collect(Request $request)
             return response()->json(['error' => 'Loan not found'], 404);
         }
 
-        $totalDue = $loan->repayments->sum('amount_due') - $loan->repayments->sum('amount_paid');
+        $totalDue = $loan->repayments->sum('effective_amount_due') - $loan->repayments->sum('amount_paid');
         $overdueCount = $loan->repayments->filter(function($repayment) {
             return $repayment->due_date < now() && $repayment->status != 'paid';
         })->count();
@@ -141,7 +141,7 @@ public function collect(Request $request)
             foreach ($repayments as $repayment) {
                 if ($remainingAmount <= 0) break;
 
-                $balance = $repayment->amount_due - $repayment->amount_paid;
+                $balance = $repayment->effective_amount_due - $repayment->amount_paid;
                 $paymentToApply = min($remainingAmount, $balance);
 
                 if ($paymentToApply > 0) {
@@ -150,7 +150,7 @@ public function collect(Request $request)
                     $repayment->total_paid += $paymentToApply;
 
                     // Update status
-                    if ($repayment->amount_paid >= $repayment->amount_due) {
+                    if ($repayment->amount_paid >= $repayment->effective_amount_due) {
                         $repayment->status = 'paid';
                         $repayment->paid_date = now();
                     } elseif ($repayment->amount_paid > 0) {
@@ -167,7 +167,7 @@ public function collect(Request $request)
             }
 
             // Check if loan is fully paid
-            $totalDue = $loan->repayments->sum('amount_due');
+            $totalDue = $loan->repayments->sum('effective_amount_due');
             $totalPaid = $loan->repayments->sum('amount_paid');
 
             if ($totalPaid >= $totalDue) {
@@ -256,7 +256,8 @@ public function collect(Request $request)
 
         foreach ($activeLoans as $loan) {
             foreach ($loan->repayments as $repayment) {
-                $balance = $repayment->amount_due - $repayment->amount_paid;
+                // Use effective_amount_due which includes adjusted amount for Pato Ndogo
+                $balance = $repayment->effective_amount_due - $repayment->amount_paid;
                 $totalDue += $balance;
 
                 if ($repayment->due_date < now()) {
@@ -275,7 +276,7 @@ public function collect(Request $request)
             'overdue_amount' => $overdueAmount,
             'next_payment' => $nextPayment ? [
                 'due_date' => $nextPayment->due_date->format('Y-m-d'),
-                'amount' => $nextPayment->amount_due - $nextPayment->amount_paid,
+                'amount' => $nextPayment->effective_amount_due - $nextPayment->amount_paid,
                 'installment' => $nextPayment->installment_number
             ] : null
         ]);
