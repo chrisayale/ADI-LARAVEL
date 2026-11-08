@@ -277,12 +277,12 @@
             display: block;
         }
 
-        /* Member Name - Centered in BLUE CENTRAL BAND */
+        /* Member Name - Fixed left alignment matching member code frame exactly */
         .member-name {
             top: 50mm; /* Adjusted to center vertically in yellow badge */
-            left: 50%;
-            transform: translateX(-50%) translateX(-8mm); /* Shifted 8mm left (was 10mm) */
-            text-align: center;
+            left: 75%; /* Same horizontal anchor as member code */
+            transform: translateX(-50%) translateX(-12mm); /* Matches member-code-value exactly: -12mm from center */
+            text-align: left; /* Strict left alignment - names start at same position as code */
             font-size: 3.2mm;
             font-weight: 700;
             color: #ffffff;
@@ -290,7 +290,10 @@
             line-height: 1.1;
             text-transform: uppercase;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 42mm; /* Ensures 15 chars fit within card width */
         }
 
         /* Member Code Value - Centered in white rounded frame, matching member name style */
@@ -298,7 +301,7 @@
             top: 57.5mm; /* Centered vertically in white oval slot (moved down 1mm) */
             left: 75%;
             transform: translateX(-50%) translateX(-12mm); /* Centered horizontally then shifted 12mm left total */
-            font-size: 3.2mm;           /* Same size as member name */
+            font-size: 2.8mm;           /* Reduced from 3.2mm for better breathing room in frame */
             font-weight: 700;           /* Same weight as member name */
             color: #ffffff;             /* White text color */
             letter-spacing: 0.04mm;     /* Same letter-spacing as member name */
