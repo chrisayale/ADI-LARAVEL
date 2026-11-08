@@ -268,7 +268,7 @@
         .member-name {
             top: 50mm; /* Adjusted to center vertically in yellow badge */
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateX(-8mm); /* Shifted 8mm left (was 10mm) */
             text-align: center;
             font-size: 3.2mm;
             font-weight: 700;
