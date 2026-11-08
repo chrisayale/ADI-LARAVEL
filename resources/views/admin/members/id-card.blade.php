@@ -282,9 +282,9 @@
 
         /* Member Code Value - Centered in white rounded frame, matching member name style */
         .member-code-value {
-            top: 56.5mm; /* Centered vertically in white oval slot */
+            top: 57.5mm; /* Centered vertically in white oval slot (moved down 1mm) */
             left: 75%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateX(-12mm); /* Centered horizontally then shifted 12mm left total */
             font-size: 3.2mm;           /* Same size as member name */
             font-weight: 700;           /* Same weight as member name */
             color: #ffffff;             /* White text color */
@@ -297,18 +297,20 @@
             text-transform: none;       /* Keep membership number format (e.g., MEM-2024-001) */
         }
 
-        /* Expiry Value - Centered in YELLOW/WHITE SLOT (line "Expire le :") in BLACK */
+        /* Expiry Value - Centered in YELLOW/WHITE SLOT, matching member code style */
         .member-expiry-value {
-            top: 62.5mm; /* Aligned with "Expire le :" label in white oval slot */
-            left: 71%;
-            transform: translateX(-50%);
-            font-size: 2.2mm;
+            top: 62.5mm;
+            left: 75%;
+            transform: translateX(-50%) translateX(-7mm); /* Moved 1mm right from -8mm */
+            font-size: 3.2mm;
             font-weight: 700;
-            color: #000000; /* Black as requested */
-            letter-spacing: 0.08mm;
-            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            color: #ffffff;
+            letter-spacing: 0.04mm;
+            font-family: inherit;
             text-align: center;
             white-space: nowrap;
+            font-style: italic;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         /* Side indicator */
@@ -419,7 +421,7 @@
                     <div class="member-name">{{ strtoupper($displayName ?? $user->name) }}</div>
 
                     <!-- Member Code Value Only - Centered in Yellow/White Slot -->
-                    <div class="member-code-value">{{ $user->membership_number }}</div>
+                    <div class="member-code-value">CODE : {{ $user->membership_number }}</div>
 
                     <!-- Expiry Value Only - Centered in Yellow/White Slot (Black) -->
                     <div class="member-expiry-value">{{ $expiryDate }}</div>
