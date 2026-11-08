@@ -264,7 +264,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.5mm 3.5mm 1.5mm 2.5mm;  /* Asymmetric padding: left=3.5mm (was 1.5mm+2mm), right=2.5mm (was 1.5mm+1mm) */
+            padding: 0;  /* No padding - QR fills entire frame */
             box-shadow:
                 0 4px 16px rgba(0,0,0,0.15),
                 0 0 0 1px rgba(245,158,11,0.3),
