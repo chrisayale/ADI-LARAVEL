@@ -280,18 +280,21 @@
             word-break: break-word;
         }
 
-        /* Member Code Value - Centered in YELLOW/WHITE SLOT (line "Code membre :") */
+        /* Member Code Value - Centered in white rounded frame, matching member name style */
         .member-code-value {
             top: 56.5mm; /* Centered vertically in white oval slot */
             left: 75%;
             transform: translateX(-50%);
-            font-size: 1.8mm;
-            font-weight: 700;
-            color: #000000;
-            letter-spacing: 0.08mm;
-            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-            text-align: center;
+            font-size: 3.2mm;           /* Same size as member name */
+            font-weight: 700;           /* Same weight as member name */
+            color: #ffffff;             /* White text color */
+            letter-spacing: 0.04mm;     /* Same letter-spacing as member name */
+            font-family: inherit;       /* Same font as member name (Helvetica Neue/Helvetica/Arial) */
+            text-align: center;         /* Perfectly centered */
             white-space: nowrap;
+            font-style: italic;         /* Italic style as requested */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Same shadow as member name for readability on light bg */
+            text-transform: none;       /* Keep membership number format (e.g., MEM-2024-001) */
         }
 
         /* Expiry Value - Centered in YELLOW/WHITE SLOT (line "Expire le :") in BLACK */
