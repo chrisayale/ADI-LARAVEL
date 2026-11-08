@@ -238,9 +238,9 @@
             z-index: 2;
         }
 
-        /* QR Frame - Centered at top: 23mm, size 22mm */
+        /* QR Frame - Centered at top: 25mm (moved down 2mm), size 22mm */
         .qr-frame {
-            top: 23mm;
+            top: 25mm;
             left: 50%;
             transform: translateX(-50%);
             width: 22mm;
@@ -388,7 +388,7 @@
         <button type="button" id="zoomIn" aria-label="{{ __('zoom_in') }}">+</button>
         <button type="button" id="zoomOut" aria-label="{{ __('zoom_out') }}">-</button>
         <button type="button" id="zoomReset" aria-label="{{ __('zoom_reset') }}">{{ __('reset') }}</button>
-        <button type="button" id="downloadPng" aria-label="{{ __('download_png') }}" class="download-btn">{{ __('download_png') }}</button>
+        <button type="button" id="downloadPng" aria-label="{{ __('download_png_label') }}" class="download-btn">{{ __('download_png_label') }}</button>
         <button type="button" id="downloadPdf" aria-label="{{ __('download_pdf') }}" class="download-btn pdf-btn">{{ __('download_pdf') }}</button>
     </div>
 

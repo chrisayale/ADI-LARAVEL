@@ -1131,5 +1131,7 @@
     "total_with_penalty": "Total with Penalty",
     "penalty_amount_per_period": "Penalty Amount Per Period",
     "apply_late_penalty": "Apply Late Penalty",
-    "late_penalty_amount": "Late Penalty Amount"
+    "late_penalty_amount": "Late Penalty Amount",
+    "download_png_label": "Download as PNG",
+    "download_pdf_label": "Download as PDF"
 }
