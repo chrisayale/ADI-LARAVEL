@@ -238,12 +238,12 @@
             z-index: 2;
         }
 
-        /* QR Frame - Centered at top: 25mm (moved down 2mm), size 22mm */
+        /* QR Frame - Centered at top: 25mm (moved down 2mm), size extended horizontally */
         .qr-frame {
             top: 25mm;
             left: 50%;
             transform: translateX(-50%);
-            width: 22mm;
+            width: 25mm;  /* Increased from 22mm to 25mm (extended 3mm total: 2mm left + 1mm right) */
             height: 22mm;
             background: #ffffff;
             border: 3px solid #f59e0b;
@@ -251,7 +251,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.5mm;
+            padding: 1.5mm 3.5mm 1.5mm 2.5mm;  /* Asymmetric padding: left=3.5mm (was 1.5mm+2mm), right=2.5mm (was 1.5mm+1mm) */
             box-shadow:
                 0 4px 16px rgba(0,0,0,0.15),
                 0 0 0 1px rgba(245,158,11,0.3),
