@@ -381,7 +381,14 @@ public function showPvcCard(User $user)
     }
     $bgBase64 = file_exists($bgPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
-    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'displayName'));
+    // Load verso background image as base64 data URI
+    $bgVersoPath = public_path('images/card-background-verso.png');
+    if (!file_exists($bgVersoPath)) {
+        $bgVersoPath = public_path('card-background-verso.png');
+    }
+    $bgVersoBase64 = file_exists($bgVersoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgVersoPath)) : '';
+
+    return view('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'bgVersoBase64', 'displayName'));
 }
 
 /**
@@ -472,8 +479,15 @@ public function downloadPvcCard(Request $request, User $user)
     }
     $bgBase64 = file_exists($bgPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgPath)) : '';
 
+    // Load verso background image as base64 data URI
+    $bgVersoPath = public_path('images/card-background-verso.png');
+    if (!file_exists($bgVersoPath)) {
+        $bgVersoPath = public_path('card-background-verso.png');
+    }
+    $bgVersoBase64 = file_exists($bgVersoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($bgVersoPath)) : '';
+
     // Generate PDF using DomPDF - CR80 Portrait: 53.98mm x 85.6mm = 153.1 x 242.6 points
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'displayName'))
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.members.id-card', compact('user', 'expiryDate', 'qrCodeSvg', 'bgBase64', 'bgVersoBase64', 'displayName'))
         ->setPaper([0, 0, 153.1, 242.6], 'portrait')
         ->setOptions([
             'defaultFont' => 'Helvetica',

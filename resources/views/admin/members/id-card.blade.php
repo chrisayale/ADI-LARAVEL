@@ -39,6 +39,14 @@
             overflow: hidden;
         }
 
+        .cards-wrapper {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         .card-container {
             position: relative;
             width: 53.98mm;
@@ -47,6 +55,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
         }
 
         .card-wrapper {
@@ -84,10 +93,14 @@
                 background-color: transparent;
                 display: block;
             }
+            .cards-wrapper {
+                display: none; /* Hide screen preview in print */
+            }
             .card-container {
                 width: 53.98mm;
                 height: 85.6mm;
                 transform: none !important;
+                filter: none !important;
             }
             .card-wrapper {
                 transform: none !important;
@@ -403,39 +416,43 @@
         <input type="hidden" name="card_image" id="cardImageInput">
     </form>
 
-    <!-- Card Container with Zoom -->
-    <div class="card-container" id="cardContainer">
-        <div class="card-wrapper" id="cardWrapper">
-            <div class="card">
-                <!-- Background Image as <img> with Base64 data URI for universal rendering -->
-                <img src="{!! $bgBase64 ?? '' !!}" class="card-bg" alt="Background">
+    <!-- Cards Container with Zoom -->
+    <div class="cards-wrapper" id="cardsWrapper">
+        <!-- FRONT CARD -->
+        <div class="card-container">
+            <div class="card-wrapper" id="cardWrapperFront">
+                <div class="card">
+                    <!-- Background Image as <img> with Base64 data URI for universal rendering -->
+                    <img src="{!! $bgBase64 ?? '' !!}" class="card-bg" alt="Background">
 
-                <!-- FRONT SIDE - Vertical Portrait -->
-                <div class="card-front">
-                    <!-- QR Code - Centered at 18mm -->
-                    <div class="qr-frame">
-                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                    <!-- FRONT SIDE - Vertical Portrait -->
+                    <div class="card-front">
+                        <!-- QR Code - Centered at 18mm -->
+                        <div class="qr-frame">
+                            <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
+                        </div>
+
+                        <!-- Member Name - Centered in Blue Band -->
+                        <div class="member-name">{{ strtoupper($displayName ?? $user->name) }}</div>
+
+                        <!-- Member Code Value Only - Centered in Yellow/White Slot -->
+                        <div class="member-code-value">CODE : {{ $user->membership_number }}</div>
+
+                        <!-- Expiry Value Only - Centered in Yellow/White Slot (Black) -->
+                        <div class="member-expiry-value">{{ $expiryDate }}</div>
+
+                        <div class="side-indicator">{{ __('front') }}</div>
                     </div>
-
-                    <!-- Member Name - Centered in Blue Band -->
-                    <div class="member-name">{{ strtoupper($displayName ?? $user->name) }}</div>
-
-                    <!-- Member Code Value Only - Centered in Yellow/White Slot -->
-                    <div class="member-code-value">CODE : {{ $user->membership_number }}</div>
-
-                    <!-- Expiry Value Only - Centered in Yellow/White Slot (Black) -->
-                    <div class="member-expiry-value">{{ $expiryDate }}</div>
-
-                    <div class="side-indicator">{{ __('front') }}</div>
                 </div>
+            </div>
+        </div>
 
-                <!-- BACK SIDE - Minimal with QR -->
-                <div class="card-back hidden">
-                    <div class="back-qr-frame">
-                        <img src="{!! $qrCodeSvg ?? '' !!}" alt="{{ __('member_code') }}" />
-                    </div>
-                    <div class="back-caption">{{ __('member_code') }}</div>
-                    <div class="back-legal">{{ __('card_back_text') }}</div>
+        <!-- BACK CARD (Verso) -->
+        <div class="card-container">
+            <div class="card-wrapper" id="cardWrapperBack">
+                <div class="card">
+                    <!-- Verso Background Image as <img> with Base64 data URI -->
+                    <img src="{!! $bgVersoBase64 ?? '' !!}" class="card-bg" alt="Background Verso">
                     <div class="side-indicator">{{ __('back') }}</div>
                 </div>
             </div>
@@ -443,32 +460,36 @@
     </div>
 
     <script>
-        // Toggle front/back view for preview (press 'B' key)
+        // Toggle front/back view for preview (press 'B' key) - legacy, kept for compatibility
         document.addEventListener('keydown', function(e) {
             if (e.key === 'b' || e.key === 'B') {
                 const front = document.querySelector('.card-front');
                 const back = document.querySelector('.card-back');
-                if (front.classList.contains('hidden')) {
-                    front.classList.remove('hidden');
-                    back.classList.add('hidden');
-                } else {
-                    front.classList.add('hidden');
-                    back.classList.remove('hidden');
+                if (front && back) {
+                    if (front.classList.contains('hidden')) {
+                        front.classList.remove('hidden');
+                        back.classList.add('hidden');
+                    } else {
+                        front.classList.add('hidden');
+                        back.classList.remove('hidden');
+                    }
                 }
             }
         });
 
-        // Zoom functionality
+        // Zoom functionality - applies to both card wrappers
         (function() {
             const slider = document.getElementById('zoomSlider');
             const valueDisplay = document.getElementById('zoomValue');
-            const cardWrapper = document.getElementById('cardWrapper');
+            const cardWrapperFront = document.getElementById('cardWrapperFront');
+            const cardWrapperBack = document.getElementById('cardWrapperBack');
             const zoomInBtn = document.getElementById('zoomIn');
             const zoomOutBtn = document.getElementById('zoomOut');
             const zoomResetBtn = document.getElementById('zoomReset');
 
             function updateZoom(scale) {
-                cardWrapper.style.transform = 'scale(' + scale + ')';
+                if (cardWrapperFront) cardWrapperFront.style.transform = 'scale(' + scale + ')';
+                if (cardWrapperBack) cardWrapperBack.style.transform = 'scale(' + scale + ')';
                 valueDisplay.textContent = Math.round(scale * 100) + '%';
                 slider.value = scale;
             }
@@ -513,39 +534,43 @@
             });
         })();
 
-        // Download PNG functionality using html2canvas
+        // Download PNG functionality using html2canvas - captures both cards side by side
         (function() {
             const downloadBtn = document.getElementById('downloadPng');
-            const cardWrapper = document.getElementById('cardWrapper');
-            const cardContainer = document.getElementById('cardContainer');
+            const cardsWrapper = document.getElementById('cardsWrapper');
 
-            if (downloadBtn && cardWrapper) {
+            if (downloadBtn && cardsWrapper) {
                 downloadBtn.addEventListener('click', async function() {
                     // Disable button during capture
                     downloadBtn.disabled = true;
                     downloadBtn.textContent = '{{ __('downloading') }}...';
 
                     try {
-                        // Store current transform
-                        const currentTransform = cardWrapper.style.transform;
+                        // Store current transforms
+                        const cardWrapperFront = document.getElementById('cardWrapperFront');
+                        const cardWrapperBack = document.getElementById('cardWrapperBack');
+                        const frontTransform = cardWrapperFront ? cardWrapperFront.style.transform : '';
+                        const backTransform = cardWrapperBack ? cardWrapperBack.style.transform : '';
 
-                        // Temporarily reset transform for accurate capture
-                        cardWrapper.style.transform = 'none';
+                        // Temporarily reset transforms for accurate capture
+                        if (cardWrapperFront) cardWrapperFront.style.transform = 'none';
+                        if (cardWrapperBack) cardWrapperBack.style.transform = 'none';
 
-                        // Capture the card wrapper at high resolution
-                        const canvas = await html2canvas(cardWrapper, {
+                        // Capture the cards wrapper at high resolution
+                        const canvas = await html2canvas(cardsWrapper, {
                             scale: 4, // High resolution for crisp output
                             useCORS: true,
                             logging: false,
                             backgroundColor: null, // Transparent background
-                            width: cardWrapper.offsetWidth,
-                            height: cardWrapper.offsetHeight,
-                            windowWidth: cardWrapper.offsetWidth,
-                            windowHeight: cardWrapper.offsetHeight,
+                            width: cardsWrapper.offsetWidth,
+                            height: cardsWrapper.offsetHeight,
+                            windowWidth: cardsWrapper.offsetWidth,
+                            windowHeight: cardsWrapper.offsetHeight,
                         });
 
-                        // Restore transform
-                        cardWrapper.style.transform = currentTransform;
+                        // Restore transforms
+                        if (cardWrapperFront) cardWrapperFront.style.transform = frontTransform;
+                        if (cardWrapperBack) cardWrapperBack.style.transform = backTransform;
 
                         // Generate filename
                         const filename = 'carte-membre-{{ $user->membership_number }}.png';
@@ -571,37 +596,42 @@
         // Download PDF functionality using html2canvas + server-side PDF generation
         (function() {
             const downloadPdfBtn = document.getElementById('downloadPdf');
-            const cardWrapper = document.getElementById('cardWrapper');
+            const cardsWrapper = document.getElementById('cardsWrapper');
             const pdfForm = document.getElementById('pdfDownloadForm');
             const cardImageInput = document.getElementById('cardImageInput');
 
-            if (downloadPdfBtn && cardWrapper && pdfForm && cardImageInput) {
+            if (downloadPdfBtn && cardsWrapper && pdfForm && cardImageInput) {
                 downloadPdfBtn.addEventListener('click', async function() {
                     // Disable button during capture
                     downloadPdfBtn.disabled = true;
                     downloadPdfBtn.textContent = '{{ __('generating_pdf') }}...';
 
                     try {
-                        // Store current transform
-                        const currentTransform = cardWrapper.style.transform;
+                        // Store current transforms
+                        const cardWrapperFront = document.getElementById('cardWrapperFront');
+                        const cardWrapperBack = document.getElementById('cardWrapperBack');
+                        const frontTransform = cardWrapperFront ? cardWrapperFront.style.transform : '';
+                        const backTransform = cardWrapperBack ? cardWrapperBack.style.transform : '';
 
-                        // Temporarily reset transform for accurate capture
-                        cardWrapper.style.transform = 'none';
+                        // Temporarily reset transforms for accurate capture
+                        if (cardWrapperFront) cardWrapperFront.style.transform = 'none';
+                        if (cardWrapperBack) cardWrapperBack.style.transform = 'none';
 
-                        // Capture the card wrapper at high resolution
-                        const canvas = await html2canvas(cardWrapper, {
+                        // Capture the cards wrapper at high resolution
+                        const canvas = await html2canvas(cardsWrapper, {
                             scale: 4, // High resolution for crisp output
                             useCORS: true,
                             logging: false,
                             backgroundColor: null,
-                            width: cardWrapper.offsetWidth,
-                            height: cardWrapper.offsetHeight,
-                            windowWidth: cardWrapper.offsetWidth,
-                            windowHeight: cardWrapper.offsetHeight,
+                            width: cardsWrapper.offsetWidth,
+                            height: cardsWrapper.offsetHeight,
+                            windowWidth: cardsWrapper.offsetWidth,
+                            windowHeight: cardsWrapper.offsetHeight,
                         });
 
-                        // Restore transform
-                        cardWrapper.style.transform = currentTransform;
+                        // Restore transforms
+                        if (cardWrapperFront) cardWrapperFront.style.transform = frontTransform;
+                        if (cardWrapperBack) cardWrapperBack.style.transform = backTransform;
 
                         // Convert to base64 and submit form
                         const base64Image = canvas.toDataURL('image/png');
