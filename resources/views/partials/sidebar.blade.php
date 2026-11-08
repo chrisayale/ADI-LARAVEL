@@ -17,6 +17,8 @@
                     {{ __('admin') }}
                 @elseif(auth()->user()->hasRole('treasurer'))
                     {{ __('treasurer') }}
+                @elseif(auth()->user()->hasRole('collector'))
+                    {{ __('collector') }}
                 @else
                     {{ __('member') }}
                 @endif
@@ -396,6 +398,40 @@
                        href="{{ route('treasurer.savings.create') }}">
                         <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
                         <span style="font-size: 13px;">{{ __('add_transaction') }}</span>
+                    </a>
+                </li>
+
+            @elseif(auth()->check() && auth()->user()->hasRole('collector'))
+                <!-- COLLECTOR MENU - Restricted to essential functions -->
+                <li class="nav-section mt-3 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('collection_operations') }}</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('collector.payments.collect') ? 'active' : '' }}"
+                       href="{{ route('collector.payments.collect') }}">
+                        <i class="fas fa-hand-holding-usd me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">{{ __('collect_payment') }}</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('collector.savings.create') ? 'active' : '' }}"
+                       href="{{ route('collector.savings.create') }}">
+                        <i class="fas fa-plus-circle me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">{{ __('make_deposit_withdrawal') }}</span>
+                    </a>
+                </li>
+
+                <li class="nav-section mt-2 mb-1 px-3">
+                    <small class="text-uppercase text-white-50 fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('my_activity') }}</small>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link py-2 px-3 {{ request()->routeIs('collector.transactions.index') ? 'active' : '' }}"
+                       href="{{ route('collector.transactions.index') }}">
+                        <i class="fas fa-history me-2" style="width: 20px; font-size: 14px;"></i>
+                        <span style="font-size: 13px;">{{ __('my_transactions') }}</span>
                     </a>
                 </li>
 

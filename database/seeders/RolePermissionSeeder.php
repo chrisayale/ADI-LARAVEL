@@ -20,6 +20,7 @@ class RolePermissionSeeder extends Seeder
             'access admin dashboard',
             'access treasurer dashboard',
             'access member dashboard',
+            'access collector dashboard',
             'view members',
             'create members',
             'edit members',
@@ -31,6 +32,7 @@ class RolePermissionSeeder extends Seeder
             'verify loans',
             'approve loans',
             'disburse loans',
+            'collect payments',
         ];
 
         foreach ($permissions as $permission) {
@@ -70,6 +72,20 @@ class RolePermissionSeeder extends Seeder
             'view savings',
             'apply for loans',
             'view loans',
+        ]);
+
+        $collectorRole = Role::firstOrCreate(
+            ['name' => 'collector', 'guard_name' => 'web'],
+            ['name' => 'collector', 'guard_name' => 'web']
+        );
+        $collectorRole->givePermissionTo([
+            'access collector dashboard',
+            'view members',
+            'view savings',
+            'record deposits',
+            'record withdrawals',
+            'view loans',
+            'collect payments',
         ]);
 
         // Create users (idempotent)
@@ -120,6 +136,23 @@ class RolePermissionSeeder extends Seeder
             ]
         );
         $member->assignRole('member');
+
+        $collector = User::firstOrCreate(
+            ['email' => 'collector@sacco.com'],
+            [
+                'name' => 'Jane Collector',
+                'password' => Hash::make('password'),
+                'phone_number' => '+256700000004',
+                'address' => 'Kampala',
+                'national_id' => 'COLL001',
+                'membership_number' => 'COLL-2024-001',
+                'membership_date' => now(),
+                'status' => 'active',
+                'email_verified_at' => now(),
+                'collection_zone' => 'Zone A',
+            ]
+        );
+        $collector->assignRole('collector');
 
         $this->command->info('Roles and users created/updated successfully!');
     }

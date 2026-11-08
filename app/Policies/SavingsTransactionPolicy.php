@@ -42,6 +42,11 @@ class SavingsTransactionPolicy
             return false;
         }
 
+        // Collector can view transactions in their SACCO
+        if ($user->hasRole('collector')) {
+            return $transaction->sacco_id === $user->sacco_id;
+        }
+
         // Regular users can only view transactions in their own SACCO
         return $transaction->sacco_id === $user->sacco_id;
     }
@@ -54,6 +59,11 @@ class SavingsTransactionPolicy
         // Super Admin can create transactions in their selected SACCO context
         if ($user->hasRole('super_admin')) {
             return TenantContext::has(); // Must have a SACCO context selected
+        }
+
+        // Collector can create transactions in their own SACCO
+        if ($user->hasRole('collector')) {
+            return true;
         }
 
         // Regular users can create transactions in their own SACCO

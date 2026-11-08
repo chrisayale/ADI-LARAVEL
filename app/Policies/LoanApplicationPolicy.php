@@ -42,6 +42,11 @@ class LoanApplicationPolicy
             return false;
         }
 
+        // Collector can view applications in their SACCO and zone
+        if ($user->hasRole('collector')) {
+            return $application->sacco_id === $user->sacco_id;
+        }
+
         // Regular users can only view applications in their own SACCO
         return $application->sacco_id === $user->sacco_id;
     }

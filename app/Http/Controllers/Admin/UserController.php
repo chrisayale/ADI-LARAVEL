@@ -67,11 +67,12 @@ class UserController extends Controller
         'next_of_kin_name' => 'required|string|max:255', // Required for all
         'next_of_kin_phone' => 'required|string|max:20', // Required for all
         'next_of_kin_relationship' => 'required|string|max:100', // Required for all
-        'role' => 'required|in:member,treasurer',
+        'role' => 'required|in:member,treasurer,collector',
         'status' => 'required|in:active,inactive,pending',
         'employee_id' => 'nullable|string|unique:users,employee_id,NULL,id',
         'employment_date' => 'nullable|date',
         'position' => 'nullable|string|max:255',
+        'collection_zone' => 'nullable|string|max:255',
         'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
@@ -105,7 +106,7 @@ class UserController extends Controller
         }
 
         $userData['membership_date'] = $request->membership_date ?? now();
-    } else { // treasurer
+    } elseif ($request->role === 'treasurer') {
         // Auto-generate employee ID if not provided
         if (empty($request->employee_id)) {
             $userData['employee_id'] = $this->generateEmployeeId();
@@ -116,6 +117,17 @@ class UserController extends Controller
         $userData['employment_date'] = $request->employment_date ?? now();
         $userData['position'] = $request->position;
         // Branch field removed completely
+    } elseif ($request->role === 'collector') {
+        // Auto-generate employee ID if not provided
+        if (empty($request->employee_id)) {
+            $userData['employee_id'] = $this->generateEmployeeId();
+        } else {
+            $userData['employee_id'] = $request->employee_id;
+        }
+
+        $userData['employment_date'] = $request->employment_date ?? now();
+        $userData['position'] = $request->position;
+        $userData['collection_zone'] = $request->collection_zone;
     }
 
     // Handle profile photo upload
@@ -148,7 +160,7 @@ class UserController extends Controller
 
     // Prepare success message with generated ID
     $identifier = $request->role === 'member' ? $user->membership_number : $user->employee_id;
-    $roleName = $request->role === 'member' ? 'Member' : 'Treasurer';
+    $roleName = $request->role === 'member' ? 'Member' : ($request->role === 'treasurer' ? 'Treasurer' : 'Collector');
 
     return redirect()->route('admin.users.index')
         ->with('success', "{$roleName} created successfully with ID: {$identifier}");
@@ -214,10 +226,15 @@ public function update(Request $request, User $user)
         $rules['membership_number'] = 'nullable|string|unique:users,membership_number,' . $user->id;
         $rules['membership_date'] = 'nullable|date';
     } elseif ($user->hasRole('treasurer')) {
-        $rules['employee_id'] = 'nullable|string|unique:users,employee_id,' . $user->id; // Made nullable
+        $rules['employee_id'] = 'nullable|string|unique:users,employee_id,' . $user->id;
         $rules['employment_date'] = 'nullable|date';
         $rules['position'] = 'nullable|string|max:255';
         // Removed branch field
+    } elseif ($user->hasRole('collector')) {
+        $rules['employee_id'] = 'nullable|string|unique:users,employee_id,' . $user->id;
+        $rules['employment_date'] = 'nullable|date';
+        $rules['position'] = 'nullable|string|max:255';
+        $rules['collection_zone'] = 'nullable|string|max:255';
     }
 
     $validator = Validator::make($request->all(), $rules);
@@ -248,6 +265,11 @@ public function update(Request $request, User $user)
         $updateData['employee_id'] = $request->employee_id;
         $updateData['employment_date'] = $request->employment_date;
         $updateData['position'] = $request->position;
+    } elseif ($user->hasRole('collector')) {
+        $updateData['employee_id'] = $request->employee_id;
+        $updateData['employment_date'] = $request->employment_date;
+        $updateData['position'] = $request->position;
+        $updateData['collection_zone'] = $request->collection_zone;
     }
 
     // Handle password update

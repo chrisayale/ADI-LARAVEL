@@ -83,6 +83,8 @@ Route::middleware('auth')->get('/dashboard', function () {
             return redirect()->route('admin.dashboard');
         } elseif ($user->hasRole('treasurer')) {
             return redirect()->route('treasurer.dashboard');
+        } elseif ($user->hasRole('collector')) {
+            return redirect()->route('collector.dashboard');
         } elseif ($user->hasRole('member')) {
             return redirect()->route('member.dashboard');
         }
@@ -380,6 +382,32 @@ Route::middleware(['auth', 'role:member'])->prefix('member')->name('member.')->g
         Route::post('/photo', [ProfileController::class, 'updatePhoto'])->name('update-photo');
     });
 });
+// ==================== COLLECTOR ROUTES ====================
+Route::middleware(['auth', 'role:collector'])->prefix('collector')->name('collector.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Collector\CollectorController::class, 'collect'])->name('dashboard');
+
+    // Payment Collection
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('/collect', [\App\Http\Controllers\Collector\CollectorController::class, 'collect'])->name('collect');
+        Route::post('/process', [\App\Http\Controllers\Collector\CollectorController::class, 'processCollection'])->name('process');
+    });
+
+    // Savings Management
+    Route::prefix('savings')->name('savings.')->group(function () {
+        Route::get('/create', [\App\Http\Controllers\Collector\CollectorController::class, 'savingsCreate'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Collector\CollectorController::class, 'storeSavings'])->name('store');
+
+        // AJAX endpoint for getting member details
+        Route::get('/get-member-details', [\App\Http\Controllers\Collector\CollectorController::class, 'getMemberDetails'])->name('get-member-details');
+    });
+
+    // Transactions History
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Collector\CollectorController::class, 'transactionsIndex'])->name('index');
+    });
+});
+
 // Request SACCO routes (public for creating and storing)
 Route::prefix('request-sacco')->name('request-sacco.')->group(function () {
     Route::get('/create', [RequestSaccoController::class, 'create'])->name('create');

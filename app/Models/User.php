@@ -27,7 +27,12 @@ class User extends Authenticatable
         'next_of_kin_phone',
         'next_of_kin_relationship',
         'profile_photo',
-        'sacco_id'
+        'sacco_id',
+        'employee_id',
+        'branch',
+        'employment_date',
+        'position',
+        'collection_zone'
     ];
 
     protected $hidden = [
@@ -101,6 +106,11 @@ public function guaranteedLoans()
     public function isTreasurer(): bool
     {
         return $this->hasRole('treasurer');
+    }
+
+    public function isCollector(): bool
+    {
+        return $this->hasRole('collector');
     }
 
     public function isMember(): bool

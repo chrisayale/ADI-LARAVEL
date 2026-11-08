@@ -50,6 +50,11 @@
                                    {{ old('role') == 'treasurer' ? 'checked' : '' }} onchange="toggleUserType()">
                             <label class="form-check-label" for="role_treasurer">{{ __('treasurer') }}</label>
                         </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="role" id="role_collector" value="collector"
+                                   {{ old('role') == 'collector' ? 'checked' : '' }} onchange="toggleUserType()">
+                            <label class="form-check-label" for="role_collector">{{ __('collector') }}</label>
+                        </div>
                         @error('role')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -204,6 +209,55 @@
                     </div>
                 </div>
 
+                <!-- Collector Specific Fields -->
+                <div id="collector-fields" style="{{ old('role') == 'collector' ? 'display: block;' : 'display: none;' }}">
+                    <h5 class="border-bottom pb-2 mb-4 mt-4">{{ __('employment_information') }}</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="employee_id">{{ __('employee_id') }}</label>
+                            <input type="text" class="form-control @error('employee_id') is-invalid @enderror"
+                                   id="employee_id" name="employee_id" value="{{ old('employee_id') }}"
+                                   placeholder="{{ __('employee_id_placeholder') }}">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                {{ __('employee_id_help') }}
+                            </small>
+                            @error('employee_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="employment_date">{{ __('employment_date') }}</label>
+                            <input type="date" class="form-control @error('employment_date') is-invalid @enderror"
+                                   id="employment_date" name="employment_date" value="{{ old('employment_date', date('Y-m-d')) }}">
+                            @error('employment_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="position">{{ __('position_title') }}</label>
+                            <input type="text" class="form-control @error('position') is-invalid @enderror"
+                                   id="position" name="position" value="{{ old('position') }}"
+                                   placeholder="{{ __('position_placeholder') }}">
+                            @error('position')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="collection_zone">{{ __('collection_zone') }}</label>
+                            <input type="text" class="form-control @error('collection_zone') is-invalid @enderror"
+                                   id="collection_zone" name="collection_zone" value="{{ old('collection_zone') }}"
+                                   placeholder="{{ __('collection_zone_placeholder') }}">
+                            @error('collection_zone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Account Information (Common for both) -->
                 <h5 class="border-bottom pb-2 mb-4 mt-4">{{ __('account_information') }}</h5>
                 <div class="row">
@@ -260,20 +314,35 @@
 <script>
     function toggleUserType() {
         const isMember = document.getElementById('role_member').checked;
+        const isTreasurer = document.getElementById('role_treasurer').checked;
+        const isCollector = document.getElementById('role_collector').checked;
         const memberFields = document.getElementById('member-fields');
         const treasurerFields = document.getElementById('treasurer-fields');
+        const collectorFields = document.getElementById('collector-fields');
 
         if (isMember) {
             memberFields.style.display = 'block';
             treasurerFields.style.display = 'none';
+            collectorFields.style.display = 'none';
 
-            // Clear treasurer fields
+            // Clear treasurer/collector fields
             document.getElementById('employee_id').value = '';
             document.getElementById('position').value = '';
             document.getElementById('employment_date').value = '{{ date('Y-m-d') }}';
-        } else {
+            document.getElementById('collection_zone').value = '';
+        } else if (isTreasurer) {
             memberFields.style.display = 'none';
             treasurerFields.style.display = 'block';
+            collectorFields.style.display = 'none';
+
+            // Clear member fields
+            document.getElementById('membership_number').value = '';
+            document.getElementById('membership_date').value = '{{ date('Y-m-d') }}';
+            document.getElementById('collection_zone').value = '';
+        } else if (isCollector) {
+            memberFields.style.display = 'none';
+            treasurerFields.style.display = 'none';
+            collectorFields.style.display = 'block';
 
             // Clear member fields
             document.getElementById('membership_number').value = '';
