@@ -180,7 +180,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">{{ __('primary_currency') }}</label>
-                            <input type="text" name="primary_currency" class="form-control @error('primary_currency') is-invalid @enderror" value="{{ old('primary_currency', 'USD') }}">
+                            <input type="text" name="primary_currency" class="form-control @error('primary_currency') is-invalid @enderror" value="{{ old('primary_currency', 'CDF') }}">
                             @error('primary_currency')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

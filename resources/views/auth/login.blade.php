@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', __('login') . ' - Capital Investment Club')
-@section('subtitle', __('welcome_back', ['name' => '']))
+@section('subtitle', __('login_to_your_account'))
 
 @section('content')
     <form method="POST" action="{{ route('login') }}" novalidate>

@@ -67,7 +67,7 @@
                                     <p class="mb-1"><strong>{{ __('phone') }}:</strong> <span id="detail-phone"></span></p>
                                     <p class="mb-1"><strong>{{ __('collection_zone') }}:</strong> <span id="detail-zone"></span></p>
                                     <hr>
-                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">CDF 0.00</span></p>
+                                    <p class="mb-1"><strong>{{ __('current_balance') }}:</strong> <span class="h5 text-success" id="current-balance">{{ $sacco->primary_currency ?? 'CDF' }} 0.00</span></p>
                                 </div>
                             </div>
                         </div>
@@ -265,8 +265,8 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mb-0 small">
-                        <li class="mb-2"><i class="fas fa-check text-success"></i> {{ __('min_deposit') }}: {{ config('sacco.min_deposit', '100') }} {{ __('currency') }}</li>
-                        <li class="mb-2"><i class="fas fa-check text-success"></i> {{ __('min_withdrawal') }}: {{ config('sacco.min_withdrawal', '100') }} {{ __('currency') }}</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> {{ __('min_deposit') }}: {{ config('sacco.min_deposit', '100') }} {{ $sacco->primary_currency ?? 'CDF' }}</li>
+                        <li class="mb-2"><i class="fas fa-check text-success"></i> {{ __('min_withdrawal') }}: {{ config('sacco.min_withdrawal', '100') }} {{ $sacco->primary_currency ?? 'CDF' }}</li>
                         <li class="mb-2"><i class="fas fa-info-circle text-info"></i> {{ __('withdrawal_requires_sufficient_balance') }}</li>
                         <li class="mb-0"><i class="fas fa-info-circle text-info"></i> {{ __('all_transactions_recorded_realtime') }}</li>
                     </ul>
@@ -306,6 +306,9 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    // Currency from SACCO config
+    const saccoCurrency = '{{ $sacco->primary_currency ?? 'CDF' }}';
+
     $(document).ready(function() {
         console.log('Collector savings create - Document ready, initializing Select2...');
 
@@ -386,7 +389,7 @@
             $('#detail-email').text(data.email || '');
             $('#detail-phone').text(data.phone_number || '{{ __('n_a') }}');
             $('#detail-zone').text(data.collection_zone || '{{ __('n_a') }}');
-            $('#current-balance').text('CDF ' + formattedBalance);
+            $('#current-balance').text(saccoCurrency + ' ' + formattedBalance);
         }
 
         function updateRecentTransactions(transactions) {
@@ -407,8 +410,8 @@
                         <tr>
                             <td>${t.date}</td>
                             <td><span class="badge badge-${badgeClass}">${t.type}</span></td>
-                            <td class="text-right">CDF ${amount}</td>
-                            <td class="text-right">CDF ${t.balance || '{{ __('n_a') }}'}</td>
+                            <td class="text-right">${saccoCurrency} ${amount}</td>
+                            <td class="text-right">${saccoCurrency} ${t.balance || '{{ __('n_a') }}'}</td>
                         </tr>
                     `;
                 });
@@ -440,9 +443,9 @@
                     }).format(num);
                 };
 
-                $('#summary-current').text('CDF ' + formatNumber(currentBalance));
-                $('#summary-amount').text('CDF ' + formatNumber(amount));
-                $('#summary-new').text('CDF ' + formatNumber(newBalance));
+                $('#summary-current').text(saccoCurrency + ' ' + formatNumber(currentBalance));
+                $('#summary-amount').text(saccoCurrency + ' ' + formatNumber(amount));
+                $('#summary-new').text(saccoCurrency + ' ' + formatNumber(newBalance));
                 $('#summary-method').text(method ? method.replace('_', ' ').toUpperCase() : '{{ __('cash') }}');
 
                 // Update status display
@@ -472,7 +475,7 @@
             const amount = parseFloat($('#amount').val()) || 0;
             const currentBalanceText = $('#current-balance').text();
 
-            if (currentBalanceText === 'CDF undefined' || currentBalanceText === 'CDF NaN') {
+            if (currentBalanceText === saccoCurrency + ' undefined' || currentBalanceText === saccoCurrency + ' NaN') {
                 e.preventDefault();
                 toastr.error('{{ __('please_select_valid_member') }}');
                 return false;
@@ -482,7 +485,7 @@
 
             if (type === 'withdrawal' && amount > currentBalance) {
                 e.preventDefault();
-                toastr.error('{{ __('insufficient_balance') }}! {{ __('current_balance') }}: CDF ' +
+                toastr.error('{{ __('insufficient_balance') }}! {{ __('current_balance') }}: ' + saccoCurrency + ' ' +
                       new Intl.NumberFormat(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2

@@ -29,6 +29,11 @@ class Sacco extends Model
         'description'
     ];
 
+    protected $attributes = [
+        'primary_currency' => 'CDF',
+        'secondary_currency' => 'CDF',
+    ];
+
     protected $casts = [
         'status' => 'string',
         'settings' => 'array',

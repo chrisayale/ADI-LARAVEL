@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->text('address')->nullable();
-            $table->string('primary_currency')->default('USD');
+            $table->string('primary_currency')->default('CDF');
             $table->string('secondary_currency')->default('CDF');
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->json('settings')->nullable();

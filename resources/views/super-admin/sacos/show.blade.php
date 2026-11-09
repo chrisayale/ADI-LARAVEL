@@ -59,8 +59,8 @@
                                     'USD' => 'Dollar américain (USD)',
                                     'EUR' => 'Euro (EUR)',
                                     'CDF' => 'Franc congolais (CDF)',
+                                    'UGX' => 'Shilling ougandais (UGX)',
                                     'KES' => 'Shilling kényan (KES)',
-                                    'CDF' => 'Shilling ougandais (CDF)',
                                     'TZS' => 'Shilling tanzanien (TZS)',
                                 ];
                                 echo $currencies[$sacco->primary_currency] ?? $sacco->primary_currency;
@@ -74,8 +74,8 @@
                                     'USD' => 'Dollar américain (USD)',
                                     'EUR' => 'Euro (EUR)',
                                     'CDF' => 'Franc congolais (CDF)',
+                                    'UGX' => 'Shilling ougandais (UGX)',
                                     'KES' => 'Shilling kényan (KES)',
-                                    'CDF' => 'Shilling ougandais (CDF)',
                                     'TZS' => 'Shilling tanzanien (TZS)',
                                 ];
                                 echo $currencies[$sacco->secondary_currency] ?? $sacco->secondary_currency;

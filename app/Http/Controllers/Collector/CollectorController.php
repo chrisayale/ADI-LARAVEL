@@ -9,36 +9,79 @@ use App\Models\PaymentTransaction;
 use App\Models\User;
 use App\Models\LoanApplication;
 use App\Models\LoanRepayment;
+use App\Models\Zone;
+use App\Services\LoanPenaltyService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 class CollectorController extends Controller
 {
     /**
-     * Display the payment collection page for the collector.
+     * Get the zone IDs for the authenticated collector.
      */
-    public function collect()
+    protected function getCollectorZoneIds(): array
+    {
+        $collector = auth()->user();
+        return $collector->zones()->pluck('zones.id')->toArray();
+    }
+
+    /**
+     * Display the payment collection page for the collector.
+     * Supports member search and QR code lookup like the admin/cashier interface.
+     */
+    public function collect(Request $request)
     {
         $collector = auth()->user();
         $saccoId = $collector->sacco_id;
+        $zoneIds = $this->getCollectorZoneIds();
 
-        // Get pending loan repayments assigned to this collector's zone/members
-        $pendingRepayments = LoanRepayment::whereHas('loanApplication', function ($query) use ($saccoId, $collector) {
-            $query->where('sacco_id', $saccoId)
-                  ->where('status', 'disbursed')
-                  ->where(function ($q) use ($collector) {
-                      // Filter by collector's zone or members they're responsible for
-                      if ($collector->collection_zone) {
-                          $q->whereHas('user', function ($mq) use ($collector) {
-                              $mq->where('collection_zone', $collector->collection_zone);
-                          });
-                      }
-                  });
-        })
-        ->where('status', 'pending')
-        ->where('due_date', '<=', now())
-        ->with(['loanApplication.user', 'loanApplication.loanProduct'])
-        ->orderBy('due_date', 'asc')
-        ->paginate(20);
+        // Load SACCO with currency info
+        $sacco = $collector->sacco;
+
+        $search = $request->get('search');
+        $member = null;
+        $loans = collect();
+        $pendingRepayments = collect();
+
+        if ($search) {
+            // Search by membership number, phone_number, or name within collector's zones
+            $query = User::role('member')
+                ->where('sacco_id', $saccoId)
+                ->where('status', 'active')
+                ->where(function($q) use ($search) {
+                    $q->where('membership_number', $search)
+                        ->orWhere('phone_number', $search)
+                        ->orWhere('name', 'LIKE', "%{$search}%");
+                });
+
+            // Filter by collector's assigned zones
+            if (!empty($zoneIds)) {
+                $query->whereIn('zone_id', $zoneIds);
+            }
+
+            $member = $query->first();
+
+            if ($member) {
+                // Get active loans for this member
+                $loans = LoanApplication::with(['repayments' => function($q) {
+                        $q->whereIn('status', ['pending', 'partial', 'overdue'])
+                            ->orderBy('due_date');
+                    }])
+                    ->where('user_id', $member->id)
+                    ->whereIn('status', ['disbursed', 'approved'])
+                    ->get();
+
+                // Collect all pending/partial/overdue repayments from these loans
+                $pendingRepayments = $loans->flatMap(function($loan) {
+                    return $loan->repayments;
+                })->filter(function($repayment) {
+                    return in_array($repayment->status, ['pending', 'partial', 'overdue'])
+                        && $repayment->due_date <= now()
+                        && ($repayment->effective_amount_due - $repayment->amount_paid) > 0;
+                })->sortBy('due_date')->values();
+            }
+        }
 
         // Get today's collections
         $todayCollections = PaymentTransaction::where('recorded_by', $collector->id)
@@ -53,81 +96,213 @@ class CollectorController extends Controller
             ->where('status', 'completed')
             ->sum('amount');
 
-        return view('collector.collect', compact('pendingRepayments', 'todayCollections', 'monthlyCollections'));
+        return view('collector.collect', compact(
+            'pendingRepayments',
+            'todayCollections',
+            'monthlyCollections',
+            'sacco',
+            'search',
+            'member',
+            'loans'
+        ));
+    }
+
+    /**
+     * Find member by QR code / membership number for auto-selection
+     */
+    public function findMemberByQrCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'qr_code' => 'required|string|max:100'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Code QR invalide'], 422);
+        }
+
+        $collector = auth()->user();
+        $qrCode = trim($request->qr_code);
+        $zoneIds = $this->getCollectorZoneIds();
+
+        // Try to find member by membership_number (which is what QR code contains)
+        $query = User::role('member')
+            ->where('sacco_id', $collector->sacco_id)
+            ->where('status', 'active')
+            ->where('membership_number', $qrCode);
+
+        // Filter by collector's assigned zones
+        if (!empty($zoneIds)) {
+            $query->whereIn('zone_id', $zoneIds);
+        }
+
+        $member = $query->first();
+
+        if (!$member) {
+            // Also try to extract membership number from formats like "#MEM-2024-001"
+            if (preg_match('/MEM-?(\d+)-?(\d+)/i', $qrCode, $matches)) {
+                $membershipNumber = strtoupper($matches[0]);
+                $query = User::role('member')
+                    ->where('sacco_id', $collector->sacco_id)
+                    ->where('status', 'active')
+                    ->where('membership_number', $membershipNumber);
+
+                if (!empty($zoneIds)) {
+                    $query->whereIn('zone_id', $zoneIds);
+                }
+
+                $member = $query->first();
+            }
+        }
+
+        if (!$member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucun membre trouvé avec ce code QR : ' . $qrCode
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'member' => [
+                'id' => $member->id,
+                'name' => $member->name,
+                'membership_number' => $member->membership_number,
+                'email' => $member->email,
+                'phone_number' => $member->phone_number,
+            ]
+        ]);
     }
 
     /**
      * Process a loan repayment collection.
+     * Supports multiple repayment_ids like the admin/cashier interface.
      */
     public function processCollection(Request $request)
     {
-        $request->validate([
-            'loan_repayment_id' => 'required|exists:loan_repayments,id',
-            'amount' => 'required|numeric|min:0.01',
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'repayment_ids' => 'required|array|min:1',
+            'repayment_ids.*' => 'exists:loan_repayments,id',
+            'amount' => 'required|numeric|min:0.001',
             'payment_method' => 'required|in:cash,mpesa,airtel_money,bank_transfer,cheque',
-            'transaction_reference' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
+            'reference_number' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:500',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $collector = auth()->user();
-        $repayment = LoanRepayment::with('loanApplication')->findOrFail($request->loan_repayment_id);
+        $zoneIds = $this->getCollectorZoneIds();
 
-        // Verify this repayment belongs to the collector's zone
-        if ($collector->collection_zone && $repayment->loanApplication->user->collection_zone !== $collector->collection_zone) {
-            return back()->with('error', 'Vous n\'êtes pas autorisé à collecter ce paiement.');
+        try {
+            DB::beginTransaction();
+
+            // Get the repayments being paid
+            $repayments = LoanRepayment::whereIn('id', $request->repayment_ids)
+                ->orderBy('due_date')
+                ->get();
+
+            if ($repayments->isEmpty()) {
+                throw new \Exception('Aucun remboursement valide sélectionné');
+            }
+
+            $loan = $repayments->first()->loanApplication;
+
+            // Verify this loan belongs to the collector's zones
+            if (!empty($zoneIds) && !$zoneIds->contains($loan->user->zone_id)) {
+                throw new \Exception('Vous n\'êtes pas autorisé à collecter ce paiement pour un membre en dehors de vos zones assignées.');
+            }
+
+            // Sync penalties for all overdue repayments before processing
+            LoanPenaltyService::syncPenaltiesForLoan($loan);
+
+            // Reload repayments to get updated penalty amounts
+            $repayments = $loan->repayments()->whereIn('id', $request->repayment_ids)
+                ->orderBy('due_date')
+                ->get();
+
+            $remainingAmount = $request->amount;
+
+            // Generate receipt number
+            $receiptNumber = 'RCT-' . date('Ymd') . '-' . str_pad(PaymentTransaction::max('id') + 1, 6, '0', STR_PAD_LEFT);
+
+            // Create transaction record
+            $transaction = PaymentTransaction::create([
+                'transaction_number' => 'TXN-' . date('Y') . '-' . str_pad(PaymentTransaction::max('id') + 1, 6, '0', STR_PAD_LEFT),
+                'user_id' => $request->user_id,
+                'loan_repayment_id' => $repayments->first()->id, // Link to first repayment
+                'sacco_id' => $collector->sacco_id,
+                'amount' => $request->amount,
+                'payment_type' => 'loan_repayment',
+                'payment_method' => $request->payment_method,
+                'reference_number' => $request->reference_number,
+                'payment_date' => now(),
+                'receipt_number' => $receiptNumber,
+                'notes' => $request->notes,
+                'recorded_by' => $collector->id,
+                'status' => 'completed'
+            ]);
+
+            // Distribute payment across selected repayments (oldest first)
+            // IMPORTANT: Payment goes ONLY to principal/interest (effective_amount_due)
+            // Penalty is tracked separately and NOT automatically deducted from payment
+            foreach ($repayments as $repayment) {
+                if ($remainingAmount <= 0) break;
+
+                // Ensure penalty is calculated for overdue repayments
+                if ($repayment->is_overdue && $repayment->penalty_amount == 0) {
+                    LoanPenaltyService::applyPenalty($repayment);
+                    $repayment->refresh();
+                }
+
+                // Principal/interest balance only (EXCLUDING penalty)
+                $principalBalance = $repayment->effective_amount_due - $repayment->amount_paid;
+                $paymentToApply = min($remainingAmount, $principalBalance);
+
+                if ($paymentToApply > 0) {
+                    // Update repayment - payment goes to principal only
+                    $repayment->amount_paid += $paymentToApply;
+                    $repayment->total_paid += $paymentToApply;
+
+                    // Update status based on PRINCIPAL only (penalty is separate)
+                    if ($repayment->amount_paid >= $repayment->effective_amount_due) {
+                        $repayment->status = 'paid';
+                        $repayment->paid_date = now();
+                    } elseif ($repayment->amount_paid > 0) {
+                        $repayment->status = 'partial';
+                    }
+
+                    $repayment->recorded_by = $collector->id;
+                    $repayment->save();
+
+                    $remainingAmount -= $paymentToApply;
+                }
+            }
+
+            // Check if loan is fully paid (principal only - penalties are separate)
+            $totalPrincipalDue = $loan->repayments->sum('effective_amount_due');
+            $totalPrincipalPaid = $loan->repayments->sum('amount_paid');
+
+            if ($totalPrincipalPaid >= $totalPrincipalDue) {
+                $loan->status = 'completed';
+                $loan->save();
+            }
+
+            DB::commit();
+
+            return redirect()->route('collector.payments.receipt', $transaction)
+                ->with('success', 'Paiement collecté avec succès. Reçu généré : ' . $receiptNumber);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Erreur lors du traitement du paiement : ' . $e->getMessage())
+                ->withInput();
         }
-
-        // Check if already paid
-        if ($repayment->status === 'paid') {
-            return back()->with('error', 'Ce remboursement a déjà été payé.');
-        }
-
-        // Calculate amount due (principal + interest + penalties)
-        $amountDue = $repayment->effective_amount_due - $repayment->amount_paid;
-        $calculatedPenalty = $repayment->calculated_penalty;
-
-        if ($request->amount > $amountDue + $calculatedPenalty) {
-            return back()->with('error', 'Le montant ne peut pas dépasser le total dû (capital + intérêts + pénalités).');
-        }
-
-        // Create payment transaction
-        $transaction = PaymentTransaction::create([
-            'sacco_id' => $collector->sacco_id,
-            'user_id' => $repayment->loanApplication->user_id,
-            'loan_repayment_id' => $repayment->id,
-            'amount' => $request->amount,
-            'payment_type' => 'loan_repayment',
-            'payment_method' => $request->payment_method,
-            'reference_number' => $request->transaction_reference,
-            'notes' => $request->notes,
-            'recorded_by' => $collector->id,
-            'status' => 'completed',
-            'payment_date' => now(),
-        ]);
-
-        // Update loan repayment
-        $repayment->amount_paid += $request->amount;
-        $repayment->total_paid += $request->amount;
-        $repayment->paid_date = now();
-        $repayment->recorded_by = $collector->id;
-
-        if ($repayment->amount_paid >= $repayment->effective_amount_due) {
-            $repayment->status = 'paid';
-        } elseif ($repayment->amount_paid > 0) {
-            $repayment->status = 'partial';
-        }
-
-        $repayment->save();
-
-        // Check if loan is completed
-        $loan = $repayment->loanApplication;
-        $allPaid = $loan->repayments()->where('status', '!=', 'paid')->count() === 0;
-        if ($allPaid) {
-            $loan->status = 'completed';
-            $loan->save();
-        }
-
-        return back()->with('success', 'Paiement collecté avec succès. Reçu généré.');
     }
 
     /**
@@ -137,21 +312,24 @@ class CollectorController extends Controller
     {
         $collector = auth()->user();
         $saccoId = $collector->sacco_id;
+        $sacco = $collector->sacco;
+        $zoneIds = $this->getCollectorZoneIds();
 
-        // Get members in collector's zone
+        // Get members in collector's zones
         $membersQuery = User::where('sacco_id', $saccoId)
             ->where('status', 'active')
             ->whereHas('roles', function ($q) {
                 $q->where('name', 'member');
             });
 
-        if ($collector->collection_zone) {
-            $membersQuery->where('collection_zone', $collector->collection_zone);
+        // Filter by collector's assigned zones
+        if (!empty($zoneIds)) {
+            $membersQuery->whereIn('zone_id', $zoneIds);
         }
 
         $members = $membersQuery->orderBy('name')->get();
 
-        return view('collector.savings.create', compact('members'));
+        return view('collector.savings.create', compact('members', 'sacco'));
     }
 
     /**
@@ -171,10 +349,11 @@ class CollectorController extends Controller
 
         $collector = auth()->user();
         $member = User::findOrFail($request->member_id);
+        $zoneIds = $this->getCollectorZoneIds();
 
-        // Verify member belongs to collector's zone
-        if ($collector->collection_zone && $member->collection_zone !== $collector->collection_zone) {
-            return back()->with('error', 'Ce membre n\'est pas dans votre zone de collecte.');
+        // Verify member belongs to collector's zones
+        if (!empty($zoneIds) && !$zoneIds->contains($member->zone_id)) {
+            return back()->with('error', 'Vous n\'êtes pas autorisé à effectuer une opération pour un membre en dehors de vos zones assignées.');
         }
 
         // Get member's current savings balance
@@ -225,12 +404,13 @@ class CollectorController extends Controller
 
         $collector = auth()->user();
         $member = User::findOrFail($request->member_id);
+        $zoneIds = $this->getCollectorZoneIds();
 
-        // Verify member belongs to collector's zone
-        if ($collector->collection_zone && $member->collection_zone !== $collector->collection_zone) {
+        // Verify member belongs to collector's zones
+        if (!empty($zoneIds) && !$zoneIds->contains($member->zone_id)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ce membre n\'est pas dans votre zone de collecte.'
+                'message' => 'Ce membre n\'est pas dans vos zones de collecte assignées.'
             ], 403);
         }
 
@@ -287,7 +467,7 @@ class CollectorController extends Controller
                 'membership_number' => $member->membership_number,
                 'email' => $member->email,
                 'phone_number' => $member->phone_number,
-                'collection_zone' => $member->collection_zone,
+                'collection_zone' => $member->zone?->name ?? $member->collection_zone,
                 'savings_balance' => $currentBalance,
                 'pending_repayments_count' => $pendingRepayments,
                 'total_loan_balance' => $totalLoanBalance,
@@ -358,11 +538,30 @@ class CollectorController extends Controller
             ->sum('amount');
 
         return view('collector.transactions.index', compact(
+            'sacco',
             'loanTransactions',
             'savingsTransactions',
             'totalCollected',
             'totalDeposits',
             'totalWithdrawals'
         ));
+    }
+
+    /**
+     * Print receipt for a payment transaction
+     */
+    public function printReceipt(PaymentTransaction $transaction)
+    {
+        $collector = auth()->user();
+
+        // Verify this transaction belongs to the collector
+        if ($transaction->recorded_by !== $collector->id) {
+            abort(403, 'Accès non autorisé à ce reçu.');
+        }
+
+        $transaction->load(['user', 'loanRepayment.loanApplication', 'recorder']);
+        $sacco = $collector->sacco;
+
+        return view('collector.payments.receipt', compact('transaction', 'sacco'));
     }
 }

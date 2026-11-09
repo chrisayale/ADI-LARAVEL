@@ -35,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure CSRF token validation exceptions for AJAX endpoints
         $middleware->validateCsrfTokens(except: [
             'admin/loans/find-member-qr',
+            'collector/payments/find-member-qr',
         ]);
 
         // Add middleware to groups if needed
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\TenantMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

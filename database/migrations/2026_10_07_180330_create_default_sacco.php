@@ -18,7 +18,7 @@ return new class extends Migration
             'code' => 'DEFAULT',
             'registration_number' => 'MIGRATION-' . strtoupper(Str::random(10)),
             'status' => 'active',
-            'primary_currency' => 'USD',
+            'primary_currency' => 'CDF',
             'secondary_currency' => 'CDF',
             'created_at' => now(),
             'updated_at' => now(),

@@ -391,6 +391,15 @@ Route::middleware(['auth', 'role:collector'])->prefix('collector')->name('collec
     Route::prefix('payments')->name('payments.')->group(function () {
         Route::get('/collect', [\App\Http\Controllers\Collector\CollectorController::class, 'collect'])->name('collect');
         Route::post('/process', [\App\Http\Controllers\Collector\CollectorController::class, 'processCollection'])->name('process');
+
+        // QR Code / Member Search
+        Route::post('/find-member-qr', [\App\Http\Controllers\Collector\CollectorController::class, 'findMemberByQrCode'])->name('find-member-qr');
+
+        // Member details AJAX (for refresh button)
+        Route::get('/get-member-details', [\App\Http\Controllers\Collector\CollectorController::class, 'getMemberDetails'])->name('get-member-details');
+
+        // Receipt
+        Route::get('/receipt/{transaction}', [\App\Http\Controllers\Collector\CollectorController::class, 'printReceipt'])->name('receipt');
     });
 
     // Savings Management

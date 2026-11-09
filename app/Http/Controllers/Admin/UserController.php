@@ -143,7 +143,7 @@ class UserController extends Controller
             'code' => 'KZF',
             'registration_number' => 'KZF-' . strtoupper(\Illuminate\Support\Str::random(10)),
             'status' => 'active',
-            'primary_currency' => 'USD',
+            'primary_currency' => 'CDF',
             'secondary_currency' => 'CDF',
         ]
     );

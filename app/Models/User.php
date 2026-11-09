@@ -54,6 +54,31 @@ class User extends Authenticatable
         return $this->belongsTo(Sacco::class);
     }
 
+    /**
+     * Get the zone this member belongs to.
+     */
+    public function zone()
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
+     * Get the zones assigned to this collector.
+     */
+    public function zones()
+    {
+        return $this->belongsToMany(Zone::class, 'collector_zone', 'collector_id', 'zone_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the zone IDs assigned to this collector.
+     */
+    public function getZoneIdsAttribute()
+    {
+        return $this->zones()->pluck('zones.id');
+    }
+
 
 /**
  * Get the loan applications where this user is the primary applicant

@@ -22,7 +22,7 @@ class DemoSaccoSeeder extends Seeder
                 'mobile_money' => '+250 788 123 456',
                 'official_email' => 'info@umojasacco.rw',
                 'physical_address' => 'Kigali, Rwanda',
-                'primary_currency' => 'USD',
+                'primary_currency' => 'CDF',
                 'secondary_currency' => 'CDF',
                 'status' => 'active',
                 'settings' => [
@@ -41,7 +41,7 @@ class DemoSaccoSeeder extends Seeder
                 'mobile_money' => '+250 788 987 654',
                 'official_email' => 'info@twigasacco.rw',
                 'physical_address' => 'Gisenyi, Rwanda',
-                'primary_currency' => 'USD',
+                'primary_currency' => 'CDF',
                 'secondary_currency' => 'CDF',
                 'status' => 'active',
                 'settings' => [

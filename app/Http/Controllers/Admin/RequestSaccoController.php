@@ -110,7 +110,7 @@ class RequestSaccoController extends Controller
             'physical_address' => $requestSacco->address,
             'mobile_money' => $requestSacco->phone_number,
             'official_email' => $officialEmail,
-            'primary_currency' => 'USD', // Default values
+            'primary_currency' => 'CDF', // Default values
             'secondary_currency' => 'CDF', // Default values
             'status' => 'active',
             'settings' => $requestSacco->settings,

@@ -105,7 +105,7 @@ class SaccoController extends Controller
             'mobile_money' => $request->phone_number,
             'official_email' => $request->email,
             'physical_address' => $request->address,
-            'primary_currency' => 'USD', // Default values
+            'primary_currency' => 'CDF', // Default values
             'secondary_currency' => 'CDF', // Default values
             'status' => 'active', // Default status
             'settings' => $settings,

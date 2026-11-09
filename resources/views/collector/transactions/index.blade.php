@@ -30,7 +30,7 @@
                                 {{ __('total_loan_collections') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($totalCollected, 2) }} {{ __('currency') }}
+                                {{ number_format($totalCollected, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -50,7 +50,7 @@
                                 {{ __('total_deposits') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($totalDeposits, 2) }} {{ __('currency') }}
+                                {{ number_format($totalDeposits, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -70,7 +70,7 @@
                                 {{ __('total_withdrawals') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ number_format($totalWithdrawals, 2) }} {{ __('currency') }}
+                                {{ number_format($totalWithdrawals, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -149,7 +149,7 @@
                                     </td>
                                     <td><code>{{ $transaction->loanRepayment->loanApplication->loan_reference }}</code></td>
                                     <td>#{{ $transaction->loanRepayment->installment_number }}</td>
-                                    <td class="font-weight-bold text-success">{{ number_format($transaction->amount, 2) }}</td>
+                                    <td class="font-weight-bold text-success">{{ number_format($transaction->amount, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}</td>
                                     <td>
                                         <span class="badge badge-{{ $transaction->payment_method === 'cash' ? 'success' : ($transaction->payment_method === 'mpesa' ? 'info' : 'secondary') }}">
                                             {{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}
@@ -214,9 +214,9 @@
                                         </span>
                                     </td>
                                     <td class="font-weight-bold {{ $transaction->transaction_type === 'deposit' ? 'text-success' : 'text-warning' }}">
-                                        {{ number_format($transaction->amount, 2) }}
+                                        {{ number_format($transaction->amount, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}
                                     </td>
-                                    <td>{{ number_format($transaction->balance_after, 2) }}</td>
+                                    <td>{{ number_format($transaction->balance_after, 2) }} {{ $sacco->primary_currency ?? 'CDF' }}</td>
                                     <td>
                                         <span class="badge badge-{{ $transaction->payment_method === 'cash' ? 'success' : ($transaction->payment_method === 'mpesa' ? 'info' : 'secondary') }}">
                                             {{ ucfirst(str_replace('_', ' ', $transaction->payment_method)) }}
